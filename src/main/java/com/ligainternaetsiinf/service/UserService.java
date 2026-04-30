@@ -30,14 +30,10 @@ public class UserService {
         return (new UserResponse(user.getId(), user.getUsername()));
     }
 
-    public LoginResponse loginUser(String email, String password){
+    public LoginResponse loginUser(String email){
         Optional<User> aux = userRepository.findByEmail(email);
         if(!aux.isPresent()){
             throw new RuntimeException("No existe ninguna cuenta asignada a este correo");
-        }
-
-        if(!passwordEncoder.matches(password, aux.get().getPassword())){
-            throw new RuntimeException("Contraseña incorrecta");
         }
 
         return (new LoginResponse(aux.get().getId(), aux.get().getUsername(), aux.get().getRole()));

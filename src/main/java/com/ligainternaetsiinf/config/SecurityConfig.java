@@ -13,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 
 @Configuration
@@ -29,7 +30,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable()
+            .csrf(csrf -> 
+                csrf .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()) 
+                .ignoringRequestMatchers("/users/login", "/users/register") 
             )
             .formLogin(login -> login.disable()) // Desactiva login form html proporcionada por spring security para implementarlo solo a traves de peticion REST
             .httpBasic(basic -> basic.disable())

@@ -50,9 +50,4 @@ public class JugadorController {
 
         jugadorService.eliminarJugador(id);
     }
-
-    @GetMapping("/debug-auth")
-    public String debug(Authentication auth) {
-        return auth == null ? "NULL" : auth.getName() + " " + auth.getAuthorities();
-    }
 }

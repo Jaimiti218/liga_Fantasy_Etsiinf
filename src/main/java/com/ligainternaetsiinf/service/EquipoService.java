@@ -87,11 +87,22 @@ public class EquipoService {
                 if(jugador.getEquipo() != null && !jugador.getEquipo().getId().equals(id)){
                     throw new RuntimeException("El jugador " + equipoActualizado.getJugadores().get(i) + " ya pertenece al equipo " + jugador.getEquipo().getName());
                 }
-                jugador.setEquipo(equipoAModificar);
-                jugadorRepository.save(jugador);
+                if(!equipoAModificar.getJugadores().contains(jugador)){ /*esto es en caso de que ese jugador no estuviese en el equipo, porque si ya 
+                    estaba no es necesario poner este codigo */
+                    jugador.setEquipo(equipoAModificar);
+                    jugadorRepository.save(jugador);
 
-                jugadores.add(jugador);
+                    jugadores.add(jugador);
+                }
+                
                 i++;
+            }
+
+            for(Jugador j : equipoAModificar.getJugadores()){
+                if(!equipoActualizado.getJugadores().contains(j)){ /*esto es para cuando has eliminado a un jugador del equipo */
+                    j.setEquipo(null);
+                    jugadorRepository.save(j);
+                }
             }
         }
 

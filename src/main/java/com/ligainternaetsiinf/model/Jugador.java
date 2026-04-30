@@ -12,6 +12,7 @@ public class Jugador {
     private String fullName;
 
     @ManyToOne
+    @JoinColumn(name = "equipo_id")
     private Equipo equipo;
 
     private boolean esPortero;

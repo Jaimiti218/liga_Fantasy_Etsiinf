@@ -45,16 +45,31 @@ function renderizarTabla(equipos) {
         return;
     }
 
-    tbody.innerHTML = equipos.map(e => `
+    tbody.innerHTML = equipos.map(e => {
+        const jugadoresB64 = btoa(unescape(encodeURIComponent(JSON.stringify(e.jugadores))));
+        return `
         <tr>
             <td>${e.name}</td>
             <td>${e.jugadores.length > 0 ? e.jugadores.join(', ') : '—'}</td>
             <td>
-                <button class="btn-accion" title="Editar" onclick="abrirModalEditar(${e.id}, '${escapar(e.name)}', ${JSON.stringify(e.jugadores)})">✏️</button>
-                <button class="btn-accion" title="Eliminar" onclick="eliminarEquipo(${e.id}, '${escapar(e.name)}')">🗑️</button>
+                <button class="btn-accion" title="Editar"
+                    data-id="${e.id}"
+                    data-nombre="${escapar(e.name)}"
+                    data-jugadores="${jugadoresB64}"
+                    onclick="abrirModalEditarDesdeBoton(this)">✏️</button>
+                <button class="btn-accion" title="Eliminar"
+                    onclick="eliminarEquipo(${e.id}, '${escapar(e.name)}')">🗑️</button>
             </td>
-        </tr>
-    `).join('');
+        </tr>`;
+    }).join('');
+}
+
+
+function abrirModalEditarDesdeBoton(boton) {
+    const id        = parseInt(boton.dataset.id);
+    const nombre    = boton.dataset.nombre;
+    const jugadores = JSON.parse(decodeURIComponent(escape(atob(boton.dataset.jugadores))));
+    abrirModalEditar(id, nombre, jugadores);
 }
 
 // ─── Modal crear ──────────────────────────────────────────────────────────────
@@ -134,17 +149,25 @@ function renderizarTags() {
 // ─── Guardar ─────────────────────────────────────────────────────────────────
 async function guardarEquipo() {
     const nombre = document.getElementById('input-nombre').value.trim();
+    const inputBuscar = document.getElementById('input-jugador-buscar').value.trim();
 
     if (!nombre) {
         mostrarErrorModal('El nombre del equipo es obligatorio.');
         return;
     }
 
+    // Si hay texto en el buscador sin confirmar, añadirlo a la lista
+    if (inputBuscar && !jugadoresSeleccionados.includes(inputBuscar)) {
+        jugadoresSeleccionados.push(inputBuscar);
+        document.getElementById('input-jugador-buscar').value = '';
+        document.getElementById('sugerencias-jugador').classList.add('hidden');
+        renderizarTags();
+    }
+
     try {
         let res;
 
         if (!modoEdicion) {
-            // CREAR — body: { name, jugadores: [{fullName}] }
             const body = {
                 name: nombre,
                 jugadores: jugadoresSeleccionados.map(n => ({ fullName: n }))
@@ -155,7 +178,6 @@ async function guardarEquipo() {
                 body: JSON.stringify(body)
             });
         } else {
-            // EDITAR — body: { nombre, jugadores: [string] }
             const body = {
                 nombre: nombre,
                 jugadores: jugadoresSeleccionados

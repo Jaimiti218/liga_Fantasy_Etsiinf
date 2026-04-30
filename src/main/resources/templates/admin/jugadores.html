@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar Jugadores – Liga ETSIINF</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-izquierda">
+            <button class="btn-nav" onclick="window.location.href='/admin'">← Volver</button>
+            <span class="logo">👤 Gestionar Jugadores</span>
+        </div>
+    </nav>
+
+    <main class="gestion-contenido">
+
+        <div class="barra-acciones">
+            <button class="btn-crear" onclick="abrirModalCrear()">+ Crear jugador</button>
+        </div>
+
+        <div id="mensaje-global" class="mensaje-global hidden"></div>
+
+        <table class="tabla-gestion" id="tabla-jugadores">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Equipo</th>
+                    <th>Portero</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="tbody-jugadores">
+                <tr><td colspan="4" class="cargando">Cargando jugadores...</td></tr>
+            </tbody>
+        </table>
+    </main>
+
+    <!-- MODAL CREAR / EDITAR -->
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <div class="modal">
+            <h3 id="modal-titulo">Crear jugador</h3>
+
+            <div id="error-modal" class="mensaje-error hidden"></div>
+
+            <div class="campo">
+                <label>Nombre completo</label>
+                <input type="text" id="input-nombre" placeholder="Ej: Pablo García López" />
+            </div>
+
+            <div class="campo">
+                <label>Equipo</label>
+                <input type="text" id="input-equipo" placeholder="Nombre del equipo (opcional)"
+                       oninput="autocompletarEquipo(this.value)" autocomplete="off"/>
+                <ul id="sugerencias-equipo" class="sugerencias hidden"></ul>
+            </div>
+
+            <div class="campo campo-horizontal">
+                <label>¿Es portero?</label>
+                <input type="checkbox" id="input-portero" />
+            </div>
+
+            <div class="modal-botones">
+                <button class="btn-primary" onclick="guardarJugador()">Guardar</button>
+                <button class="btn-ghost" onclick="cerrarModal()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/admin-jugadores.js}"></script>
+</body>
+</html>

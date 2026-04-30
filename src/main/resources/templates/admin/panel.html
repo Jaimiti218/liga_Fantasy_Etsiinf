@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin – Liga ETSIINF</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-izquierda">
+            <button class="btn-nav" onclick="window.location.href='/'">← Volver</button>
+            <span class="logo">🛠 Panel de Administración</span>
+        </div>
+        <div class="nav-derecha">
+            <span id="saludo-usuario" class="saludo"></span>
+        </div>
+    </nav>
+
+    <main class="panel-contenido">
+        <h2>¿Qué quieres gestionar?</h2>
+        <div class="panel-botones">
+            <button class="btn-panel" onclick="window.location.href='/admin/jugadores'">
+                👤 Gestionar Jugadores
+            </button>
+            <button class="btn-panel" onclick="window.location.href='/admin/equipos'">
+                🏟 Gestionar Equipos
+            </button>
+        </div>
+    </main>
+
+    <script th:src="@{/js/admin-panel.js}"></script>
+</body>
+</html>

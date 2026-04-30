@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fantasy ETSIINF – Acceso</title>
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+</head>
+<body>
+
+    <div class="auth-wrapper">
+
+        <!-- LOGO / CABECERA -->
+        <div class="auth-header">
+            <h1>⚽ Liga ETSIINF</h1>
+            <p>Fantasy</p>
+        </div>
+
+        <!-- PANTALLA: ya logueado -->
+        <div id="vista-ya-logueado" class="auth-card hidden">
+            <p class="bienvenida">👋 Bienvenido de nuevo, <strong id="nombre-usuario"></strong></p>
+            <button class="btn btn-primary" onclick="entrarAlFantasy()">Entrar al Fantasy</button>
+            <button class="btn btn-ghost" onclick="cerrarSesion()">No soy yo, cerrar sesión</button>
+        </div>
+
+        <!-- PANTALLA: login -->
+        <div id="vista-login" class="auth-card hidden">
+            <h2>Iniciar sesión</h2>
+
+            <div id="error-login" class="mensaje-error hidden"></div>
+
+            <div class="campo">
+                <label for="email-login">Correo electrónico</label>
+                <input type="email" id="email-login" placeholder="tu@correo.com" />
+            </div>
+
+            <div class="campo">
+                <label for="password-login">Contraseña</label>
+                <div class="input-password">
+                    <input type="password" id="password-login" placeholder="Tu contraseña" />
+                    <button type="button" class="toggle-password" onclick="togglePassword('password-login', this)">👁</button>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="hacerLogin()">Iniciar sesión</button>
+            <button class="btn btn-secondary" onclick="mostrarRegistro()">¿No tienes cuenta? Regístrate</button>
+            <button class="btn btn-ghost" onclick="mostrarOlvidePassword()">Olvidé mi contraseña</button>
+        </div>
+
+        <!-- PANTALLA: registro -->
+        <div id="vista-registro" class="auth-card hidden">
+            <h2>Crear cuenta</h2>
+
+            <div id="error-registro" class="mensaje-error hidden"></div>
+            <div id="exito-registro" class="mensaje-exito hidden"></div>
+
+            <div class="campo">
+                <label for="username-registro">Nombre de usuario</label>
+                <input type="text" id="username-registro" placeholder="Cómo te llamarás en el fantasy" />
+            </div>
+
+            <div class="campo">
+                <label for="email-registro">Correo electrónico</label>
+                <input type="email" id="email-registro" placeholder="tu@correo.com" />
+            </div>
+
+            <div class="campo">
+                <label for="password-registro">Contraseña</label>
+                <div class="input-password">
+                    <input type="password" id="password-registro" placeholder="Mínimo 6 caracteres" />
+                    <button type="button" class="toggle-password" onclick="togglePassword('password-registro', this)">👁</button>
+                </div>
+            </div>
+
+            <div class="campo">
+                <label for="password-registro2">Repite la contraseña</label>
+                <div class="input-password">
+                    <input type="password" id="password-registro2" placeholder="Repite tu contraseña" />
+                    <button type="button" class="toggle-password" onclick="togglePassword('password-registro2', this)">👁</button>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="hacerRegistro()">Crear cuenta</button>
+            <button class="btn btn-ghost" onclick="mostrarLogin()">¿Ya tienes cuenta? Inicia sesión</button>
+        </div>
+
+        <!-- PANTALLA: olvidé contraseña -->
+        <div id="vista-olvide" class="auth-card hidden">
+            <h2>Recuperar contraseña</h2>
+            <p class="subtexto">Introduce tu correo y te enviaremos instrucciones para recuperar tu cuenta.</p>
+
+            <div id="error-olvide" class="mensaje-error hidden"></div>
+            <div id="exito-olvide" class="mensaje-exito hidden"></div>
+
+            <div class="campo">
+                <label for="email-olvide">Correo electrónico</label>
+                <input type="email" id="email-olvide" placeholder="tu@correo.com" />
+            </div>
+
+            <button class="btn btn-primary" onclick="enviarRecuperacion()">Enviar correo de recuperación</button>
+            <button class="btn btn-ghost" onclick="mostrarLogin()">Volver al inicio de sesión</button>
+        </div>
+
+    </div>
+
+    <script th:src="@{/js/auth.js}"></script>
+</body>
+</html>

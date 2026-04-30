@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liga ETSIINF</title>
+    <link rel="stylesheet" th:href="@{/css/inicio.css}">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-izquierda">
+            <span class="logo">⚽ Liga ETSIINF</span>
+            <button class="btn-nav" onclick="irAlFantasy()">Fantasy</button>
+            <button class="btn-nav btn-admin hidden" id="btn-gestionar" onclick="window.location.href='/admin'">
+                🛠 Gestionar Liga
+            </button>
+        </div>
+        <div class="nav-derecha">
+            <span id="saludo-usuario" class="saludo hidden"></span>
+            <button class="btn-nav btn-sesion" id="btn-sesion" onclick="manejarSesion()">Iniciar sesión</button>
+        </div>
+    </nav>
+
+    <main class="contenido">
+        <div class="hero">
+            <h1>Bienvenido a la Liga Interna ETSIINF</h1>
+            <p>Consulta clasificaciones, estadísticas y partidos de la liga de fútbol del campus.</p>
+        </div>
+
+        <div class="cards-placeholder">
+            <div class="card-info">
+                <h3>📅 Próximos partidos</h3>
+                <p class="proximamente">Próximamente disponible</p>
+            </div>
+            <div class="card-info">
+                <h3>🏆 Clasificación</h3>
+                <p class="proximamente">Próximamente disponible</p>
+            </div>
+            <div class="card-info">
+                <h3>📰 Noticias</h3>
+                <p class="proximamente">Próximamente disponible</p>
+            </div>
+        </div>
+    </main>
+
+    <script th:src="@{/js/inicio.js}"></script>
+</body>
+</html>

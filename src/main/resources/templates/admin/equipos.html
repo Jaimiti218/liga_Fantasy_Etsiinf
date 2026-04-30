@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar Equipos – Liga ETSIINF</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-izquierda">
+            <button class="btn-nav" onclick="window.location.href='/admin'">← Volver</button>
+            <span class="logo">🏟 Gestionar Equipos</span>
+        </div>
+    </nav>
+
+    <main class="gestion-contenido">
+
+        <div class="barra-acciones">
+            <button class="btn-crear" onclick="abrirModalCrear()">+ Crear equipo</button>
+        </div>
+
+        <div id="mensaje-global" class="mensaje-global hidden"></div>
+
+        <table class="tabla-gestion" id="tabla-equipos">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Jugadores</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="tbody-equipos">
+                <tr><td colspan="3" class="cargando">Cargando equipos...</td></tr>
+            </tbody>
+        </table>
+    </main>
+
+    <!-- MODAL CREAR / EDITAR -->
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <div class="modal">
+            <h3 id="modal-titulo">Crear equipo</h3>
+
+            <div id="error-modal" class="mensaje-error hidden"></div>
+
+            <div class="campo">
+                <label>Nombre del equipo</label>
+                <input type="text" id="input-nombre" placeholder="Ej: Los Tigres" />
+            </div>
+
+            <div class="campo">
+                <label>Jugadores (opcional)</label>
+                <input type="text" id="input-jugador-buscar" placeholder="Buscar jugador..."
+                       oninput="autocompletarJugador(this.value)" autocomplete="off"/>
+                <ul id="sugerencias-jugador" class="sugerencias hidden"></ul>
+                <div id="jugadores-seleccionados" class="tags-container"></div>
+            </div>
+
+            <div class="modal-botones">
+                <button class="btn-primary" onclick="guardarEquipo()">Guardar</button>
+                <button class="btn-ghost" onclick="cerrarModal()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/admin-equipos.js}"></script>
+</body>
+</html>

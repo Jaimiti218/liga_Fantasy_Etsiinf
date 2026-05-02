@@ -3,6 +3,7 @@ package com.ligainternaetsiinf.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,6 +26,7 @@ public class EquipoController {
     @Autowired
     private EquipoService equipoService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public Equipo crearEquipo(@RequestBody Equipo equipo){
         return equipoService.crearEquipo(equipo);
@@ -35,12 +37,14 @@ public class EquipoController {
         return equipoService.listarEquipos();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public Equipo editarEquipo(@PathVariable Integer id, @RequestBody EquipoUpdateDTO dto){
 
         return equipoService.editarEquipo(id, dto);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public void eliminarEquipo(@PathVariable Integer id){
 

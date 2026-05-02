@@ -37,12 +37,7 @@ function obtenerSesion() {
 }
 
 function cerrarSesion() {
-    if (confirm('¿Seguro que quieres cerrar sesión?')) {
-        localStorage.removeItem('userId');
-        localStorage.removeItem('username');
-        localStorage.removeItem('role');
-        mostrarVista('vista-login');
-    }
+    cerrarSesionCompleta();
 }
 
 // ─── Redirección tras login ───────────────────────────────────────────────────
@@ -74,6 +69,7 @@ async function hacerLogin() {
         const respuesta = await fetch('/users/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify({ email, password })
         });
 
@@ -118,6 +114,7 @@ async function hacerRegistro() {
         const respuesta = await fetch('/users/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify({ email, username, password })
         });
 

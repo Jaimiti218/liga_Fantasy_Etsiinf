@@ -1,16 +1,12 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const userId   = localStorage.getItem('userId');
-    const username = localStorage.getItem('username');
-    const role     = localStorage.getItem('role');
+document.addEventListener('DOMContentLoaded', async () => {
+    const usuario = await obtenerUsuarioActual();
 
-    if (userId && username) {
-        // Hay sesión: mostrar saludo y cambiar botón a "Cerrar sesión"
-        document.getElementById('saludo-usuario').textContent = '👋 ' + username;
+    if (usuario) {
+        document.getElementById('saludo-usuario').textContent = '👋 ' + usuario.username;
         document.getElementById('saludo-usuario').classList.remove('hidden');
         document.getElementById('btn-sesion').textContent = 'Cerrar sesión';
 
-        // Si es admin, mostrar botón de gestión
-        if (role === 'ADMIN') {
+        if (usuario.role === 'ADMIN') {
             document.getElementById('btn-gestionar').classList.remove('hidden');
         }
     }
@@ -19,15 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
 function manejarSesion() {
     const userId = localStorage.getItem('userId');
     if (userId) {
-        // Hay sesión → cerrar sesión
-        if (confirm('¿Seguro que quieres cerrar sesión?')) {
-            localStorage.removeItem('userId');
-            localStorage.removeItem('username');
-            localStorage.removeItem('role');
-            window.location.reload();
-        }
+        cerrarSesionCompleta();
     } else {
-        // No hay sesión → ir al login con redirect a home
         window.location.href = '/fantasy/auth?redirect=home';
     }
 }

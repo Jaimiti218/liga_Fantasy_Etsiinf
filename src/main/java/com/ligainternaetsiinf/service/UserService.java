@@ -16,6 +16,8 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    private static final String HASH_FALSO = "$2a$10$abcdefghijklmnopqrstuuABCDEFGHIJKLMNOPQRSTUVWXYZ012345";
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -27,13 +29,14 @@ public class UserService {
 
         User user = new User(email, passwordEncoder.encode(password), username);
         userRepository.save(user);
-        return (new UserResponse(user.getId(), user.getUsername()));
+        return (new UserResponse(user.getId(), user.getUsername(), user.getRole()));
     }
 
     public LoginResponse loginUser(String email){
         Optional<User> aux = userRepository.findByEmail(email);
         if(!aux.isPresent()){
-            throw new RuntimeException("No existe ninguna cuenta asignada a este correo");
+            
+            throw new RuntimeException("El correo o la contraseña son incorrectos"); 
         }
 
         return (new LoginResponse(aux.get().getId(), aux.get().getUsername(), aux.get().getRole()));

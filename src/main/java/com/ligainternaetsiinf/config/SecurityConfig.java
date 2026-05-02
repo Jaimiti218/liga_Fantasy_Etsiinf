@@ -30,18 +30,26 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> 
-                csrf .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()) 
-                .ignoringRequestMatchers("/users/login", "/users/register") 
+            .csrf(csrf -> csrf
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .ignoringRequestMatchers("/users/login", "/users/register", "/logout")
             )
-            .formLogin(login -> login.disable()) // Desactiva login form html proporcionada por spring security para implementarlo solo a traves de peticion REST
+            .formLogin(login -> login.disable())
             .httpBasic(basic -> basic.disable())
             .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/users/register", "/users/login").permitAll()
-                    .anyRequest().authenticated()
+                // Recursos estáticos — siempre públicos
+                .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
+                // Páginas HTML públicas
+                .requestMatchers("/", "/fantasy/auth").permitAll()
+                // Endpoints públicos de la API
+                .requestMatchers("/users/register", "/users/login", "/users/me").permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/jugadores").permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/equipos").permitAll()
+                // Todo lo demás requiere autenticación
+                .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
-                    .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
             )
             .securityContext(securityContext ->
                 securityContext.securityContextRepository(

@@ -4,16 +4,20 @@ let modoEdicion         = false;
 let idEditando          = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
-    verificarAdmin();
-    await cargarJugadores();
-    await cargarEquipos();
+    const esAdmin = await verificarAdmin();
+    if (!esAdmin) return;
+    await cargarJugadores(); // o cargarEquipos()
+    await cargarEquipos();   // o cargarJugadores()
 });
 
-function verificarAdmin() {
-    if (localStorage.getItem('role') !== 'ADMIN') {
+async function verificarAdmin() {
+    const usuario = await obtenerUsuarioActual();
+    if (!usuario || usuario.role !== 'ADMIN') {
         alert('No tienes permisos para acceder a esta página.');
         window.location.href = '/';
+        return false;
     }
+    return true;
 }
 
 // ─── Cargar datos ─────────────────────────────────────────────────────────────

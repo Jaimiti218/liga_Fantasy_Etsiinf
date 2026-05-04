@@ -178,7 +178,8 @@ async function guardarEquipo() {
             };
             res = await fetch('/equipos', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'X-XSRF-TOKEN': obtenerCsrfToken() },
+                credentials: 'include',
                 body: JSON.stringify(body)
             });
         } else {
@@ -188,7 +189,8 @@ async function guardarEquipo() {
             };
             res = await fetch(`/equipos/${idEditando}`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json' , 'X-XSRF-TOKEN': obtenerCsrfToken()},
+                credentials: 'include',
                 body: JSON.stringify(body)
             });
         }
@@ -213,7 +215,7 @@ async function eliminarEquipo(id, nombre) {
     if (!confirm(`¿Seguro que quieres eliminar el equipo "${nombre}"?`)) return;
 
     try {
-        const res = await fetch(`/equipos/${id}`, { method: 'DELETE' });
+        const res = await fetch(`/equipos/${id}`, { method: 'DELETE', credentials: 'include', 'X-XSRF-TOKEN': obtenerCsrfToken() });
 
         if (!res.ok) {
             mostrarMensajeGlobal('Error al eliminar el equipo.', 'error');

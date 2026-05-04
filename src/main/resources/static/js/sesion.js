@@ -16,16 +16,12 @@ async function cerrarSesionCompleta() {
     try {
         await fetch('/logout', { 
             method: 'POST',
-            credentials: 'include',
-            headers: { 'X-XSRF-TOKEN': obtenerCsrfToken() }
+            credentials: 'include'
+            // ya no hace falta el X-XSRF-TOKEN
         });
     } catch (e) {}
     
-    // Limpiar localStorage también por si acaso
-    localStorage.removeItem('userId');
     localStorage.removeItem('username');
-    localStorage.removeItem('role');
-    
     window.location.href = '/';
 }
 

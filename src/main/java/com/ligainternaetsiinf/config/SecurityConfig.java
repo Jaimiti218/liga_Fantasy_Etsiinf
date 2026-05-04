@@ -32,7 +32,7 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                .ignoringRequestMatchers("/users/login", "/users/register", "/logout")
+                .ignoringRequestMatchers("/users/login", "/users/register", "/jugadores/**", "/equipos/**", "/ligas-fantasy/**")
             )
             .formLogin(login -> login.disable())
             .httpBasic(basic -> basic.disable())

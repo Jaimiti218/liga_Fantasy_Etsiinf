@@ -141,7 +141,8 @@ async function guardarJugador() {
             };
             res = await fetch('/jugadores', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json' , 'X-XSRF-TOKEN': obtenerCsrfToken()},
+                credentials: 'include',
                 body: JSON.stringify(body)
             });
         } else {
@@ -153,7 +154,8 @@ async function guardarJugador() {
             };
             res = await fetch(`/jugadores/${idEditando}`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'X-XSRF-TOKEN': obtenerCsrfToken() },
+                credentials: 'include',
                 body: JSON.stringify(body)
             });
         }
@@ -178,7 +180,7 @@ async function eliminarJugador(id, nombre) {
     if (!confirm(`¿Seguro que quieres eliminar a "${nombre}"?`)) return;
 
     try {
-        const res = await fetch(`/jugadores/${id}`, { method: 'DELETE' });
+        const res = await fetch(`/jugadores/${id}`, { method: 'DELETE', credentials: 'include','X-XSRF-TOKEN': obtenerCsrfToken() });
 
         if (!res.ok) {
             mostrarMensajeGlobal('Error al eliminar el jugador.', 'error');

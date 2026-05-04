@@ -16,8 +16,6 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    private static final String HASH_FALSO = "$2a$10$abcdefghijklmnopqrstuuABCDEFGHIJKLMNOPQRSTUVWXYZ012345";
-
     @Autowired
     private PasswordEncoder passwordEncoder;
 

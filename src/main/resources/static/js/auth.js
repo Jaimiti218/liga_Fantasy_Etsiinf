@@ -1,6 +1,5 @@
-// ─── Al cargar la página, decidir qué vista mostrar ───────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-    const usuario = obtenerSesion();
+document.addEventListener('DOMContentLoaded', async () => {
+    const usuario = await obtenerUsuarioActual();
     if (usuario) {
         document.getElementById('nombre-usuario').textContent = usuario.username;
         mostrarVista('vista-ya-logueado');
@@ -9,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// ─── Gestión de vistas ────────────────────────────────────────────────────────
 function mostrarVista(idVista) {
     const vistas = ['vista-ya-logueado', 'vista-login', 'vista-registro', 'vista-olvide'];
     vistas.forEach(id => {
@@ -22,25 +20,6 @@ function mostrarLogin()          { mostrarVista('vista-login');    limpiarMensaj
 function mostrarRegistro()       { mostrarVista('vista-registro'); limpiarMensajes(); }
 function mostrarOlvidePassword() { mostrarVista('vista-olvide');   limpiarMensajes(); }
 
-// ─── Sesión en localStorage ───────────────────────────────────────────────────
-function guardarSesion(userId, username, role) {
-    localStorage.setItem('userId',   userId);
-    localStorage.setItem('username', username);
-    localStorage.setItem('role',     role ?? 'USER');
-}
-
-function obtenerSesion() {
-    const userId   = localStorage.getItem('userId');
-    const username = localStorage.getItem('username');
-    if (userId && username) return { userId, username };
-    return null;
-}
-
-function cerrarSesion() {
-    cerrarSesionCompleta();
-}
-
-// ─── Redirección tras login ───────────────────────────────────────────────────
 function obtenerRedirect() {
     const params = new URLSearchParams(window.location.search);
     return params.get('redirect');
@@ -55,7 +34,10 @@ function entrarTrasLogin() {
     }
 }
 
-// ─── LOGIN ────────────────────────────────────────────────────────────────────
+function entrarAlFantasy() {
+    window.location.href = '/fantasy/mis-ligas';
+}
+
 async function hacerLogin() {
     const email    = document.getElementById('email-login').value.trim();
     const password = document.getElementById('password-login').value;
@@ -79,8 +61,11 @@ async function hacerLogin() {
             return;
         }
 
+        // La cookie JSESSIONID ya se guardó automáticamente
+        // Guardamos solo lo necesario para la UI en localStorage
         const datos = await respuesta.json();
-        guardarSesion(datos.id, datos.username, datos.role);
+        localStorage.setItem('username', datos.username);
+
         entrarTrasLogin();
 
     } catch (e) {
@@ -88,7 +73,6 @@ async function hacerLogin() {
     }
 }
 
-// ─── REGISTRO ─────────────────────────────────────────────────────────────────
 async function hacerRegistro() {
     const username  = document.getElementById('username-registro').value.trim();
     const email     = document.getElementById('email-registro').value.trim();
@@ -124,11 +108,9 @@ async function hacerRegistro() {
             return;
         }
 
-        const datos = await respuesta.json();
         mostrarExito('exito-registro', '¡Cuenta creada! Iniciando sesión...');
 
         setTimeout(() => {
-            guardarSesion(datos.id, datos.username, datos.role);
             entrarTrasLogin();
         }, 1200);
 
@@ -137,7 +119,6 @@ async function hacerRegistro() {
     }
 }
 
-// ─── OLVIDÉ CONTRASEÑA ────────────────────────────────────────────────────────
 function enviarRecuperacion() {
     const email = document.getElementById('email-olvide').value.trim();
     if (!email) {
@@ -147,7 +128,6 @@ function enviarRecuperacion() {
     mostrarExito('exito-olvide', 'Si existe una cuenta con ese correo, recibirás un email en breve. (Función próximamente disponible)');
 }
 
-// ─── Mostrar/ocultar contraseña ───────────────────────────────────────────────
 function togglePassword(inputId, boton) {
     const input = document.getElementById(inputId);
     if (input.type === 'password') {
@@ -159,7 +139,10 @@ function togglePassword(inputId, boton) {
     }
 }
 
-// ─── Utilidades de mensajes ───────────────────────────────────────────────────
+function cerrarSesion() {
+    cerrarSesionCompleta();
+}
+
 function mostrarError(id, texto) {
     const el = document.getElementById(id);
     el.textContent = texto;

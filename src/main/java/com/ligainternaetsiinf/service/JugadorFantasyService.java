@@ -154,7 +154,7 @@ public class JugadorFantasyService {
             dueno = jf.getEquipoFantasy().getUser().getUsername();
         }
 
-        return new JugadorFantasyResponse(jf.getId(), jf.getJugadorReal().getId(), jf.getJugadorReal().getFullName(), jf.getJugadorReal().getEsPortero(),
+        return new JugadorFantasyResponse(jf.getId(), jf.getJugadorReal().getId(), jf.getJugadorReal().getFullName(), jf.getJugadorReal().getPosicion(),
         jf.getJugadorReal().getValorMercado(), jf.getLigaFantasy().getId(), jf.getLigaFantasy().getName(), equipoId, dueno, jf.getClausula());
     }
 }

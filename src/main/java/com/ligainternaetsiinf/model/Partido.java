@@ -24,16 +24,19 @@ public class Partido {
 
     private boolean jugado;
 
+    private Integer jornada;
+
     public Partido() {
     }
 
-    public Partido(Equipo equipoLocal, Equipo equipoVisitante, LocalDateTime fecha) {
+    public Partido(Equipo equipoLocal, Equipo equipoVisitante, LocalDateTime fecha, Integer jornada) {
         this.equipoLocal = equipoLocal;
         this.equipoVisitante = equipoVisitante;
         this.fecha = fecha;
         this.jugado = false;
         this.golesLocal = null;
         this.golesVisitante = null;
+        this.jornada = jornada;
     }
 
     public Integer getId() {
@@ -87,4 +90,7 @@ public class Partido {
     public void setJugado(boolean jugado) {
         this.jugado = jugado;
     }
+
+    public Integer getJornada(){ return jornada; }
+    public void setJornada(Integer jornada){ this.jornada = jornada; }
 }

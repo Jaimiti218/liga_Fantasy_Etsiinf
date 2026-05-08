@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Ligas – Fantasy ETSIINF</title>
+    <link rel="stylesheet" th:href="@{/css/fantasy.css}">
+</head>
+<body>
+
+    <!-- NAVBAR FANTASY -->
+    <nav class="fantasy-navbar">
+        <div class="nav-izquierda">
+            <button class="btn-menu" onclick="toggleMenu()">☰</button>
+            <span class="logo">⚽ Fantasy ETSIINF</span>
+        </div>
+        <div class="nav-derecha">
+            <span id="nav-username" class="nav-username"></span>
+        </div>
+    </nav>
+
+    <!-- MENÚ DESPLEGABLE -->
+    <div id="menu-overlay" class="menu-overlay hidden" onclick="toggleMenu()"></div>
+    <div id="menu-lateral" class="menu-lateral hidden">
+        <div class="menu-header">
+            <span id="menu-username"></span>
+            <button class="btn-cerrar-menu" onclick="toggleMenu()">✕</button>
+        </div>
+        <nav class="menu-opciones">
+            <a class="menu-item" onclick="toggleMenu(); window.location.href='/fantasy/mis-ligas'">🏆 Mis Ligas</a>
+            <a class="menu-item" onclick="toggleMenu()">📅 Partidos <span class="proximamente-badge">Próximamente</span></a>
+            <a class="menu-item" onclick="toggleMenu()">📈 Mercado <span class="proximamente-badge">Próximamente</span></a>
+            <a class="menu-item" onclick="toggleMenu()">👤 Perfil <span class="proximamente-badge">Próximamente</span></a>
+        </nav>
+        <div class="menu-footer">
+            <button class="btn-volver-inicio" onclick="window.location.href='/'">← Volver al inicio</button>
+            <button class="btn-cerrar-sesion-menu" onclick="cerrarSesionCompleta()">Cerrar sesión</button>
+        </div>
+    </div>
+
+    <main class="fantasy-contenido">
+
+        <div class="mis-ligas-header">
+            <h1>Mis Ligas</h1>
+            <div class="acciones-ligas">
+                <button class="btn-accion-liga btn-crear" onclick="abrirModalCrear()">+ Crear liga</button>
+                <button class="btn-accion-liga btn-unirse" onclick="abrirModalUnirse()">🔗 Unirse a liga</button>
+            </div>
+        </div>
+
+        <div id="mensaje-global" class="mensaje-global hidden"></div>
+
+        <div id="lista-ligas" class="lista-ligas">
+            <div class="cargando-ligas">Cargando tus ligas...</div>
+        </div>
+
+    </main>
+
+    <!-- MODAL CREAR LIGA -->
+    <div id="modal-crear" class="modal-overlay hidden">
+        <div class="modal">
+            <h3>Crear nueva liga</h3>
+            <div id="error-crear" class="mensaje-error hidden"></div>
+            <div class="campo">
+                <label>Nombre de la liga</label>
+                <input type="text" id="input-nombre-liga" placeholder="Ej: Liga de los Cracks" maxlength="50"/>
+            </div>
+            <div class="modal-botones">
+                <button class="btn-primary" onclick="crearLiga()">Crear</button>
+                <button class="btn-ghost" onclick="cerrarModales()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL UNIRSE A LIGA -->
+    <div id="modal-unirse" class="modal-overlay hidden">
+        <div class="modal">
+            <h3>Unirse a una liga</h3>
+            <div id="error-unirse" class="mensaje-error hidden"></div>
+            <div class="campo">
+                <label>Código de la liga</label>
+                <input type="text" id="input-codigo-liga" placeholder="Introduce el código" maxlength="6"/>
+            </div>
+            <div class="modal-botones">
+                <button class="btn-primary" onclick="unirseALiga()">Unirse</button>
+                <button class="btn-ghost" onclick="cerrarModales()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CÓDIGO DE INVITACIÓN -->
+    <div id="modal-invitar" class="modal-overlay hidden">
+        <div class="modal">
+            <h3>Invitar amigos</h3>
+            <p class="subtexto">Comparte este código con tus amigos para que se unan a la liga.</p>
+            <div class="codigo-invitacion">
+                <span id="codigo-mostrar"></span>
+                <button class="btn-copiar" onclick="copiarCodigo()">📋 Copiar</button>
+            </div>
+            <div id="exito-copiar" class="mensaje-exito hidden">¡Código copiado!</div>
+            <div class="modal-botones">
+                <button class="btn-primary" onclick="cerrarModales()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/sesion.js}"></script>
+    <script th:src="@{/js/fantasy-navbar.js}"></script>
+    <script th:src="@{/js/mis-ligas.js}"></script>
+</body>
+</html>

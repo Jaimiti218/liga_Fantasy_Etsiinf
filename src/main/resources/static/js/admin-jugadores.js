@@ -2,11 +2,18 @@ let todosLosEquipos  = [];
 let modoEdicion      = false;
 let idEditando       = null;
 
+const POSICIONES = {
+    'PORTERO':     '🧤 Portero',
+    'DEFENSA':     '🛡 Defensa',
+    'MEDIOCENTRO': '⚙️ Mediocentro',
+    'DELANTERO':   '⚡ Delantero'
+};
+
 document.addEventListener('DOMContentLoaded', async () => {
     const esAdmin = await verificarAdmin();
     if (!esAdmin) return;
-    await cargarJugadores(); // o cargarEquipos()
-    await cargarEquipos();   // o cargarJugadores()
+    await cargarJugadores();
+    await cargarEquipos();
 });
 
 async function verificarAdmin() {
@@ -19,10 +26,9 @@ async function verificarAdmin() {
     return true;
 }
 
-// ─── Cargar datos ─────────────────────────────────────────────────────────────
 async function cargarJugadores() {
     try {
-        const res  = await fetch('/jugadores');
+        const res   = await fetch('/jugadores');
         const lista = await res.json();
         renderizarTabla(lista);
     } catch (e) {
@@ -33,13 +39,12 @@ async function cargarJugadores() {
 async function cargarEquipos() {
     try {
         const res = await fetch('/equipos');
-        todosLosEquipos = await res.json(); // [{id, name, jugadores}, ...]
+        todosLosEquipos = await res.json();
     } catch (e) {
         todosLosEquipos = [];
     }
 }
 
-// ─── Tabla ────────────────────────────────────────────────────────────────────
 function renderizarTabla(jugadores) {
     const tbody = document.getElementById('tbody-jugadores');
 
@@ -52,36 +57,36 @@ function renderizarTabla(jugadores) {
         <tr>
             <td>${j.fullName}</td>
             <td>${j.nombreEquipo ?? '—'}</td>
-            <td>${j.esPortero ? '✅' : '—'}</td>
+            <td>${POSICIONES[j.posicion] ?? j.posicion ?? '—'}</td>
             <td>
-                <button class="btn-accion" title="Editar" onclick="abrirModalEditar(${j.id}, '${escapar(j.fullName)}', '${escapar(j.nombreEquipo ?? '')}', ${j.esPortero})">✏️</button>
-                <button class="btn-accion" title="Eliminar" onclick="eliminarJugador(${j.id}, '${escapar(j.fullName)}')">🗑️</button>
+                <button class="btn-accion" title="Editar"
+                    onclick="abrirModalEditar(${j.id}, '${escapar(j.fullName)}', '${escapar(j.nombreEquipo ?? '')}', '${j.posicion}')">✏️</button>
+                <button class="btn-accion" title="Eliminar"
+                    onclick="eliminarJugador(${j.id}, '${escapar(j.fullName)}')">🗑️</button>
             </td>
         </tr>
     `).join('');
 }
 
-// ─── Modal crear ──────────────────────────────────────────────────────────────
 function abrirModalCrear() {
     modoEdicion = false;
     idEditando  = null;
-    document.getElementById('modal-titulo').textContent  = 'Crear jugador';
-    document.getElementById('input-nombre').value        = '';
-    document.getElementById('input-equipo').value        = '';
-    document.getElementById('input-portero').checked     = false;
+    document.getElementById('modal-titulo').textContent = 'Crear jugador';
+    document.getElementById('input-nombre').value       = '';
+    document.getElementById('input-equipo').value       = '';
+    document.getElementById('input-posicion').value     = 'PORTERO';
     ocultarSugerencias();
     document.getElementById('error-modal').classList.add('hidden');
     document.getElementById('modal-overlay').classList.remove('hidden');
 }
 
-// ─── Modal editar ─────────────────────────────────────────────────────────────
-function abrirModalEditar(id, nombre, equipo, esPortero) {
+function abrirModalEditar(id, nombre, equipo, posicion) {
     modoEdicion = true;
     idEditando  = id;
-    document.getElementById('modal-titulo').textContent  = 'Editar jugador';
-    document.getElementById('input-nombre').value        = nombre;
-    document.getElementById('input-equipo').value        = equipo;
-    document.getElementById('input-portero').checked     = esPortero;
+    document.getElementById('modal-titulo').textContent = 'Editar jugador';
+    document.getElementById('input-nombre').value       = nombre;
+    document.getElementById('input-equipo').value       = equipo;
+    document.getElementById('input-posicion').value     = posicion;
     ocultarSugerencias();
     document.getElementById('error-modal').classList.add('hidden');
     document.getElementById('modal-overlay').classList.remove('hidden');
@@ -92,7 +97,6 @@ function cerrarModal() {
     ocultarSugerencias();
 }
 
-// ─── Autocompletar equipo ─────────────────────────────────────────────────────
 function autocompletarEquipo(valor) {
     const lista = document.getElementById('sugerencias-equipo');
     if (!valor.trim()) { ocultarSugerencias(); return; }
@@ -118,11 +122,10 @@ function ocultarSugerencias() {
     document.getElementById('sugerencias-equipo').classList.add('hidden');
 }
 
-// ─── Guardar (crear o editar) ─────────────────────────────────────────────────
 async function guardarJugador() {
     const nombre   = document.getElementById('input-nombre').value.trim();
     const equipo   = document.getElementById('input-equipo').value.trim();
-    const portero  = document.getElementById('input-portero').checked;
+    const posicion = document.getElementById('input-posicion').value;
 
     if (!nombre) {
         mostrarErrorModal('El nombre es obligatorio.');
@@ -133,28 +136,32 @@ async function guardarJugador() {
         let res;
 
         if (!modoEdicion) {
-            // CREAR — el backend espera un objeto Jugador con fullName, equipo.name y esPortero
             const body = {
                 fullName: nombre,
                 equipo: equipo ? { name: equipo } : null,
-                esPortero: portero
+                posicion: posicion
             };
             res = await fetch('/jugadores', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' , 'X-XSRF-TOKEN': obtenerCsrfToken()},
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-XSRF-TOKEN': obtenerCsrfToken()
+                },
                 credentials: 'include',
                 body: JSON.stringify(body)
             });
         } else {
-            // EDITAR — usa JugadorUpdateDTO: fullName, nombreEquipo, esPortero
             const body = {
                 fullName: nombre,
                 nombreEquipo: equipo || null,
-                esPortero: portero
+                posicion: posicion
             };
             res = await fetch(`/jugadores/${idEditando}`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json', 'X-XSRF-TOKEN': obtenerCsrfToken() },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-XSRF-TOKEN': obtenerCsrfToken()
+                },
                 credentials: 'include',
                 body: JSON.stringify(body)
             });
@@ -175,12 +182,15 @@ async function guardarJugador() {
     }
 }
 
-// ─── Eliminar ─────────────────────────────────────────────────────────────────
 async function eliminarJugador(id, nombre) {
     if (!confirm(`¿Seguro que quieres eliminar a "${nombre}"?`)) return;
 
     try {
-        const res = await fetch(`/jugadores/${id}`, { method: 'DELETE', credentials: 'include','X-XSRF-TOKEN': obtenerCsrfToken() });
+        const res = await fetch(`/jugadores/${id}`, {
+            method: 'DELETE',
+            credentials: 'include',
+            headers: { 'X-XSRF-TOKEN': obtenerCsrfToken() }
+        });
 
         if (!res.ok) {
             mostrarMensajeGlobal('Error al eliminar el jugador.', 'error');
@@ -195,7 +205,6 @@ async function eliminarJugador(id, nombre) {
     }
 }
 
-// ─── Utilidades ───────────────────────────────────────────────────────────────
 function mostrarErrorModal(texto) {
     const el = document.getElementById('error-modal');
     el.textContent = texto;

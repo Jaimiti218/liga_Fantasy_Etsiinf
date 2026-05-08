@@ -30,4 +30,19 @@ public class ViewController {
     public String adminEquipos() {
         return "admin/equipos";
     }
+
+    @GetMapping("/fantasy/mis-ligas")
+    public String misLigas() {
+        return "fantasy/mis-ligas";
+    }
+
+    @GetMapping("/fantasy/liga/{id}")
+    public String ligaFantasy() {
+        return "fantasy/liga";
+    }
+    
+    @GetMapping("/fantasy/plantilla/{equipoId}")
+    public String plantilla() {
+        return "fantasy/plantilla";
+    }
 }

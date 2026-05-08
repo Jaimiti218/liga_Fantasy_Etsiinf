@@ -1,0 +1,484 @@
+/* ── TABS ── */
+.plantilla-tabs {
+    display: flex;
+    background: white;
+    border-bottom: 2px solid #eee;
+    position: sticky;
+    top: 52px;
+    z-index: 40;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 0.85rem;
+    background: none;
+    border: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #888;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+}
+
+.tab-btn.active {
+    color: #0f3460;
+    border-bottom-color: #0f3460;
+    font-weight: 700;
+}
+
+.plantilla-contenido {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.tab-seccion { }
+
+/* ── ALINEACIÓN LAYOUT ── */
+.alineacion-layout {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+}
+
+/* ── CAMPO DE FÚTBOL ── */
+.campo-container {
+    flex: 1;
+    min-width: 0;
+}
+
+.formacion-selector {
+    text-align: right;
+    margin-bottom: 0.5rem;
+}
+
+.formacion-selector select {
+    padding: 0.4rem 0.75rem;
+    border: 1.5px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    background: white;
+    cursor: pointer;
+}
+
+.campo-futbol {
+    background: linear-gradient(180deg, #2d6a2d 0%, #3a8c3a 25%, #2d6a2d 50%, #3a8c3a 75%, #2d6a2d 100%);
+    border-radius: 12px;
+    border: 3px solid rgba(255,255,255,0.3);
+    padding: 1rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    min-height: 400px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* líneas del campo */
+.campo-futbol::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: rgba(255,255,255,0.2);
+    transform: translateX(-50%);
+}
+
+.campo-futbol::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 80px;
+    height: 80px;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.linea-campo {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+}
+
+/* ── CARTA DE JUGADOR ── */
+.carta-jugador {
+    background: rgba(255,255,255,0.92);
+    border-radius: 10px;
+    padding: 0.5rem 0.4rem;
+    width: 72px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    position: relative;
+}
+
+.carta-jugador:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+
+.carta-jugador.seleccionado {
+    border: 2px solid #f0b429;
+    background: rgba(255,244,200,0.95);
+}
+
+.carta-jugador.vacio {
+    background: rgba(255,255,255,0.3);
+    border: 2px dashed rgba(255,255,255,0.6);
+    cursor: pointer;
+}
+
+.carta-foto {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #ddd;
+    margin: 0 auto 0.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    overflow: hidden;
+    position: relative;
+}
+
+.carta-foto img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.escudo-mini {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.carta-nombre {
+    font-size: 0.62rem;
+    font-weight: 600;
+    color: #1a1a2e;
+    line-height: 1.2;
+    word-break: break-word;
+    margin-top: 0.1rem;
+}
+
+.carta-puntos-jornada {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #0f3460;
+    margin-top: 0.2rem;
+}
+
+/* ── RESUMEN EQUIPO ── */
+.resumen-equipo {
+    width: 180px;
+    background: white;
+    border-radius: 14px;
+    padding: 1.25rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    flex-shrink: 0;
+}
+
+.resumen-equipo h3 {
+    font-size: 0.95rem;
+    color: #1a1a2e;
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.resumen-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.resumen-stat:last-child { border-bottom: none; margin-bottom: 0; }
+
+.resumen-label { font-size: 0.72rem; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
+.resumen-valor { font-size: 1rem; font-weight: 700; color: #0f3460; }
+
+/* ── BOTÓN GUARDAR ALINEACIÓN ── */
+.btn-guardar-alineacion {
+    width: 100%;
+    background: #0f3460;
+    color: white;
+    border: none;
+    padding: 0.75rem;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 0.75rem;
+    transition: background 0.2s;
+}
+.btn-guardar-alineacion:hover { background: #1a4a80; }
+
+/* ── PANEL SELECCIÓN ── */
+.panel-seleccion {
+    background: white;
+    border-radius: 14px;
+    padding: 1rem;
+    margin-top: 1rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+}
+
+.panel-seleccion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    color: #1a1a2e;
+}
+
+.panel-seleccion-header button {
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    cursor: pointer;
+    color: #999;
+}
+
+.lista-candidatos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 0.75rem;
+}
+
+.candidato-item {
+    background: #f0f4ff;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.candidato-item:hover { background: #e0eaff; }
+.candidato-item.seleccionado { border-color: #0f3460; background: #e0eaff; font-weight: 600; }
+
+.btn-confirmar-cambio {
+    width: 100%;
+    background: #0f3460;
+    color: white;
+    border: none;
+    padding: 0.65rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-confirmar-cambio:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+/* ── LISTA PLANTILLA ── */
+.lista-plantilla {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.jugador-card {
+    background: white;
+    border-radius: 14px;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.jugador-foto-grande {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.jugador-foto-grande img { width: 100%; height: 100%; object-fit: cover; }
+
+.jugador-card-info { flex: 1; min-width: 0; }
+
+.jugador-card-nombre {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.jugador-card-equipo {
+    font-size: 0.78rem;
+    color: #888;
+    margin-top: 0.1rem;
+}
+
+.jugador-card-stats {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.jugador-mini-stat { display: flex; flex-direction: column; align-items: center; }
+.jugador-mini-stat .label { font-size: 0.65rem; color: #aaa; text-transform: uppercase; }
+.jugador-mini-stat .valor { font-size: 0.85rem; font-weight: 700; color: #333; }
+
+.clausula-badge {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+}
+.clausula-abierta { background: #d4edda; color: #155724; }
+.clausula-bloqueada { background: #f8d7da; color: #721c24; }
+
+.btn-acciones {
+    background: #f0f4ff;
+    border: 1.5px solid #dde;
+    color: #0f3460;
+    padding: 0.4rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.acciones-dropdown {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    min-width: 160px;
+    z-index: 20;
+    overflow: hidden;
+    margin-top: 4px;
+}
+
+.acciones-item {
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    color: #333;
+    transition: background 0.15s;
+}
+.acciones-item:hover { background: #f0f4ff; }
+
+/* ── PUNTOS POR JORNADA ── */
+.jornada-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.btn-jornada {
+    background: white;
+    border: 1.5px solid #ddd;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+.btn-jornada:hover { border-color: #0f3460; color: #0f3460; }
+
+#jornada-label {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    min-width: 100px;
+    text-align: center;
+}
+
+/* ── CLÁUSULA INFO ── */
+.clausula-info {
+    font-size: 0.8rem;
+    color: #666;
+    font-style: italic;
+    margin-top: -0.5rem;
+}
+
+/* ── NAVBAR BOTÓN VOLVER ── */
+.btn-nav-volver {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border: none;
+    padding: 0.4rem 0.75rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background 0.2s;
+}
+.btn-nav-volver:hover { background: rgba(255,255,255,0.25); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 600px) {
+    .alineacion-layout { flex-direction: column; }
+    .resumen-equipo { width: 100%; }
+    .carta-jugador { width: 60px; }
+    .carta-foto { width: 34px; height: 34px; }
+    .carta-nombre { font-size: 0.58rem; }
+}
+
+/* Campo vertical */
+.campo-futbol {
+    flex-direction: column-reverse; /* portero abajo, delanteros arriba */
+}
+
+/* Opción quitar jugador */
+.candidato-quitar {
+    background: #fff0f0;
+    color: #c0392b;
+    border-color: #f5c6c6;
+    font-weight: 600;
+}
+.candidato-quitar:hover { background: #ffe0e0; }

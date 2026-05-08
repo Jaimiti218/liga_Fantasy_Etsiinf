@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Plantilla – Fantasy ETSIINF</title>
+    <link rel="stylesheet" th:href="@{/css/fantasy.css}">
+    <link rel="stylesheet" th:href="@{/css/plantilla.css}">
+</head>
+<body>
+
+    <nav class="fantasy-navbar">
+        <div class="nav-izquierda">
+            <button class="btn-menu" onclick="toggleMenu()">☰</button>
+            <span class="logo" id="nombre-liga-nav">⚽ Mi Plantilla</span>
+        </div>
+        <div class="nav-derecha">
+            <button class="btn-nav-volver" onclick="volverALiga()">← Liga</button>
+            <span id="nav-username" class="nav-username"></span>
+        </div>
+    </nav>
+
+    <div id="menu-overlay" class="menu-overlay hidden" onclick="toggleMenu()"></div>
+    <div id="menu-lateral" class="menu-lateral hidden">
+        <div class="menu-header">
+            <span id="menu-username"></span>
+            <button class="btn-cerrar-menu" onclick="toggleMenu()">✕</button>
+        </div>
+        <nav class="menu-opciones">
+            <a class="menu-item" onclick="toggleMenu(); window.location.href='/fantasy/mis-ligas'">🏆 Mis Ligas</a>
+            <a class="menu-item" onclick="toggleMenu()">📅 Partidos <span class="proximamente-badge">Próximamente</span></a>
+            <a class="menu-item" onclick="toggleMenu()">📈 Mercado <span class="proximamente-badge">Próximamente</span></a>
+            <a class="menu-item" onclick="toggleMenu()">👤 Perfil <span class="proximamente-badge">Próximamente</span></a>
+        </nav>
+        <div class="menu-footer">
+            <button class="btn-volver-inicio" onclick="window.location.href='/'">← Volver al inicio</button>
+            <button class="btn-cerrar-sesion-menu" onclick="cerrarSesionCompleta()">Cerrar sesión</button>
+        </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="plantilla-tabs">
+        <button class="tab-btn active" id="tab-alineacion" onclick="cambiarTab('alineacion')">Alineación</button>
+        <button class="tab-btn" id="tab-plantilla" onclick="cambiarTab('plantilla')">Plantilla</button>
+        <button class="tab-btn" id="tab-puntos" onclick="cambiarTab('puntos')">Puntos</button>
+    </div>
+
+    <main class="plantilla-contenido">
+
+        <!-- ─── TAB ALINEACIÓN ─── -->
+        <div id="seccion-alineacion" class="tab-seccion">
+            <div class="alineacion-layout">
+
+                <!-- CAMPO DE FÚTBOL -->
+                <div class="campo-container">
+                    <div class="formacion-selector">
+                        <select id="select-formacion" onchange="cambiarFormacion(this.value)">
+                            <option value="3-2-1">3-2-1</option>
+                            <option value="2-3-1">2-3-1</option>
+                            <option value="2-2-2">2-2-2</option>
+                            <option value="2-1-3">2-1-3</option>
+                        </select>
+                    </div>
+
+                    <div class="campo-futbol">
+                        <!-- Línea de portero -->
+                        <div class="linea-campo" id="linea-portero"></div>
+                        <!-- Línea 1 -->
+                        <div class="linea-campo" id="linea-1"></div>
+                        <!-- Línea 2 -->
+                        <div class="linea-campo" id="linea-2"></div>
+                        <!-- Línea 3 -->
+                        <div class="linea-campo" id="linea-3"></div>
+                    </div>
+
+                    <button class="btn-guardar-alineacion" onclick="guardarAlineacion()">
+                        💾 Guardar alineación
+                    </button>
+                </div>
+
+                <!-- RESUMEN DEL EQUIPO -->
+                <div class="resumen-equipo">
+                    <h3>Resumen</h3>
+                    <div class="resumen-stat">
+                        <span class="resumen-label">Valor del equipo</span>
+                        <span class="resumen-valor" id="valor-equipo">—</span>
+                    </div>
+                    <div class="resumen-stat">
+                        <span class="resumen-label">Jugadores</span>
+                        <span class="resumen-valor" id="num-jugadores">—</span>
+                    </div>
+                    <div class="resumen-stat">
+                        <span class="resumen-label">Formación</span>
+                        <span class="resumen-valor" id="formacion-actual">—</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PANEL DE SELECCIÓN DE JUGADOR -->
+            <div id="panel-seleccion" class="panel-seleccion hidden">
+                <div class="panel-seleccion-header">
+                    <span>Seleccionar jugador</span>
+                    <button onclick="cerrarPanelSeleccion()">✕</button>
+                </div>
+                <div id="lista-candidatos" class="lista-candidatos"></div>
+                <button class="btn-confirmar-cambio" id="btn-confirmar" onclick="confirmarCambio()" disabled>
+                    ✓ Confirmar cambio
+                </button>
+            </div>
+        </div>
+
+        <!-- ─── TAB PLANTILLA ─── -->
+        <div id="seccion-plantilla" class="tab-seccion hidden">
+            <div id="lista-plantilla" class="lista-plantilla">
+                <div class="cargando-ligas">Cargando plantilla...</div>
+            </div>
+        </div>
+
+        <!-- ─── TAB PUNTOS ─── -->
+        <div id="seccion-puntos" class="tab-seccion hidden">
+            <div class="jornada-nav">
+                <button class="btn-jornada" onclick="cambiarJornada(-1)">‹</button>
+                <span id="jornada-label">Jornada 1</span>
+                <button class="btn-jornada" onclick="cambiarJornada(1)">›</button>
+            </div>
+            <div class="campo-futbol" id="campo-puntos"></div>
+        </div>
+
+    </main>
+
+    <!-- MODAL SUBIR CLÁUSULA -->
+    <div id="modal-clausula" class="modal-overlay hidden">
+        <div class="modal">
+            <h3>Subir cláusula</h3>
+            <p class="subtexto" id="clausula-jugador-nombre"></p>
+            <div id="error-clausula" class="mensaje-error hidden"></div>
+            <div class="campo">
+                <label>Cantidad a invertir (€)</label>
+                <input type="number" id="input-clausula" placeholder="Ej: 1000000" min="0"/>
+            </div>
+            <p class="clausula-info">La cláusula subirá el doble de lo que inviertas.</p>
+            <div class="modal-botones">
+                <button class="btn-primary" onclick="confirmarSubirClausula()">Confirmar</button>
+                <button class="btn-ghost" onclick="cerrarModalClausula()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/sesion.js}"></script>
+    <script th:src="@{/js/fantasy-navbar.js}"></script>
+    <script th:src="@{/js/plantilla.js}"></script>
+</body>
+</html>

@@ -34,7 +34,7 @@ public class JugadorService {
         if(!aux.isPresent()){
             throw new RuntimeException("No existe ese equipo");
         }
-        return jugadorRepository.save(new Jugador(jugador.getFullName(), aux.get(), jugador.getEsPortero()));
+        return jugadorRepository.save(new Jugador(jugador.getFullName(), aux.get(), jugador.getPosicion()));
     }
 
     public List<JugadorResponse> listarJugadores(){
@@ -71,8 +71,8 @@ public class JugadorService {
             equipo.getJugadores().add(jugador);
 
         }
-        if(jugadorActualizado.getEsPortero() != null){
-            jugador.setEsPortero(jugadorActualizado.getEsPortero());
+        if(jugadorActualizado.getPosicion() != null){
+            jugador.setPosicion(jugadorActualizado.getPosicion());
         }
         
         if(jugadorActualizado.getFullName() != null){
@@ -99,6 +99,6 @@ public class JugadorService {
             nombreEquipo = jugador.getEquipo().getName();
         }
 
-        return new JugadorResponse(jugador.getId(), jugador.getFullName(), jugador.getEsPortero(), nombreEquipo);
+        return new JugadorResponse(jugador.getId(), jugador.getFullName(), jugador.getPosicion(), nombreEquipo);
     }
 }

@@ -28,7 +28,7 @@
                 <tr>
                     <th>Nombre</th>
                     <th>Equipo</th>
-                    <th>Portero</th>
+                    <th>Posición</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -57,9 +57,14 @@
                 <ul id="sugerencias-equipo" class="sugerencias hidden"></ul>
             </div>
 
-            <div class="campo campo-horizontal">
-                <label>¿Es portero?</label>
-                <input type="checkbox" id="input-portero" />
+            <div class="campo">
+                <label>Posición</label>
+                <select id="input-posicion">
+                    <option value="PORTERO">Portero</option>
+                    <option value="DEFENSA">Defensa</option>
+                    <option value="MEDIOCENTRO">Mediocentro</option>
+                    <option value="DELANTERO">Delantero</option>
+                </select>
             </div>
 
             <div class="modal-botones">

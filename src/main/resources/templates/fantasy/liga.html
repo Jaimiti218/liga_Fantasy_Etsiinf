@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liga Fantasy – ETSIINF</title>
+    <link rel="stylesheet" th:href="@{/css/fantasy.css}">
+</head>
+<body>
+
+    <!-- NAVBAR FANTASY -->
+    <nav class="fantasy-navbar">
+        <div class="nav-izquierda">
+            <button class="btn-menu" onclick="toggleMenu()">☰</button>
+            <span class="logo" id="nombre-liga-nav">⚽ Fantasy ETSIINF</span>
+        </div>
+        <div class="nav-derecha">
+            <span id="nav-username" class="nav-username"></span>
+        </div>
+    </nav>
+
+    <!-- MENÚ DESPLEGABLE (mismo que mis-ligas) -->
+    <div id="menu-overlay" class="menu-overlay hidden" onclick="toggleMenu()"></div>
+    <div id="menu-lateral" class="menu-lateral hidden">
+        <div class="menu-header">
+            <span id="menu-username"></span>
+            <button class="btn-cerrar-menu" onclick="toggleMenu()">✕</button>
+        </div>
+        <nav class="menu-opciones">
+            <a class="menu-item" onclick="toggleMenu(); window.location.href='/fantasy/mis-ligas'">🏆 Mis Ligas</a>
+            <a class="menu-item" onclick="toggleMenu()">📅 Partidos <span class="proximamente-badge">Próximamente</span></a>
+            <a class="menu-item" onclick="toggleMenu()">📈 Mercado <span class="proximamente-badge">Próximamente</span></a>
+            <a class="menu-item" onclick="toggleMenu()">👤 Perfil <span class="proximamente-badge">Próximamente</span></a>
+        </nav>
+        <div class="menu-footer">
+            <button class="btn-volver-inicio" onclick="window.location.href='/'">← Volver al inicio</button>
+            <button class="btn-cerrar-sesion-menu" onclick="cerrarSesionCompleta()">Cerrar sesión</button>
+        </div>
+    </div>
+
+    <main class="fantasy-contenido">
+
+        <!-- INFO DEL EQUIPO DEL USUARIO -->
+        <div id="mi-equipo-info" class="mi-equipo-banner hidden">
+            <div class="equipo-stat">
+                <span class="stat-label">Posición</span>
+                <span class="stat-valor" id="mi-posicion">—</span>
+            </div>
+            <div class="equipo-stat">
+                <span class="stat-label">Puntos</span>
+                <span class="stat-valor" id="mis-puntos">—</span>
+            </div>
+            <div class="equipo-stat">
+                <span class="stat-label">Dinero</span>
+                <span class="stat-valor" id="mi-dinero">—</span>
+            </div>
+        </div>
+
+        <!-- CLASIFICACIÓN -->
+        <div class="clasificacion-container">
+            <h2>Clasificación</h2>
+            <div id="tabla-clasificacion" class="tabla-clasificacion">
+                <div class="cargando-ligas">Cargando clasificación...</div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- BARRA DE NAVEGACIÓN INFERIOR -->
+    <nav class="bottom-nav">
+        <button class="bottom-nav-item active" onclick="window.location.href=window.location.href">
+            🏆 Clasificación
+        </button>
+        <button class="bottom-nav-item" onclick="irAPlantilla()">
+            👤 Mi Plantilla
+        </button>
+        <button class="bottom-nav-item proximamente-btn" disabled>
+            📈 Mercado
+        </button>
+        <button class="bottom-nav-item proximamente-btn" disabled>
+            🔔 Noticias
+        </button>
+    </nav>
+
+    <script th:src="@{/js/sesion.js}"></script>
+    <script th:src="@{/js/fantasy-navbar.js}"></script>
+    <script th:src="@{/js/liga-fantasy.js}"></script>
+</body>
+</html>

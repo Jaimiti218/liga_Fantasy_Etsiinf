@@ -149,6 +149,11 @@ public class LigaFantasyService {
             .findByLigaFantasyIdAndUserId(ligaId, userId)
             .orElseThrow(() -> new RuntimeException("Equipo no encontrado"));
 
+
+        for(JugadorFantasy j : equipo.getJugadores()){
+            j.setEquipoFantasy(null);
+            jugadorFantasyRepository.save(j);
+        }
         equipoFantasyRepository.delete(equipo);
     }
 
@@ -166,7 +171,7 @@ public class LigaFantasyService {
         
         for(JugadorFantasy jf : disponibles){
 
-            if(jf.getJugadorReal().getEsPortero()){
+            if(jf.getJugadorReal().getPosicion().equals("PORTERO")){
                 porteros.add(jf);
             }
             else{
@@ -263,6 +268,75 @@ public class LigaFantasyService {
         return plantilla;
     }
 
+
+
+
+    private List<JugadorFantasy> asignarEquipoInicial(LigaFantasy liga) {
+        List<JugadorFantasy> disponibles = jugadorFantasyRepository
+            .findByLigaFantasyIdAndEquipoFantasyIsNull(liga.getId());
+
+        List<JugadorFantasy> porteros     = new ArrayList<>();
+        List<JugadorFantasy> defensas     = new ArrayList<>();
+        List<JugadorFantasy> mediocentros = new ArrayList<>();
+        List<JugadorFantasy> delanteros   = new ArrayList<>();
+
+        for (JugadorFantasy jf : disponibles) {
+            switch (jf.getJugadorReal().getPosicion()) {
+                case "PORTERO"     -> porteros.add(jf);
+                case "DEFENSA"     -> defensas.add(jf);
+                case "MEDIOCENTRO" -> mediocentros.add(jf);
+                case "DELANTERO"   -> delanteros.add(jf);
+            }
+        }
+
+        Random random = new Random();
+        List<JugadorFantasy> plantilla = new ArrayList<>();
+
+        // 1 portero
+        plantilla.add(elegirJugadorEquilibrado(porteros, random));
+        // 2 defensas
+        plantilla.addAll(elegirNJugadores(defensas, 2, random, plantilla));
+        // 3 mediocentros
+        plantilla.addAll(elegirNJugadores(mediocentros, 3, random, plantilla));
+        // 1 delantero
+        plantilla.addAll(elegirNJugadores(delanteros, 1, random, plantilla));
+
+        if (plantilla.size() < 7) {
+            throw new RuntimeException("No hay suficientes jugadores para crear una plantilla");
+        }
+
+        return plantilla;
+    }
+
+    private JugadorFantasy elegirJugadorEquilibrado(List<JugadorFantasy> lista, Random random) {
+        if (lista.isEmpty()) throw new RuntimeException("No hay jugadores disponibles para esta posición");
+        List<JugadorFantasy> normales = lista.stream()
+            .filter(j -> j.getJugadorReal().getValorMercado() >= 2000000
+                    && j.getJugadorReal().getValorMercado() <= 15000000)
+            .collect(java.util.stream.Collectors.toList());
+        List<JugadorFantasy> fuente = normales.isEmpty() ? lista : normales;
+        return fuente.get(random.nextInt(fuente.size()));
+    }
+
+    private List<JugadorFantasy> elegirNJugadores(List<JugadorFantasy> lista, int n,
+            Random random, List<JugadorFantasy> yaElegidos) {
+        List<JugadorFantasy> disponibles = lista.stream()
+            .filter(j -> !yaElegidos.contains(j))
+            .collect(java.util.stream.Collectors.toList());
+
+        Collections.shuffle(disponibles, random);
+        List<JugadorFantasy> resultado = new ArrayList<>();
+        for (int i = 0; i < n && i < disponibles.size(); i++) {
+            resultado.add(disponibles.get(i));
+        }
+        // Si no hay suficientes, completar con cualquiera disponible
+        if (resultado.size() < n) {
+            throw new RuntimeException("No hay suficientes jugadores de posición " + (lista.isEmpty() ? "desconocida" : lista.get(0).getJugadorReal().getPosicion()));
+        }
+        return resultado;
+    }
+
+
     private LigaFantasyResponse cambioTipoRespuesta(LigaFantasy liga){
 
         return new LigaFantasyResponse(
@@ -274,4 +348,9 @@ public class LigaFantasyService {
             liga.getMaxPlayers()
         );
     }
+
+
+
+
+
 }

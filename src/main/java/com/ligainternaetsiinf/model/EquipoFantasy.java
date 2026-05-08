@@ -22,6 +22,8 @@ public class EquipoFantasy { /*cada objeto fantasy team representa, para entende
 
     private long dinero;
 
+    private String formacion; // "3-2-1", "2-3-1", "2-2-2", "2-1-3"
+
     @OneToMany(mappedBy = "equipoFantasy")
     private List<JugadorFantasy> jugadores; //PARA LA ASIGNACION INICIAL DE JUGADORES no se aun que hacer, ya que dependera
     //un poco desde donde se haga la logica detras de la asignación real, si desde esta entidad en el constructor (es lo que creo, llamando a otra funcion que
@@ -37,6 +39,7 @@ public class EquipoFantasy { /*cada objeto fantasy team representa, para entende
         this.jugadores = jugadores;
         this.dinero = 100000000;
         this.puntos = 0;
+        this.formacion = "2-3-1";
     }
 
     public Integer getId(){ return id; }
@@ -62,4 +65,7 @@ public class EquipoFantasy { /*cada objeto fantasy team representa, para entende
     public int getPuntos(){ return puntos; }
 
     public void setPuntos(int puntos){ this.puntos = puntos; }
+
+    public String getFormacion(){ return formacion; }
+    public void setFormacion(String formacion){ this.formacion = formacion; }
 }

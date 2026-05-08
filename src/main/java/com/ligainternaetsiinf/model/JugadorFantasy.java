@@ -24,6 +24,8 @@ public class JugadorFantasy {
     private Long clausula; /*es Long y no long por lo mismo que int e Integer, porque el valor de la clausula puede ser null si el jugador
     no pertenece aun a ningun equipo */
 
+    private boolean alineado;
+
     private LocalDateTime clausulaBloqueadaHasta;
 
     private LocalDateTime fechaCompra;
@@ -33,7 +35,7 @@ public class JugadorFantasy {
     public JugadorFantasy(Jugador jugadorReal, LigaFantasy ligaFantasy){
         this.jugadorReal = jugadorReal;
         this.ligaFantasy = ligaFantasy;
-
+        this.alineado = false;
     }
 
     public Integer getId(){ return id; }
@@ -79,5 +81,8 @@ public class JugadorFantasy {
     public void setClausulaBloqueadaHasta(LocalDateTime fecha){
         this.clausulaBloqueadaHasta = fecha;
     }
+
+    public boolean isAlineado(){ return alineado; }
+    public void setAlineado(boolean alineado){ this.alineado = alineado; }
 
 }

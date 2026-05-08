@@ -1,31 +1,31 @@
-window.usuarioActual = null;
+let usuarioActual = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
-    window.usuarioActual = await obtenerUsuarioActual();
+    usuarioActual = await obtenerUsuarioActual();
 
-    if (window.usuarioActual) {
-        document.getElementById('saludo-usuario').textContent = '👋 ' + window.usuarioActual.username;
+    if (usuarioActual) {
+        document.getElementById('saludo-usuario').textContent = '👋 ' + usuarioActual.username;
         document.getElementById('saludo-usuario').classList.remove('hidden');
         document.getElementById('btn-sesion').textContent = 'Cerrar sesión';
 
-        if (window.usuarioActual.role === 'ADMIN') {
+        if (usuarioActual.role === 'ADMIN') {
             document.getElementById('btn-gestionar').classList.remove('hidden');
         }
     }
 });
 
 function manejarSesion() {
-    if (window.usuarioActual) {
+    if (usuarioActual) {
         cerrarSesionCompleta();
     } else {
-        window.location.href = '/fantasy/auth?redirect=home';
+        location.href = '/fantasy/auth?redirect=home';
     }
 }
 
 function irAlFantasy() {
-    if (window.usuarioActual) {
-        window.location.href = '/fantasy/mis-ligas';
+    if (usuarioActual) {
+        location.href = '/fantasy/mis-ligas';
     } else {
-        window.location.href = '/fantasy/auth?redirect=fantasy';
+        location.href = '/fantasy/auth?redirect=fantasy';
     }
 }

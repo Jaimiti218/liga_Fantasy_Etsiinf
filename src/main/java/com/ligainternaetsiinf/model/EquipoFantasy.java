@@ -39,7 +39,7 @@ public class EquipoFantasy { /*cada objeto fantasy team representa, para entende
         this.jugadores = jugadores;
         this.dinero = 100000000;
         this.puntos = 0;
-        this.formacion = "2-3-1";
+        this.formacion = "2-2-2";
     }
 
     public Integer getId(){ return id; }

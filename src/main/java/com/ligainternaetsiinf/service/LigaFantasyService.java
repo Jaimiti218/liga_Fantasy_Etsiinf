@@ -57,13 +57,13 @@ public class LigaFantasyService {
 
         // Crear jugadorFantasy para cada jugador real
         List<Jugador> jugadoresReales = jugadorRepository.findAll();
+        List<JugadorFantasy> jugadoresFantasy = new ArrayList<>();
 
         for(Jugador j : jugadoresReales){
-
-            JugadorFantasy jf = new JugadorFantasy(j, liga);
-
-            jugadorFantasyRepository.save(jf);
+            jugadoresFantasy.add(new JugadorFantasy(j, liga));
         }
+
+        jugadorFantasyRepository.saveAll(jugadoresFantasy);
         
         // Crear equipo fantasy del creador
         List<JugadorFantasy> plantilla = asignarEquipoInicial(liga);
@@ -160,117 +160,6 @@ public class LigaFantasyService {
 
 
 
-    private List<JugadorFantasy> asignarEquipoInicial(LigaFantasy liga){
-        /*TENER EN CUENTA: este metodo esta pensado teniendo en cuenta que los jugadores de campo no tienen posicion concreta
-    (defensa, mediocentro o delantero), si mas adelante eso se añade, habra que modificar un poco este metodo */
-
-        List<JugadorFantasy> disponibles = jugadorFantasyRepository.findByLigaFantasyIdAndEquipoFantasyIsNull(liga.getId());
-        List<JugadorFantasy> porteros = new ArrayList<>();
-        List<JugadorFantasy> campo = new ArrayList<>();
-        List<JugadorFantasy> plantilla = new ArrayList<>();
-        
-        for(JugadorFantasy jf : disponibles){
-
-            if(jf.getJugadorReal().getPosicion().equals("PORTERO")){
-                porteros.add(jf);
-            }
-            else{
-                campo.add(jf);
-            }
-        }
-
-        Random random = new Random();
-
-        long valorTotal = 0;
-
-        /*elegir portero equilibrado*/
-        List<JugadorFantasy> porterosPrecioNormal = new ArrayList<>(); /*esto será basicamente para porteros con precios mas cercanos a la media,
-        para crear plantillas iniciales equilibradas en la medida de lo posible, porque si de primeras el juego te da al mejor portero de la liga, 
-        que vale 30M, sería injusto. No obstante */
-        List<JugadorFantasy> restoPorteros = new ArrayList<>(); /*este se usa basicamente para porteros o con mucho precio, o con muy poco, que en un
-        principio se evitará dar, pero si hay muchos jugadores en esa liga fantasy, pues no queda otra (sobretodo con los porteros) */
-
-        for(JugadorFantasy p : porteros){
-
-            if(p.getJugadorReal().getValorMercado() <= 15000000 && p.getJugadorReal().getValorMercado() >= 2000000){ /*estos dos valores son susceptibles de cambio */
-                porterosPrecioNormal.add(p);
-            }
-            else{
-                restoPorteros.add(p);
-            }
-        }
-        JugadorFantasy porteroEquipoInicial = new JugadorFantasy();
-        if(porterosPrecioNormal.size()!=0){
-            porteroEquipoInicial = porterosPrecioNormal.get(random.nextInt(porterosPrecioNormal.size()));
-        }
-        else{
-            if(restoPorteros.stream().min(Comparator.comparing(j -> j.getJugadorReal().getValorMercado())).isPresent()){
-                porteroEquipoInicial = restoPorteros.stream().min(Comparator.comparing(j -> j.getJugadorReal().getValorMercado())).get();
-            }
-           
-        }
-    
-        plantilla.add(porteroEquipoInicial);
-        valorTotal += porteroEquipoInicial.getJugadorReal().getValorMercado();
-
-        // elegir jugadores de campo
-        Collections.shuffle(campo);
-
-        JugadorFantasy aux = new JugadorFantasy(); /*esta variable se usa para rellenar la plantilla en caso de que se recorra TODA la lista de jugadores
-        de la liga y no haya sido posible crear una plantilla equilibrada, entonces habra que coger jugadores random */
-
-        for(int i=0; i<campo.size() ; i++){
-
-            JugadorFantasy j = campo.get(i);
-
-            if(plantilla.size() == 7){
-                break;
-            }
-
-            long valor = j.getJugadorReal().getValorMercado();
-
-            if(valor < 6000000 || valor > 20000000){
-                if(i == campo.size()-1){ /*esto significa que es el ULTIMO jugador de la lista */
-                    while(plantilla.size() < 7){                       
-                        aux = campo.get(random.nextInt(campo.size()));/*obtenemos un jugador aleatorio, con el precio que sea, ya que mejor dar un jugador
-                                                                    con mucho o poco valor y que la plantilla quede un poco descompensada, a que no haya plantilla completa*/
-                        if(!plantilla.contains(aux)){ /*comprobamos que el que se ha cogido no estuviese JUSTO ya en la plantilla */
-                            plantilla.add(aux);
-                            valorTotal += valor;
-                        }
-                    }
-                    continue;                   
-                }
-                else continue;
-                
-            }
-
-            plantilla.add(j);
-            valorTotal += valor;
-
-            if(i == campo.size()-1 && plantilla.size() < 7){ /*tenemos que repetirlo aqui por si acaso justamente el ultimo jugador fuese entre 6-20M
-                , caso en el que no se rellenaria bien la plantilla, porque el codigo de arriba para ello con jugadores random no se ejecutaria */
-                while(plantilla.size() < 7){                       
-                    aux = campo.get(random.nextInt(campo.size())); 
-                    if(!plantilla.contains(aux)){ 
-                        plantilla.add(aux);
-                        valorTotal += valor;
-                     }
-                }
-                continue;                   
-            }
-        }
-
-        if(plantilla.size() < 7){
-            throw new RuntimeException("No se pudo generar plantilla equilibrada");
-        }
-
-        return plantilla;
-    }
-
-
-
-
     private List<JugadorFantasy> asignarEquipoInicial(LigaFantasy liga) {
         List<JugadorFantasy> disponibles = jugadorFantasyRepository
             .findByLigaFantasyIdAndEquipoFantasyIsNull(liga.getId());
@@ -295,11 +184,11 @@ public class LigaFantasyService {
         // 1 portero
         plantilla.add(elegirJugadorEquilibrado(porteros, random));
         // 2 defensas
-        plantilla.addAll(elegirNJugadores(defensas, 2, random, plantilla));
+        plantilla.addAll(elegirNJugadores(defensas, 2, random, "defensas"));
         // 3 mediocentros
-        plantilla.addAll(elegirNJugadores(mediocentros, 3, random, plantilla));
+        plantilla.addAll(elegirNJugadores(mediocentros, 2, random, "mediocentros"));
         // 1 delantero
-        plantilla.addAll(elegirNJugadores(delanteros, 1, random, plantilla));
+        plantilla.addAll(elegirNJugadores(delanteros, 2, random, "delanteros"));
 
         if (plantilla.size() < 7) {
             throw new RuntimeException("No hay suficientes jugadores para crear una plantilla");
@@ -319,15 +208,21 @@ public class LigaFantasyService {
     }
 
     private List<JugadorFantasy> elegirNJugadores(List<JugadorFantasy> lista, int n,
-            Random random, List<JugadorFantasy> yaElegidos) {
+            Random random, String posicion) {
+        
+        if (lista.isEmpty()) throw new RuntimeException("No hay suficientes " + posicion + " disponibles");
+        
         List<JugadorFantasy> disponibles = lista.stream()
-            .filter(j -> !yaElegidos.contains(j))
+            .filter(j -> j.getJugadorReal().getValorMercado() >= 2000000
+                    && j.getJugadorReal().getValorMercado() <= 15000000)
             .collect(java.util.stream.Collectors.toList());
 
-        Collections.shuffle(disponibles, random);
+        List<JugadorFantasy> fuente = disponibles.isEmpty() ? lista : disponibles;
+
+        Collections.shuffle(fuente, random);
         List<JugadorFantasy> resultado = new ArrayList<>();
-        for (int i = 0; i < n && i < disponibles.size(); i++) {
-            resultado.add(disponibles.get(i));
+        for (int i = 0; i < n && i < fuente.size(); i++) {
+            resultado.add(fuente.get(i));
         }
         // Si no hay suficientes, completar con cualquiera disponible
         if (resultado.size() < n) {

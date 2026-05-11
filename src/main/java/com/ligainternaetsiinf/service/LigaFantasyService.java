@@ -1,5 +1,6 @@
 package com.ligainternaetsiinf.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -74,6 +75,8 @@ public class LigaFantasyService {
 
         for(JugadorFantasy jf : plantilla){
             jf.setEquipoFantasy(equipo);
+            jf.setClausula(jf.getJugadorReal().getValorMercado() * 2);
+            jf.setClausulaBloqueadaHasta(LocalDateTime.now().plusWeeks(2));
         }
 
         jugadorFantasyRepository.saveAll(plantilla);

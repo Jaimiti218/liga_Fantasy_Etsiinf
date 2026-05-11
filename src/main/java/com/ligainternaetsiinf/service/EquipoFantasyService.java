@@ -219,7 +219,8 @@ public class EquipoFantasyService {
                 equipo.getUser().getUsername(),
                 equipo.getDinero(),
                 equipo.getPuntos(),
-                jugadores
+                jugadores,
+                equipo.getFormacion()
         );
     }
 }

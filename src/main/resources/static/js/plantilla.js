@@ -51,39 +51,41 @@ function volverALiga() {
 // ─── Cargar plantilla ────────────────────────────────────────────────────────
 async function cargarPlantilla() {
     try {
-        const res = await fetch(`/equipos-fantasy/${equipoId}/plantilla`, {
-            credentials: 'include'
-        });
-        if (!res.ok) { plantillaData = []; return; }
-        plantillaData = await res.json();
-
-        // Reconstruir alineación respetando el orden por posición
-        // Los alineados los ordenamos: primero portero, luego defensas, medios, delanteros
-        const alineados = plantillaData.filter(j => j.alineado);
-        const porteroAlin    = alineados.filter(j => j.posicion === 'PORTERO');
-        const defensasAlin   = alineados.filter(j => j.posicion === 'DEFENSA');
-        const mediosAlin     = alineados.filter(j => j.posicion === 'MEDIOCENTRO');
-        const delantAlin     = alineados.filter(j => j.posicion === 'DELANTERO');
-
-        const lineas = parsearFormacion(formacionActual);
-        // Reconstruir array de 7 posiciones [portero, ...defensas, ...medios, ...delanteros]
-        const nuevaAlin = [
-            porteroAlin[0]?.id ?? null,
-            ...rellenarLinea(defensasAlin, lineas[0]),
-            ...rellenarLinea(mediosAlin, lineas[1]),
-            ...rellenarLinea(delantAlin, lineas[2])
-        ];
-        alineacionActual = nuevaAlin;
-
+        // Primero cargar la formación del equipo
         const resEquipo = await fetch(`/equipos-fantasy/${equipoId}`, {
             credentials: 'include'
         });
         if (resEquipo.ok) {
             const equipo = await resEquipo.json();
             formacionActual = equipo.formacion || '2-2-2';
+            window.dineroEquipo = equipo.dinero;
+            document.getElementById('select-formacion').value = formacionActual;
         }
 
+        // Luego cargar la plantilla con la formación ya correcta
+        const res = await fetch(`/equipos-fantasy/${equipoId}/plantilla`, {
+            credentials: 'include'
+        });
+        if (!res.ok) { plantillaData = []; return; }
+        plantillaData = await res.json();
+
+        // Ahora reconstruir la alineación con la formación correcta
+        const alineados      = plantillaData.filter(j => j.alineado);
+        const porteroAlin    = alineados.filter(j => j.posicion === 'PORTERO');
+        const defensasAlin   = alineados.filter(j => j.posicion === 'DEFENSA');
+        const mediosAlin     = alineados.filter(j => j.posicion === 'MEDIOCENTRO');
+        const delantAlin     = alineados.filter(j => j.posicion === 'DELANTERO');
+
+        const lineas = parsearFormacion(formacionActual);
+        alineacionActual = [
+            porteroAlin[0]?.id ?? null,
+            ...rellenarLinea(defensasAlin, lineas[0]),
+            ...rellenarLinea(mediosAlin,   lineas[1]),
+            ...rellenarLinea(delantAlin,   lineas[2])
+        ];
+
         actualizarResumen();
+
     } catch (e) {
         plantillaData = [];
     }
@@ -277,7 +279,6 @@ async function guardarAlineacion() {
     const ids = alineacionActual.filter(id => id !== null);
 
     if (ids.length < 7) {
-        // Avisar pero guardar igualmente
         const confirmar = confirm(
             `Solo tienes ${ids.length} jugadores alineados de 7. No puntuarás en la siguiente jornada con los huecos vacíos. ¿Guardar de todos modos?`
         );
@@ -291,7 +292,7 @@ async function guardarAlineacion() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 jugadorFantasyIds: ids,
-                formacion: formacionActual   // ← siempre mandamos la formación actual
+                formacion: formacionActual  // ← siempre se manda la formación actual
             })
         });
 
@@ -302,7 +303,9 @@ async function guardarAlineacion() {
         }
 
         mostrarToast('✓ Alineación guardada');
-        await cargarPlantilla();
+        // No recargar la plantilla entera, solo actualizar el resumen
+        // para evitar que formacionActual se sobreescriba
+        actualizarResumen();
         renderizarCampo();
     } catch (e) {
         alert('Error de conexión.');
@@ -340,10 +343,16 @@ function renderizarPlantilla() {
         let clausulaHtml      = '';
 
         if (j.clausula === null) {
-            clausulaHtml = '<span class="clausula-badge" style="background:#eee;color:#999">Sin cláusula</span>';
+            clausulaHtml = '<span class="clausula-badge clausula-sin">Sin cláusula</span>';
         } else if (clausulaBloq2) {
-            const dias = Math.ceil((clausulaBloq - ahora) / (1000 * 60 * 60 * 24));
-            clausulaHtml = `<span class="clausula-badge clausula-bloqueada">🔒 ${dias}d</span>`;
+            const diff  = clausulaBloq - ahora;
+            const dias  = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const horas = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const tiempo = dias > 0 ? `${dias}d ${horas}h` : `${horas}h`;
+            clausulaHtml = `
+                <span class="clausula-badge clausula-bloqueada">🔒 ${tiempo}</span>
+                <span class="clausula-badge clausula-valor-bloqueada">${formatearDinero(j.clausula)}</span>
+            `;
         } else {
             clausulaHtml = `<span class="clausula-badge clausula-abierta">✓ ${formatearDinero(j.clausula)}</span>`;
         }
@@ -356,7 +365,8 @@ function renderizarPlantilla() {
             <div class="jugador-card-info">
                 <div class="jugador-card-nombre">${j.nombre}</div>
                 <div class="jugador-card-equipo">
-                    ${j.nombreEquipoReal || 'Sin equipo'} · ${j.posicion.charAt(0) + j.posicion.slice(1).toLowerCase()}
+                    <span class="badge-equipo">${j.nombreEquipoReal || 'Sin equipo'}</span>
+                    <span class="badge-posicion ${j.posicion}">${j.posicion.charAt(0) + j.posicion.slice(1).toLowerCase()}</span>
                 </div>
                 <div class="jugador-card-stats">
                     <div class="jugador-mini-stat">
@@ -415,6 +425,7 @@ function abrirModalClausula(jfId, nombre) {
     cerrarAcciones();
     jugadorClausulaActual = jfId;
     document.getElementById('clausula-jugador-nombre').textContent = nombre;
+    document.getElementById('clausula-saldo').textContent = formatearDinero(window.dineroEquipo ?? 0);
     document.getElementById('input-clausula').value                = '';
     document.getElementById('error-clausula').classList.add('hidden');
     document.getElementById('modal-clausula').classList.remove('hidden');
@@ -429,6 +440,11 @@ async function confirmarSubirClausula() {
     const cantidad = parseInt(document.getElementById('input-clausula').value);
     if (!cantidad || cantidad <= 0) {
         mostrarErrorElement('error-clausula', 'Introduce una cantidad válida.');
+        return;
+    }
+
+    // Confirmación antes de ejecutar
+    if (!confirm(`¿Seguro que quieres invertir ${formatearDinero(cantidad)} para subir la cláusula? La cláusula subirá ${formatearDinero(cantidad * 2)}.`)) {
         return;
     }
 

@@ -133,6 +133,9 @@
         <div class="modal">
             <h3>Subir cláusula</h3>
             <p class="subtexto" id="clausula-jugador-nombre"></p>
+            <div class="saldo-disponible">
+                💰 Saldo disponible: <strong id="clausula-saldo">—</strong>
+            </div>
             <div id="error-clausula" class="mensaje-error hidden"></div>
             <div class="campo">
                 <label>Cantidad a invertir (€)</label>
@@ -145,6 +148,21 @@
             </div>
         </div>
     </div>
+
+    <nav class="bottom-nav">
+        <button class="bottom-nav-item" onclick="volverALiga()">
+            🏆 Clasificación
+        </button>
+        <button class="bottom-nav-item active">
+            👤 Mi Plantilla
+        </button>
+        <button class="bottom-nav-item proximamente-btn" disabled>
+            📈 Mercado
+        </button>
+        <button class="bottom-nav-item proximamente-btn" disabled>
+            🔔 Noticias
+        </button>
+    </nav>
 
     <script th:src="@{/js/sesion.js}"></script>
     <script th:src="@{/js/fantasy-navbar.js}"></script>

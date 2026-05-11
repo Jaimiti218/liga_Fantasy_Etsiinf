@@ -18,10 +18,12 @@ public class EquipoFantasyResponse {
 
     private List<String> jugadores;
 
+    private String formacion;
+
     public EquipoFantasyResponse(){}
 
     public EquipoFantasyResponse(Integer id, Integer ligaId, String ligaNombre, Integer userId, String userNombre, long dinero, int puntos, 
-        List<String> jugadores){
+        List<String> jugadores, String formacion){
 
         this.id = id;
         this.ligaId = ligaId;
@@ -31,6 +33,7 @@ public class EquipoFantasyResponse {
         this.dinero = dinero;
         this.puntos = puntos;
         this.jugadores = jugadores;
+        this.formacion = formacion;
     }
 
     public Integer getId(){ return id; }
@@ -48,4 +51,5 @@ public class EquipoFantasyResponse {
     public int getPuntos(){ return puntos; }
 
     public List<String> getJugadores(){ return jugadores; }
+    public String getFormacion(){ return formacion; }
 }

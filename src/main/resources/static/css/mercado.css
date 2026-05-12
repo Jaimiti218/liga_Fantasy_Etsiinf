@@ -1,0 +1,133 @@
+.saldo-mercado {
+    background: #c0392b;
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+    color: white;
+}
+
+.saldo-mercado-principal {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.saldo-label { font-size: 0.85rem; opacity: 0.85; }
+.saldo-valor { font-size: 1.4rem; font-weight: 800; }
+
+.saldo-mercado-tras-pujas {
+    border-top: 1px solid rgba(255,255,255,0.3);
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.saldo-label-small { font-size: 0.75rem; opacity: 0.75; }
+.saldo-valor-small  { font-size: 1rem; font-weight: 700; }
+
+.contador-mercado {
+    background: #1a1a2e;
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    color: white;
+}
+
+.contador-label { font-size: 0.85rem; opacity: 0.75; }
+.contador-valor  { font-size: 1.1rem; font-weight: 800; font-family: monospace; color: #f0b429; }
+
+/* TARJETA MERCADO */
+.jugador-card-mercado {
+    background: white;
+    border-radius: 14px;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.btn-fichar {
+    background: #27ae60;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+.btn-fichar:hover { background: #219a52; }
+
+.temporizador-jugador {
+    font-size: 0.7rem;
+    color: #e74c3c;
+    font-weight: 700;
+    font-family: monospace;
+    margin-top: 0.25rem;
+}
+
+/* MIS OPERACIONES */
+.operaciones-tabs {
+    display: flex;
+    border-bottom: 2px solid #eee;
+    margin-bottom: 1rem;
+}
+
+.op-tab {
+    flex: 1;
+    padding: 0.65rem;
+    background: none;
+    border: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #888;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+}
+
+.op-tab.active { color: #0f3460; border-bottom-color: #0f3460; font-weight: 700; }
+
+.puja-card, .venta-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.puja-info { flex: 1; }
+.puja-nombre { font-size: 0.95rem; font-weight: 700; color: #1a1a2e; }
+.puja-detalle { font-size: 0.8rem; color: #888; margin-top: 0.2rem; }
+.puja-cantidad { font-size: 1.1rem; font-weight: 800; color: #0f3460; }
+
+.btn-aceptar-oferta {
+    background: #27ae60;
+    color: white;
+    border: none;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.valor-mercado-ref {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0f3460;
+    display: block;
+    margin-top: 0.2rem;
+}

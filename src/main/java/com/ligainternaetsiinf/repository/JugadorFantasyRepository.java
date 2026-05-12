@@ -19,4 +19,6 @@ public interface JugadorFantasyRepository extends JpaRepository<JugadorFantasy, 
 
     List<JugadorFantasy> findByEquipoFantasyIdAndAlineadoTrue(Integer equipoId);
 
+    List<JugadorFantasy> findByLigaFantasyIdAndEnVentaTrue(Integer ligaId);
+
 }

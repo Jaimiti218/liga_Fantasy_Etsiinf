@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mercado – Fantasy ETSIINF</title>
+    <link rel="stylesheet" th:href="@{/css/fantasy.css}">
+    <link rel="stylesheet" th:href="@{/css/plantilla.css}">
+    <link rel="stylesheet" th:href="@{/css/mercado.css}">
+</head>
+<body>
+
+    <nav class="fantasy-navbar">
+        <div class="nav-izquierda">
+            <button class="btn-menu" onclick="toggleMenu()">☰</button>
+            <span class="logo">📈 Mercado</span>
+        </div>
+        <div class="nav-derecha">
+            <span id="nav-username" class="nav-username"></span>
+        </div>
+    </nav>
+
+    <div id="menu-overlay" class="menu-overlay hidden" onclick="toggleMenu()"></div>
+    <div id="menu-lateral" class="menu-lateral hidden">
+        <div class="menu-header">
+            <span id="menu-username"></span>
+            <button class="btn-cerrar-menu" onclick="toggleMenu()">✕</button>
+        </div>
+        <nav class="menu-opciones">
+            <a class="menu-item" onclick="toggleMenu(); window.location.href='/fantasy/mis-ligas'">🏆 Mis Ligas</a>
+            <a class="menu-item" onclick="toggleMenu()">📅 Partidos <span class="proximamente-badge">Próximamente</span></a>
+            <a class="menu-item active-menu" onclick="toggleMenu()">📈 Mercado</a>
+            <a class="menu-item" onclick="toggleMenu()">👤 Perfil <span class="proximamente-badge">Próximamente</span></a>
+        </nav>
+        <div class="menu-footer">
+            <button class="btn-volver-inicio" onclick="window.location.href='/'">← Volver al inicio</button>
+            <button class="btn-cerrar-sesion-menu" onclick="cerrarSesionCompleta()">Cerrar sesión</button>
+        </div>
+    </div>
+
+    <!-- TABS MERCADO -->
+    <div class="plantilla-tabs">
+        <button class="tab-btn active" id="tab-mercado" onclick="cambiarTab('mercado')">Mercado</button>
+        <button class="tab-btn" id="tab-operaciones" onclick="cambiarTab('operaciones')">Mis Operaciones</button>
+    </div>
+
+    <main class="plantilla-contenido">
+
+        <!-- TAB MERCADO -->
+        <div id="seccion-mercado" class="tab-seccion">
+            <!-- Saldo disponible -->
+            <div class="saldo-mercado" id="saldo-mercado-info">
+                <div class="saldo-mercado-principal">
+                    <span class="saldo-label">💰 Saldo disponible</span>
+                    <span class="saldo-valor" id="saldo-disponible">—</span>
+                </div>
+                <div class="saldo-mercado-tras-pujas hidden" id="saldo-tras-pujas-container">
+                    <span class="saldo-label-small">Tras tus pujas activas:</span>
+                    <span class="saldo-valor-small" id="saldo-tras-pujas">—</span>
+                </div>
+            </div>
+
+            <!-- Contador del mercado -->
+            <div class="contador-mercado">
+                <span class="contador-label">⏱ Cierre del mercado en:</span>
+                <span class="contador-valor" id="contador-mercado">--:--:--</span>
+            </div>
+
+            <div id="lista-mercado" class="lista-plantilla">
+                <div class="cargando-ligas">Cargando mercado...</div>
+            </div>
+        </div>
+
+        <!-- TAB MIS OPERACIONES -->
+        <div id="seccion-operaciones" class="tab-seccion hidden">
+            <div class="operaciones-tabs">
+                <button class="op-tab active" id="op-compras" onclick="cambiarOpTab('compras')">Compras</button>
+                <button class="op-tab" id="op-ventas" onclick="cambiarOpTab('ventas')">Ventas</button>
+            </div>
+
+            <div id="seccion-compras" class="op-seccion">
+                <div id="lista-compras" class="lista-plantilla">
+                    <div class="cargando-ligas">Cargando pujas...</div>
+                </div>
+            </div>
+
+            <div id="seccion-ventas" class="op-seccion hidden">
+                <div id="lista-ventas" class="lista-plantilla">
+                    <div class="cargando-ligas">Cargando ventas...</div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- MODAL REALIZAR PUJA -->
+    <div id="modal-puja" class="modal-overlay hidden">
+        <div class="modal">
+            <h3>Realizar puja</h3>
+            <p class="subtexto" id="puja-jugador-nombre"></p>
+            <div class="saldo-disponible">
+                💰 Saldo disponible: <strong id="puja-saldo">—</strong>
+            </div>
+            <div class="campo">
+                <label>Valor de mercado</label>
+                <span class="valor-mercado-ref" id="puja-valor-mercado">—</span>
+            </div>
+            <div id="error-puja" class="mensaje-error hidden"></div>
+            <div class="campo">
+                <label>Cantidad de tu puja (€)</label>
+                <input type="text" id="input-puja" placeholder="Ej: 10.000.000"
+                       oninput="formatearInputDinero(this)"/>
+            </div>
+            <div class="modal-botones">
+                <button class="btn-primary" onclick="confirmarPuja()">Realizar puja</button>
+                <button class="btn-ghost" onclick="cerrarModalPuja()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <button class="bottom-nav-item" onclick="irAClasificacion()">🏆 Clasificación</button>
+        <button class="bottom-nav-item" onclick="irAPlantilla()">👤 Mi Plantilla</button>
+        <button class="bottom-nav-item active">📈 Mercado</button>
+        <button class="bottom-nav-item proximamente-btn" disabled>🔔 Noticias</button>
+    </nav>
+
+    <script th:src="@{/js/sesion.js}"></script>
+    <script th:src="@{/js/fantasy-navbar.js}"></script>
+    <script th:src="@{/js/mercado.js}"></script>
+</body>
+</html>

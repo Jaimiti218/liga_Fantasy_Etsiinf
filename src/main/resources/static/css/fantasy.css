@@ -510,3 +510,14 @@ body {
 .mensaje-global.error { background: #fff0f0; color: #c0392b; border: 1px solid #f5c6c6; }
 
 .hidden { display: none !important; }
+
+.mi-equipo-fila {
+    background: #1a3a6b !important;
+}
+.mi-equipo-fila .fila-username {
+    color: white;
+    font-weight: 700;
+}
+.mi-equipo-fila .fila-puntos {
+    color: #90caf9;
+}

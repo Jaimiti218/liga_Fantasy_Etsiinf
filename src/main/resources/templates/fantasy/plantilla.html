@@ -29,7 +29,7 @@
         <nav class="menu-opciones">
             <a class="menu-item" onclick="toggleMenu(); window.location.href='/fantasy/mis-ligas'">🏆 Mis Ligas</a>
             <a class="menu-item" onclick="toggleMenu()">📅 Partidos <span class="proximamente-badge">Próximamente</span></a>
-            <a class="menu-item" onclick="toggleMenu()">📈 Mercado <span class="proximamente-badge">Próximamente</span></a>
+            <a class="menu-item" onclick="toggleMenu(); irAMercado()">📈 Mercado</a>
             <a class="menu-item" onclick="toggleMenu()">👤 Perfil <span class="proximamente-badge">Próximamente</span></a>
         </nav>
         <div class="menu-footer">
@@ -38,7 +38,6 @@
         </div>
     </div>
 
-    <!-- TABS -->
     <div class="plantilla-tabs">
         <button class="tab-btn active" id="tab-alineacion" onclick="cambiarTab('alineacion')">Alineación</button>
         <button class="tab-btn" id="tab-plantilla" onclick="cambiarTab('plantilla')">Plantilla</button>
@@ -47,11 +46,9 @@
 
     <main class="plantilla-contenido">
 
-        <!-- ─── TAB ALINEACIÓN ─── -->
+        <!-- TAB ALINEACIÓN -->
         <div id="seccion-alineacion" class="tab-seccion">
             <div class="alineacion-layout">
-
-                <!-- CAMPO DE FÚTBOL -->
                 <div class="campo-container">
                     <div class="formacion-selector">
                         <select id="select-formacion" onchange="cambiarFormacion(this.value)">
@@ -61,24 +58,16 @@
                             <option value="2-1-3">2-1-3</option>
                         </select>
                     </div>
-
                     <div class="campo-futbol">
-                        <!-- Línea de portero -->
                         <div class="linea-campo" id="linea-portero"></div>
-                        <!-- Línea 1 -->
                         <div class="linea-campo" id="linea-1"></div>
-                        <!-- Línea 2 -->
                         <div class="linea-campo" id="linea-2"></div>
-                        <!-- Línea 3 -->
                         <div class="linea-campo" id="linea-3"></div>
                     </div>
-
                     <button class="btn-guardar-alineacion" onclick="guardarAlineacion()">
                         💾 Guardar alineación
                     </button>
                 </div>
-
-                <!-- RESUMEN DEL EQUIPO -->
                 <div class="resumen-equipo">
                     <h3>Resumen</h3>
                     <div class="resumen-stat">
@@ -96,7 +85,6 @@
                 </div>
             </div>
 
-            <!-- PANEL DE SELECCIÓN DE JUGADOR -->
             <div id="panel-seleccion" class="panel-seleccion hidden">
                 <div class="panel-seleccion-header">
                     <span>Seleccionar jugador</span>
@@ -109,14 +97,14 @@
             </div>
         </div>
 
-        <!-- ─── TAB PLANTILLA ─── -->
+        <!-- TAB PLANTILLA -->
         <div id="seccion-plantilla" class="tab-seccion hidden">
             <div id="lista-plantilla" class="lista-plantilla">
                 <div class="cargando-ligas">Cargando plantilla...</div>
             </div>
         </div>
 
-        <!-- ─── TAB PUNTOS ─── -->
+        <!-- TAB PUNTOS -->
         <div id="seccion-puntos" class="tab-seccion hidden">
             <div class="jornada-nav">
                 <button class="btn-jornada" onclick="cambiarJornada(-1)">‹</button>
@@ -149,19 +137,46 @@
         </div>
     </div>
 
+    <!-- MODAL DETALLE JUGADOR -->
+    <div id="modal-detalle-jugador" class="modal-overlay hidden">
+        <div class="modal-detalle">
+            <div class="detalle-header">
+                <div class="detalle-foto">
+                    <span id="detalle-icono">👤</span>
+                </div>
+                <div class="detalle-header-info">
+                    <div class="detalle-top">
+                        <span class="badge-equipo" id="detalle-equipo"></span>
+                        <span class="badge-posicion" id="detalle-posicion-badge"></span>
+                        <span id="detalle-nombre" class="detalle-nombre"></span>
+                        <span class="detalle-pfsy">PFSY <strong id="detalle-puntos"></strong></span>
+                    </div>
+                    <div class="detalle-sub">
+                        <span>Media <strong id="detalle-media"></strong></span>
+                        <span>💰 <strong id="detalle-valor"></strong></span>
+                    </div>
+                </div>
+                <button class="btn-cerrar-detalle" onclick="cerrarDetalleJugador()">✕</button>
+            </div>
+
+            <div class="detalle-jornadas-nav">
+                <button class="btn-jornada" onclick="cambiarJornadaDetalle(-1)">‹</button>
+                <span id="detalle-jornada-label">Jornada —</span>
+                <span class="detalle-jornada-pts" id="detalle-jornada-puntos">—</span>
+                <button class="btn-jornada" onclick="cambiarJornadaDetalle(1)">›</button>
+            </div>
+
+            <div id="detalle-stats-tabla" class="detalle-stats-tabla"></div>
+
+            <button class="btn-ghost" style="width:100%;margin-top:1rem" onclick="cerrarDetalleJugador()">Cerrar</button>
+        </div>
+    </div>
+
     <nav class="bottom-nav">
-        <button class="bottom-nav-item" onclick="volverALiga()">
-            🏆 Clasificación
-        </button>
-        <button class="bottom-nav-item active">
-            👤 Mi Plantilla
-        </button>
-        <button class="bottom-nav-item proximamente-btn" disabled>
-            📈 Mercado
-        </button>
-        <button class="bottom-nav-item proximamente-btn" disabled>
-            🔔 Noticias
-        </button>
+        <button class="bottom-nav-item" onclick="volverALiga()">🏆 Clasificación</button>
+        <button class="bottom-nav-item active">👤 Mi Plantilla</button>
+        <button class="bottom-nav-item" onclick="irAMercado()">📈 Mercado</button>
+        <button class="bottom-nav-item proximamente-btn" disabled>🔔 Noticias</button>
     </nav>
 
     <script th:src="@{/js/sesion.js}"></script>

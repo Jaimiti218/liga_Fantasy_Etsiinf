@@ -1,0 +1,40 @@
+package com.ligainternaetsiinf.model;
+
+import java.time.LocalDateTime;
+import jakarta.persistence.*;
+
+@Entity
+public class OfertaVenta {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @ManyToOne
+    private JugadorFantasy jugadorFantasy;
+
+    @ManyToOne
+    private EquipoFantasy equipoVendedor;
+
+    private long cantidad;
+    private LocalDateTime fecha;
+    private boolean aceptada;
+
+    public OfertaVenta(){}
+
+    public OfertaVenta(JugadorFantasy jugador, EquipoFantasy vendedor, long cantidad){
+        this.jugadorFantasy = jugador;
+        this.equipoVendedor = vendedor;
+        this.cantidad = cantidad;
+        this.fecha = LocalDateTime.now();
+        this.aceptada = false;
+    }
+
+    public Integer getId(){ return id; }
+    public JugadorFantasy getJugadorFantasy(){ return jugadorFantasy; }
+    public EquipoFantasy getEquipoVendedor(){ return equipoVendedor; }
+    public long getCantidad(){ return cantidad; }
+    public boolean isAceptada(){ return aceptada; }
+    public void setAceptada(boolean aceptada){ this.aceptada = aceptada; }
+    public LocalDateTime getFecha(){ return fecha; }
+}

@@ -82,17 +82,17 @@ function renderizarClasificacion(lista) {
     }
 
     contenedor.innerHTML = lista.map((equipo, index) => {
-        const pos = index + 1;
-        const esMio = equipo.equipoId === miEquipoId;
+        const pos    = index + 1;
+        const esMio  = equipo.equipoId === miEquipoId;
         let clasePos = 'posicion-num';
         if (pos === 1) clasePos += ' top1';
         else if (pos === 2) clasePos += ' top2';
         else if (pos === 3) clasePos += ' top3';
 
         return `
-            <div class="fila-clasificacion ${esMio ? 'mi-equipo' : ''}">
+            <div class="fila-clasificacion ${esMio ? 'mi-equipo-fila' : ''}">
                 <span class="${clasePos}">${pos}</span>
-                <span class="fila-username">${equipo.username}${esMio ? ' (tú)' : ''}</span>
+                <span class="fila-username">${equipo.userNombre}</span>
                 <span class="fila-puntos">${equipo.puntos} pts</span>
             </div>
         `;
@@ -110,4 +110,8 @@ function irAPlantilla() {
     if (miEquipoId) {
         window.location.href = `/fantasy/plantilla/${miEquipoId}?liga=${ligaId}`;
     }
+}
+
+function irAMercado() {
+    window.location.href = `/fantasy/mercado/${ligaId}`;
 }

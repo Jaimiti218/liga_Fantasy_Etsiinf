@@ -29,6 +29,9 @@ import com.ligainternaetsiinf.repository.UserRepository;
 public class LigaFantasyService {
 
     @Autowired
+    private MercadoService mercadoService;
+
+    @Autowired
     private LigaFantasyRepository ligaFantasyRepository;
 
     @Autowired
@@ -85,6 +88,7 @@ public class LigaFantasyService {
         //Mercado mercado = new Mercado(liga, jugadorFantasyRepository.findByLigaFantasyId(liga.getId()));
         Mercado mercado = new Mercado(liga);
         mercadoRepository.save(mercado);
+        mercadoService.crearPrimeraInstancia(mercado);
 
         return cambioTipoRespuesta(liga);
     }
@@ -115,6 +119,8 @@ public class LigaFantasyService {
 
         for(JugadorFantasy jf : plantilla){
             jf.setEquipoFantasy(equipo);
+            jf.setClausula(jf.getJugadorReal().getValorMercado() * 2);
+            jf.setClausulaBloqueadaHasta(LocalDateTime.now().plusWeeks(2));
         }
 
         jugadorFantasyRepository.saveAll(plantilla);

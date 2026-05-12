@@ -1,31 +1,21 @@
 // ─── Estado global ──────────────────────────────────────────────────────────
-let equipoId             = null;
-let ligaId               = null;
-let plantillaData        = [];
-let alineacionActual     = [];   // array de 7 posiciones, cada una es un ID o null
-let formacionActual      = '2-2-2';
-let posicionSeleccionada = null;
+let equipoId              = null;
+let ligaId                = null;
+let plantillaData         = [];
+let alineacionActual      = [];
+let formacionActual       = '2-3-1';
+let posicionSeleccionada  = null;
 let candidatoSeleccionado = null;
-let jornadaActual        = 1;
-let accionesAbierto      = null;
+let jornadaActual         = 1;
+let accionesAbierto       = null;
 let jugadorClausulaActual = null;
-const MAX_JUGADORES      = 13;
+const MAX_JUGADORES       = 13;
 
-// Mapeo posición → emoji e icono
 const ICONOS_POSICION = {
     'PORTERO':     '🧤',
     'DEFENSA':     '🛡',
     'MEDIOCENTRO': '⚙️',
     'DELANTERO':   '⚡'
-};
-
-// Qué posición juega en cada línea de la formación
-// Formación "D-M-DEL" → linea 1: DEFENSA, linea 2: MEDIOCENTRO, linea 3: DELANTERO
-const POSICION_POR_LINEA = {
-    0: 'PORTERO',
-    1: 'DEFENSA',
-    2: 'MEDIOCENTRO',
-    3: 'DELANTERO'
 };
 
 // ─── Init ────────────────────────────────────────────────────────────────────
@@ -51,30 +41,23 @@ function volverALiga() {
 // ─── Cargar plantilla ────────────────────────────────────────────────────────
 async function cargarPlantilla() {
     try {
-        // Primero cargar la formación del equipo
-        const resEquipo = await fetch(`/equipos-fantasy/${equipoId}`, {
-            credentials: 'include'
-        });
+        const resEquipo = await fetch(`/equipos-fantasy/${equipoId}`, { credentials: 'include' });
         if (resEquipo.ok) {
-            const equipo = await resEquipo.json();
-            formacionActual = equipo.formacion || '2-2-2';
+            const equipo    = await resEquipo.json();
+            formacionActual = equipo.formacion || '2-3-1';
             window.dineroEquipo = equipo.dinero;
             document.getElementById('select-formacion').value = formacionActual;
         }
 
-        // Luego cargar la plantilla con la formación ya correcta
-        const res = await fetch(`/equipos-fantasy/${equipoId}/plantilla`, {
-            credentials: 'include'
-        });
+        const res = await fetch(`/equipos-fantasy/${equipoId}/plantilla`, { credentials: 'include' });
         if (!res.ok) { plantillaData = []; return; }
         plantillaData = await res.json();
 
-        // Ahora reconstruir la alineación con la formación correcta
-        const alineados      = plantillaData.filter(j => j.alineado);
-        const porteroAlin    = alineados.filter(j => j.posicion === 'PORTERO');
-        const defensasAlin   = alineados.filter(j => j.posicion === 'DEFENSA');
-        const mediosAlin     = alineados.filter(j => j.posicion === 'MEDIOCENTRO');
-        const delantAlin     = alineados.filter(j => j.posicion === 'DELANTERO');
+        const alineados    = plantillaData.filter(j => j.alineado);
+        const porteroAlin  = alineados.filter(j => j.posicion === 'PORTERO');
+        const defensasAlin = alineados.filter(j => j.posicion === 'DEFENSA');
+        const mediosAlin   = alineados.filter(j => j.posicion === 'MEDIOCENTRO');
+        const delantAlin   = alineados.filter(j => j.posicion === 'DELANTERO');
 
         const lineas = parsearFormacion(formacionActual);
         alineacionActual = [
@@ -85,7 +68,6 @@ async function cargarPlantilla() {
         ];
 
         actualizarResumen();
-
     } catch (e) {
         plantillaData = [];
     }
@@ -101,7 +83,6 @@ function rellenarLinea(jugadores, cantidad) {
 function cambiarTab(tab) {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.tab-seccion').forEach(s => s.classList.add('hidden'));
-
     document.getElementById(`tab-${tab}`).classList.add('active');
     document.getElementById(`seccion-${tab}`).classList.remove('hidden');
 
@@ -115,10 +96,8 @@ function renderizarCampo() {
     const lineas = parsearFormacion(formacionActual);
     document.getElementById('select-formacion').value = formacionActual;
 
-    // Portero (posición 0)
     renderizarLinea('linea-portero', [alineacionActual[0] ?? null], 0, 'PORTERO');
 
-    // Líneas de campo según formación
     let offset = 1;
     const posicionesPorLinea = ['DEFENSA', 'MEDIOCENTRO', 'DELANTERO'];
     lineas.forEach((cantidad, idx) => {
@@ -171,27 +150,18 @@ function abrirSeleccion(posicion, posicionLinea) {
     candidatoSeleccionado = null;
     document.getElementById('btn-confirmar').disabled = true;
 
-    const idActual = alineacionActual[posicion] ?? null;
-
-    // Candidatos: jugadores de la posición correcta que no estén ya alineados
-    // excepto el que ya está en esta posición (que no aparece para no confundir)
+    const idActual    = alineacionActual[posicion] ?? null;
     const disponibles = plantillaData.filter(j => {
         if (j.posicion !== posicionLinea) return false;
         if (alineacionActual.includes(j.id) && j.id !== idActual) return false;
-        if (j.id === idActual) return false; // el que ya está no se muestra como opción
+        if (j.id === idActual) return false;
         return true;
     });
 
-    const lista = document.getElementById('lista-candidatos');
     let html = '';
-
-    // Opción de quitar al jugador actual
     if (idActual !== null) {
-        html += `<div class="candidato-item candidato-quitar" onclick="quitarJugadorPosicion()">
-            ✕ Quitar jugador
-        </div>`;
+        html += `<div class="candidato-item candidato-quitar" onclick="quitarJugadorPosicion()">✕ Quitar jugador</div>`;
     }
-
     if (disponibles.length === 0) {
         html += '<div style="color:#999;font-size:0.85rem;padding:0.5rem">No hay más jugadores disponibles para esta posición</div>';
     } else {
@@ -202,15 +172,15 @@ function abrirSeleccion(posicion, posicionLinea) {
         `).join('');
     }
 
-    lista.innerHTML = html;
+    document.getElementById('lista-candidatos').innerHTML = html;
     document.getElementById('panel-seleccion').classList.remove('hidden');
 }
 
 function quitarJugadorPosicion() {
     if (posicionSeleccionada === null) return;
-    const nuevaAlineacion = [...alineacionActual];
-    nuevaAlineacion[posicionSeleccionada] = null;
-    alineacionActual = nuevaAlineacion;
+    const nueva = [...alineacionActual];
+    nueva[posicionSeleccionada] = null;
+    alineacionActual = nueva;
     cerrarPanelSeleccion();
     renderizarCampo();
 }
@@ -225,12 +195,10 @@ function seleccionarCandidato(jfId) {
 
 function confirmarCambio() {
     if (candidatoSeleccionado === null || posicionSeleccionada === null) return;
-
-    const nuevaAlineacion = [...alineacionActual];
-    while (nuevaAlineacion.length < 7) nuevaAlineacion.push(null);
-    nuevaAlineacion[posicionSeleccionada] = candidatoSeleccionado;
-
-    alineacionActual = nuevaAlineacion;
+    const nueva = [...alineacionActual];
+    while (nueva.length < 7) nueva.push(null);
+    nueva[posicionSeleccionada] = candidatoSeleccionado;
+    alineacionActual = nueva;
     cerrarPanelSeleccion();
     renderizarCampo();
 }
@@ -244,15 +212,11 @@ function cerrarPanelSeleccion() {
 // ─── Cambiar formación ────────────────────────────────────────────────────────
 function cambiarFormacion(nuevaFormacion) {
     formacionActual = nuevaFormacion;
-    // Al cambiar formación, resetear solo las posiciones de campo (no el portero)
-    // pero mantener los jugadores que sigan siendo válidos para sus nuevas líneas
-    const portero = alineacionActual[0] ?? null;
-    const lineas  = parsearFormacion(nuevaFormacion);
-
-    // Reconstruir respetando posiciones
-    const defensasActuales   = obtenerAlineadosDePosicion('DEFENSA');
-    const mediosActuales     = obtenerAlineadosDePosicion('MEDIOCENTRO');
-    const delantActuales     = obtenerAlineadosDePosicion('DELANTERO');
+    const portero          = alineacionActual[0] ?? null;
+    const lineas           = parsearFormacion(nuevaFormacion);
+    const defensasActuales = obtenerAlineadosDePosicion('DEFENSA');
+    const mediosActuales   = obtenerAlineadosDePosicion('MEDIOCENTRO');
+    const delantActuales   = obtenerAlineadosDePosicion('DELANTERO');
 
     alineacionActual = [
         portero,
@@ -290,10 +254,7 @@ async function guardarAlineacion() {
             method: 'PUT',
             credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                jugadorFantasyIds: ids,
-                formacion: formacionActual  // ← siempre se manda la formación actual
-            })
+            body: JSON.stringify({ jugadorFantasyIds: ids, formacion: formacionActual })
         });
 
         if (!res.ok) {
@@ -303,8 +264,6 @@ async function guardarAlineacion() {
         }
 
         mostrarToast('✓ Alineación guardada');
-        // No recargar la plantilla entera, solo actualizar el resumen
-        // para evitar que formacionActual se sobreescriba
         actualizarResumen();
         renderizarCampo();
     } catch (e) {
@@ -315,39 +274,57 @@ async function guardarAlineacion() {
 // ─── Resumen ──────────────────────────────────────────────────────────────────
 function actualizarResumen() {
     const valorTotal = plantillaData.reduce((sum, j) => sum + j.valorMercado, 0);
-    document.getElementById('valor-equipo').textContent    = formatearDinero(valorTotal);
-    document.getElementById('num-jugadores').textContent   = `${plantillaData.length} / ${MAX_JUGADORES}`;
+    document.getElementById('valor-equipo').textContent     = formatearDinero(valorTotal);
+    document.getElementById('num-jugadores').textContent    = `${plantillaData.length} / ${MAX_JUGADORES}`;
     document.getElementById('formacion-actual').textContent = formacionActual;
 }
 
 // ─── TAB PLANTILLA ────────────────────────────────────────────────────────────
-function renderizarPlantilla() {
+async function renderizarPlantilla() {
     const contenedor = document.getElementById('lista-plantilla');
+    contenedor.innerHTML = '<div class="cargando-ligas">Cargando...</div>';
 
     if (plantillaData.length === 0) {
         contenedor.innerHTML = '<div class="cargando-ligas">No tienes jugadores en tu plantilla.</div>';
         return;
     }
 
-    const orden = { 'PORTERO': 0, 'DEFENSA': 1, 'MEDIOCENTRO': 2, 'DELANTERO': 3 };
+    const orden    = { 'PORTERO': 0, 'DEFENSA': 1, 'MEDIOCENTRO': 2, 'DELANTERO': 3 };
     const ordenados = [...plantillaData].sort((a, b) => {
         const diff = (orden[a.posicion] ?? 4) - (orden[b.posicion] ?? 4);
-        if (diff !== 0) return diff;
-        return b.puntosTotal - a.puntosTotal;
+        return diff !== 0 ? diff : b.puntosTotal - a.puntosTotal;
     });
 
+    // Cargar jornadas de todos en paralelo
+    const jornadasMap = {};
+    await Promise.all(ordenados.map(async j => {
+        jornadasMap[j.id] = await cargarJornadasJugador(j.id);
+    }));
+
     contenedor.innerHTML = ordenados.map(j => {
-        const clausulaBloq    = j.clausulaBloqueadaHasta ? new Date(j.clausulaBloqueadaHasta) : null;
-        const ahora           = new Date();
-        const clausulaBloq2   = clausulaBloq && clausulaBloq > ahora;
-        let clausulaHtml      = '';
+        const jornadas  = jornadasMap[j.id] ?? [];
+        const ultimas5  = jornadas.slice(-5);
+        while (ultimas5.length < 5) ultimas5.unshift(null);
+
+        const jornadasHtml = ultimas5.map(jorn => {
+            if (!jorn) return `<div class="jornada-mini jornada-vacia">—</div>`;
+            const color = jorn.puntos >= 8 ? 'alta' : jorn.puntos >= 4 ? 'media' : 'baja';
+            return `<div class="jornada-mini jornada-${color}" onclick="event.stopPropagation(); abrirDetalleJugador(${j.id})">
+                J${jorn.jornada}<br><strong>${jorn.jugo ? jorn.puntos : '—'}</strong>
+            </div>`;
+        }).join('');
+
+        const clausulaBloq  = j.clausulaBloqueadaHasta ? new Date(j.clausulaBloqueadaHasta) : null;
+        const ahora         = new Date();
+        const bloqueada     = clausulaBloq && clausulaBloq > ahora;
+        let clausulaHtml    = '';
 
         if (j.clausula === null) {
             clausulaHtml = '<span class="clausula-badge clausula-sin">Sin cláusula</span>';
-        } else if (clausulaBloq2) {
-            const diff  = clausulaBloq - ahora;
-            const dias  = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const horas = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        } else if (bloqueada) {
+            const diff   = clausulaBloq - ahora;
+            const dias   = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const horas  = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const tiempo = dias > 0 ? `${dias}d ${horas}h` : `${horas}h`;
             clausulaHtml = `
                 <span class="clausula-badge clausula-bloqueada">🔒 ${tiempo}</span>
@@ -358,7 +335,7 @@ function renderizarPlantilla() {
         }
 
         return `
-        <div class="jugador-card">
+        <div class="jugador-card" onclick="abrirDetalleJugador(${j.id})">
             <div class="jugador-foto-grande">
                 <span>${ICONOS_POSICION[j.posicion] ?? '👤'}</span>
             </div>
@@ -368,9 +345,12 @@ function renderizarPlantilla() {
                     <span class="badge-equipo">${j.nombreEquipoReal || 'Sin equipo'}</span>
                     <span class="badge-posicion ${j.posicion}">${j.posicion.charAt(0) + j.posicion.slice(1).toLowerCase()}</span>
                 </div>
+                <div class="jornadas-recientes">${jornadasHtml}</div>
+            </div>
+            <div class="jugador-card-derecha">
                 <div class="jugador-card-stats">
                     <div class="jugador-mini-stat">
-                        <span class="label">Puntos</span>
+                        <span class="label">Pts</span>
                         <span class="valor">${j.puntosTotal}</span>
                     </div>
                     <div class="jugador-mini-stat">
@@ -386,17 +366,15 @@ function renderizarPlantilla() {
                         <span class="valor">${clausulaHtml}</span>
                     </div>
                 </div>
-            </div>
-            <div style="position:relative">
-                <button class="btn-acciones" onclick="toggleAcciones(event, ${j.id})">
-                    Acciones ▾
-                </button>
-                <div id="acciones-${j.id}" class="acciones-dropdown hidden">
-                    <div class="acciones-item" onclick="abrirModalClausula(${j.id}, '${escapar(j.nombre)}')">
-                        📈 Subir cláusula
-                    </div>
-                    <div class="acciones-item" style="color:#aaa;cursor:not-allowed">
-                        🛒 Mercado (próximamente)
+                <div onclick="event.stopPropagation()" style="position:relative">
+                    <button class="btn-acciones" onclick="toggleAcciones(event, ${j.id})">Acciones ▾</button>
+                    <div id="acciones-${j.id}" class="acciones-dropdown hidden">
+                        <div class="acciones-item" onclick="abrirModalClausula(${j.id}, '${escapar(j.nombre)}')">
+                            📈 Subir cláusula
+                        </div>
+                        <div class="acciones-item" onclick="ponerEnVentaDesde(${j.id})">
+                            🛒 Añadir al mercado
+                        </div>
                     </div>
                 </div>
             </div>
@@ -404,9 +382,29 @@ function renderizarPlantilla() {
     }).join('');
 }
 
+
+async function ponerEnVentaDesde(jugadorFantasyId) {
+    cerrarAcciones();
+    try {
+        const res = await fetch(`/mercado/vender/${jugadorFantasyId}`, {
+            method: 'POST', credentials: 'include'
+        });
+        if (!res.ok) {
+            const texto = await res.text();
+            alert(texto || 'Error al poner en venta.');
+            return;
+        }
+        mostrarToast('✓ Jugador puesto en venta');
+        await cargarPlantilla();
+        renderizarPlantilla();
+    } catch (e) {
+        alert('Error de conexión.');
+    }
+}
+
 function toggleAcciones(event, jfId) {
     event.stopPropagation();
-    const dropdown   = document.getElementById(`acciones-${jfId}`);
+    const dropdown    = document.getElementById(`acciones-${jfId}`);
     const estaAbierto = !dropdown.classList.contains('hidden');
     cerrarAcciones();
     if (!estaAbierto) {
@@ -425,7 +423,7 @@ function abrirModalClausula(jfId, nombre) {
     cerrarAcciones();
     jugadorClausulaActual = jfId;
     document.getElementById('clausula-jugador-nombre').textContent = nombre;
-    document.getElementById('clausula-saldo').textContent = formatearDinero(window.dineroEquipo ?? 0);
+    document.getElementById('clausula-saldo').textContent          = formatearDinero(window.dineroEquipo ?? 0);
     document.getElementById('input-clausula').value                = '';
     document.getElementById('error-clausula').classList.add('hidden');
     document.getElementById('modal-clausula').classList.remove('hidden');
@@ -442,24 +440,18 @@ async function confirmarSubirClausula() {
         mostrarErrorElement('error-clausula', 'Introduce una cantidad válida.');
         return;
     }
-
-    // Confirmación antes de ejecutar
-    if (!confirm(`¿Seguro que quieres invertir ${formatearDinero(cantidad)} para subir la cláusula? La cláusula subirá ${formatearDinero(cantidad * 2)}.`)) {
-        return;
-    }
+    if (!confirm(`¿Seguro que quieres invertir ${formatearDinero(cantidad)}? La cláusula subirá ${formatearDinero(cantidad * 2)}.`)) return;
 
     try {
         const res = await fetch(
             `/jugadores-fantasy/${jugadorClausulaActual}/clausula?cantidadASubir=${cantidad}&equipoFantasyId=${equipoId}`,
             { method: 'PUT', credentials: 'include' }
         );
-
         if (!res.ok) {
             const texto = await res.text();
             mostrarErrorElement('error-clausula', texto || 'Error al subir la cláusula.');
             return;
         }
-
         cerrarModalClausula();
         mostrarToast('✓ Cláusula actualizada');
         await cargarPlantilla();
@@ -467,6 +459,107 @@ async function confirmarSubirClausula() {
     } catch (e) {
         mostrarErrorElement('error-clausula', 'Error de conexión.');
     }
+}
+
+// ─── Detalle jugador ──────────────────────────────────────────────────────────
+async function cargarJornadasJugador(jugadorFantasyId) {
+    try {
+        const res = await fetch(`/equipos-fantasy/jugador/${jugadorFantasyId}/jornadas`, {
+            credentials: 'include'
+        });
+        if (!res.ok) return [];
+        return await res.json();
+    } catch (e) {
+        return [];
+    }
+}
+
+async function abrirDetalleJugador(jugadorFantasyId) {
+    const jugador = plantillaData.find(j => j.id === jugadorFantasyId);
+    if (!jugador) return;
+
+    const jornadas = await cargarJornadasJugador(jugadorFantasyId);
+
+    document.getElementById('detalle-icono').textContent           = ICONOS_POSICION[jugador.posicion] ?? '👤';
+    document.getElementById('detalle-nombre').textContent          = jugador.nombre;
+    document.getElementById('detalle-equipo').textContent          = jugador.nombreEquipoReal || 'Sin equipo';
+    document.getElementById('detalle-posicion-badge').textContent  = jugador.posicion.charAt(0) + jugador.posicion.slice(1).toLowerCase();
+    document.getElementById('detalle-posicion-badge').className    = `badge-posicion ${jugador.posicion}`;
+    document.getElementById('detalle-puntos').textContent          = jugador.puntosTotal;
+    document.getElementById('detalle-media').textContent           = jugador.mediaPuntos.toFixed(2);
+    document.getElementById('detalle-valor').textContent           = formatearDinero(jugador.valorMercado);
+
+    window._jornadasDetalle      = jornadas;
+    window._jornadaDetalleActual = jornadas.length > 0 ? jornadas.length - 1 : 0;
+    window._jugadorDetalleActual = jugador;
+
+    if (jornadas.length === 0) {
+        document.getElementById('detalle-jornada-label').textContent  = 'Sin jornadas';
+        document.getElementById('detalle-jornada-puntos').textContent = '—';
+        document.getElementById('detalle-stats-tabla').innerHTML      =
+            '<div class="sin-datos">Sin jornadas jugadas todavía</div>';
+    } else {
+        renderizarJornadaDetalle();
+    }
+
+    document.getElementById('modal-detalle-jugador').classList.remove('hidden');
+}
+
+function renderizarJornadaDetalle() {
+    const jornadas = window._jornadasDetalle;
+    const jugador  = window._jugadorDetalleActual;
+    const idx      = window._jornadaDetalleActual;
+    const jorn     = jornadas[idx];
+
+    document.getElementById('detalle-jornada-label').textContent  = `Jornada ${jorn.jornada}`;
+    document.getElementById('detalle-jornada-puntos').textContent = jorn.jugo ? jorn.puntos : '—';
+
+    const stats = document.getElementById('detalle-stats-tabla');
+    if (!jorn.jugo) {
+        stats.innerHTML = '<div class="sin-datos">No jugó en esta jornada</div>';
+        return;
+    }
+
+    const esPortero = jugador?.posicion === 'PORTERO';
+    stats.innerHTML = `
+        <div class="stat-fila">
+            <span class="stat-cantidad">${jorn.goles}</span>
+            <span class="stat-nombre">Goles</span>
+            <span class="stat-puntos ${jorn.goles > 0 ? 'positivo' : 'neutro'}">${jorn.goles * 4}</span>
+        </div>
+        <div class="stat-fila">
+            <span class="stat-cantidad">${jorn.asistencias}</span>
+            <span class="stat-nombre">Asistencias</span>
+            <span class="stat-puntos ${jorn.asistencias > 0 ? 'positivo' : 'neutro'}">${jorn.asistencias * 2}</span>
+        </div>
+        <div class="stat-fila">
+            <span class="stat-cantidad">${jorn.tarjetasAmarillas}</span>
+            <span class="stat-nombre">Tarjetas amarillas</span>
+            <span class="stat-puntos ${jorn.tarjetasAmarillas > 0 ? 'negativo' : 'neutro'}">${jorn.tarjetasAmarillas * -1}</span>
+        </div>
+        <div class="stat-fila">
+            <span class="stat-cantidad">${jorn.tarjetasRojas}</span>
+            <span class="stat-nombre">Tarjetas rojas</span>
+            <span class="stat-puntos ${jorn.tarjetasRojas > 0 ? 'negativo' : 'neutro'}">${jorn.tarjetasRojas * -3}</span>
+        </div>
+        ${esPortero ? `
+        <div class="stat-fila">
+            <span class="stat-cantidad">${jorn.paradas}</span>
+            <span class="stat-nombre">Paradas</span>
+            <span class="stat-puntos ${jorn.paradas > 0 ? 'positivo' : 'neutro'}">${jorn.paradas}</span>
+        </div>` : ''}
+    `;
+}
+
+function cambiarJornadaDetalle(delta) {
+    const nueva = window._jornadaDetalleActual + delta;
+    if (nueva < 0 || nueva >= window._jornadasDetalle.length) return;
+    window._jornadaDetalleActual = nueva;
+    renderizarJornadaDetalle();
+}
+
+function cerrarDetalleJugador() {
+    document.getElementById('modal-detalle-jugador').classList.add('hidden');
 }
 
 // ─── TAB PUNTOS ───────────────────────────────────────────────────────────────
@@ -479,18 +572,15 @@ async function renderizarPuntos() {
         const res = await fetch(`/equipos-fantasy/${equipoId}/puntos/jornada/${jornadaActual}`, {
             credentials: 'include'
         });
-
         if (!res.ok) {
             campo.innerHTML = '<div style="color:rgba(255,255,255,0.7);text-align:center;padding:2rem">Sin datos para esta jornada</div>';
             return;
         }
-
         const datos = await res.json();
         if (datos.length === 0) {
             campo.innerHTML = '<div style="color:rgba(255,255,255,0.7);text-align:center;padding:2rem">Sin alineación registrada para esta jornada</div>';
             return;
         }
-
         renderizarCampoPuntos(campo, datos);
     } catch (e) {
         campo.innerHTML = '<div style="color:rgba(255,255,255,0.7);text-align:center;padding:2rem">Error al cargar</div>';
@@ -499,20 +589,17 @@ async function renderizarPuntos() {
 
 function renderizarCampoPuntos(campo, datos) {
     campo.innerHTML = '';
-    const lineas = parsearFormacion(formacionActual);
+    const lineas  = parsearFormacion(formacionActual);
+    const portero  = datos.find(j => j.posicion === 'PORTERO');
+    const defensas = datos.filter(j => j.posicion === 'DEFENSA');
+    const medios   = datos.filter(j => j.posicion === 'MEDIOCENTRO');
+    const delant   = datos.filter(j => j.posicion === 'DELANTERO');
 
-    const portero   = datos.find(j => j.posicion === 'PORTERO');
-    const defensas  = datos.filter(j => j.posicion === 'DEFENSA');
-    const medios    = datos.filter(j => j.posicion === 'MEDIOCENTRO');
-    const delant    = datos.filter(j => j.posicion === 'DELANTERO');
-
-    // Portero
     const lineaPortero = document.createElement('div');
     lineaPortero.className = 'linea-campo';
     if (portero) lineaPortero.appendChild(crearCartaPuntos(portero));
     campo.appendChild(lineaPortero);
 
-    // Líneas de campo según formación
     [defensas, medios, delant].forEach((grupo, idx) => {
         const cantidad = lineas[idx] ?? 0;
         const linea    = document.createElement('div');
@@ -525,10 +612,13 @@ function renderizarCampoPuntos(campo, datos) {
 function crearCartaPuntos(jugador) {
     const carta = document.createElement('div');
     carta.className = 'carta-jugador';
+    carta.style.cursor = 'pointer';
+    carta.onclick = () => {
+        const jf = plantillaData.find(j => j.nombre === jugador.nombre);
+        if (jf) abrirDetalleJugador(jf.id);
+    };
     carta.innerHTML = `
-        <div class="carta-foto">
-            <span>${ICONOS_POSICION[jugador.posicion] ?? '👤'}</span>
-        </div>
+        <div class="carta-foto"><span>${ICONOS_POSICION[jugador.posicion] ?? '👤'}</span></div>
         <div class="carta-nombre">${abreviarNombre(jugador.nombre)}</div>
         <div class="carta-puntos-jornada">${jugador.jugo ? jugador.puntos + ' pts' : '—'}</div>
     `;
@@ -543,15 +633,12 @@ function cambiarJornada(delta) {
 }
 
 // ─── Utilidades ──────────────────────────────────────────────────────────────
-function parsearFormacion(f) {
-    return f.split('-').map(Number);
-}
+function parsearFormacion(f) { return f.split('-').map(Number); }
 
 function abreviarNombre(nombre) {
     if (!nombre) return '—';
     const partes = nombre.trim().split(' ');
-    if (partes.length === 1) return partes[0];
-    return partes[partes.length - 1];
+    return partes.length === 1 ? partes[0] : partes[partes.length - 1];
 }
 
 function formatearDinero(cantidad) {
@@ -568,8 +655,8 @@ function mostrarToast(texto) {
         toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#0f3460;color:white;padding:0.6rem 1.2rem;border-radius:20px;font-size:0.85rem;font-weight:600;z-index:200;transition:opacity 0.3s';
         document.body.appendChild(toast);
     }
-    toast.textContent    = texto;
-    toast.style.opacity  = '1';
+    toast.textContent   = texto;
+    toast.style.opacity = '1';
     setTimeout(() => { toast.style.opacity = '0'; }, 2500);
 }
 
@@ -581,4 +668,8 @@ function mostrarErrorElement(id, texto) {
 
 function escapar(str) {
     return String(str).replace(/'/g, "\\'").replace(/"/g, '\\"');
+}
+
+function irAMercado() {
+    window.location.href = `/fantasy/mercado/${ligaId}`;
 }

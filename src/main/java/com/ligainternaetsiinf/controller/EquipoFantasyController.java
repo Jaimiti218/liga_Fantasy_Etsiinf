@@ -12,6 +12,7 @@ import com.ligainternaetsiinf.security.CustomUserDetails;
 import com.ligainternaetsiinf.service.EquipoFantasyService;
 import com.ligainternaetsiinf.dto.AlineacionDTO;
 import com.ligainternaetsiinf.dto.JugadorFantasyDetalleResponse;
+import com.ligainternaetsiinf.dto.PuntosJornadaJugadorResponse;
 import com.ligainternaetsiinf.dto.PuntosJornadaResponse;
 
 
@@ -80,5 +81,11 @@ public class EquipoFantasyController {
             @PathVariable Integer equipoId,
             @PathVariable Integer jornada) {
         return equipoFantasyService.obtenerPuntosJornada(equipoId, jornada);
+    }
+
+    @GetMapping("/jugador/{jugadorFantasyId}/jornadas")
+    public List<PuntosJornadaJugadorResponse> obtenerPuntosJugadorPorJornadas(
+            @PathVariable Integer jugadorFantasyId) {
+        return equipoFantasyService.obtenerPuntosJugadorPorJornadas(jugadorFantasyId);
     }
 }

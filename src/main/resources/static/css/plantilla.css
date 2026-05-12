@@ -536,3 +536,150 @@
     padding: 0.6rem 1rem;
     font-size: 0.875rem;
 }
+
+
+/* ── JORNADAS RECIENTES ── */
+.jornadas-recientes {
+    display: flex;
+    gap: 0.3rem;
+    margin-top: 0.5rem;
+}
+
+.jornada-mini {
+    min-width: 36px;
+    height: 44px;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.62rem;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s;
+    padding: 0.2rem;
+    text-align: center;
+    line-height: 1.3;
+}
+.jornada-mini:hover     { transform: translateY(-2px); }
+.jornada-mini.jornada-alta  { background: #27ae60; }
+.jornada-mini.jornada-media { background: #f39c12; }
+.jornada-mini.jornada-baja  { background: #e74c3c; }
+.jornada-mini.jornada-vacia { background: #ddd; color: #999; }
+
+/* ── LAYOUT TARJETA ── */
+.jugador-card { cursor: pointer; align-items: flex-start; }
+.jugador-card-derecha {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+/* ── MODAL DETALLE ── */
+.modal-detalle {
+    background: #1e2d4a;
+    border-radius: 16px;
+    padding: 1.5rem;
+    width: 100%;
+    max-width: 480px;
+    color: white;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+.detalle-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    position: relative;
+}
+
+.detalle-foto {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    flex-shrink: 0;
+}
+
+.detalle-header-info { flex: 1; }
+
+.detalle-top {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.4rem;
+}
+
+.detalle-nombre { font-size: 1.1rem; font-weight: 800; color: white; }
+
+.detalle-pfsy { margin-left: auto; font-size: 0.8rem; color: rgba(255,255,255,0.7); }
+.detalle-pfsy strong { font-size: 1.4rem; color: white; }
+
+.detalle-sub {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.65);
+}
+
+.btn-cerrar-detalle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.6);
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.detalle-jornadas-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    background: rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.detalle-jornada-pts {
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: #90caf9;
+    min-width: 50px;
+    text-align: center;
+}
+
+.detalle-stats-tabla { display: flex; flex-direction: column; }
+
+.stat-fila {
+    display: flex;
+    align-items: center;
+    padding: 0.85rem 0.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    gap: 1rem;
+}
+
+.stat-cantidad { font-size: 1.2rem; font-weight: 800; min-width: 30px; color: white; }
+.stat-nombre   { flex: 1; font-size: 0.9rem; color: rgba(255,255,255,0.75); }
+.stat-puntos   { font-size: 1rem; font-weight: 700; min-width: 30px; text-align: right; }
+.stat-puntos.positivo { color: #4caf50; }
+.stat-puntos.negativo { color: #f44336; }
+.stat-puntos.neutro   { color: rgba(255,255,255,0.4); }
+
+.sin-datos { text-align: center; color: rgba(255,255,255,0.5); padding: 2rem; font-size: 0.9rem; }

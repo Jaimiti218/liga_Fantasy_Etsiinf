@@ -45,4 +45,9 @@ public class ViewController {
     public String plantilla() {
         return "fantasy/plantilla";
     }
+
+    @GetMapping("/fantasy/mercado/{ligaId}")
+    public String mercado() {
+        return "fantasy/mercado";
+    }
 }

@@ -7,11 +7,13 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
 import com.ligainternaetsiinf.dto.AlineacionDTO;
 import com.ligainternaetsiinf.dto.ClasificacionResponse;
 import com.ligainternaetsiinf.dto.EquipoFantasyResponse;
 import com.ligainternaetsiinf.dto.JugadorFantasyDetalleResponse;
 import com.ligainternaetsiinf.dto.JugadorFantasyResponse;
+import com.ligainternaetsiinf.dto.PuntosJornadaJugadorResponse;
 import com.ligainternaetsiinf.dto.PuntosJornadaResponse;
 import com.ligainternaetsiinf.model.EquipoFantasy;
 import com.ligainternaetsiinf.model.EstadisticasJugadorPartido;
@@ -201,6 +203,66 @@ public class EquipoFantasyService {
             ));
         }
         return resultado;
+    }
+
+
+    public List<PuntosJornadaJugadorResponse> obtenerPuntosJugadorPorJornadas(Integer jugadorFantasyId) {
+        JugadorFantasy jf = jugadorFantasyRepository.findById(jugadorFantasyId)
+            .orElseThrow(() -> new RuntimeException("Jugador fantasy no encontrado"));
+
+        Jugador jr = jf.getJugadorReal();
+
+        if (jr.getEquipo() == null) return new ArrayList<>();
+
+        List<Partido> partidos = partidoRepository
+            .findByEquipoLocalOrEquipoVisitanteOrderByJornadaAsc(jr.getEquipo(), jr.getEquipo());
+
+        List<PuntosJornadaJugadorResponse> resultado = new ArrayList<>();
+
+        for (Partido p : partidos) {
+            if (!p.isJugado()) continue;
+            var stats = estadisticasRepository.findByJugadorIdAndPartidoId(jr.getId(), p.getId());
+            if (stats.isPresent()) {
+                EstadisticasJugadorPartido e = stats.get();
+                resultado.add(new PuntosJornadaJugadorResponse(
+                    p.getJornada(), e.getPuntosObtenidos(), e.getGoles(),
+                    e.getAsistencias(), e.getTarjetasAmarillas(), e.getTarjetasRojas(),
+                    e.getParadas(), e.isJugo()
+                ));
+            }
+        }
+        return resultado;
+    }
+
+
+    public Integer obtenerEquipoIdPorUsuarioYLiga(Integer ligaId, Integer userId) {
+        return equipoFantasyRepository.findByLigaFantasyIdAndUserId(ligaId, userId)
+            .orElseThrow(() -> new RuntimeException("Equipo no encontrado"))
+            .getId();
+    }
+
+    public Integer obtenerEquipoIdPorJugadorYUsuario(Integer jugadorFantasyId, Integer userId) {
+        JugadorFantasy jf = jugadorFantasyRepository.findById(jugadorFantasyId)
+            .orElseThrow(() -> new RuntimeException("Jugador no encontrado"));
+        if (!jf.getEquipoFantasy().getUser().getId().equals(userId)) {
+            throw new RuntimeException("No tienes permiso");
+        }
+        return jf.getEquipoFantasy().getId();
+    }
+
+    public Integer obtenerEquipoIdPorUsuarioYInstancia(Integer jugadorFantasyId, Integer userId) {
+        JugadorFantasy jf = jugadorFantasyRepository.findById(jugadorFantasyId)
+            .orElseThrow(() -> new RuntimeException("Jugador no encontrado"));
+        Integer ligaId = jf.getLigaFantasy().getId();
+        return equipoFantasyRepository.findByLigaFantasyIdAndUserId(ligaId, userId)
+            .orElseThrow(() -> new RuntimeException("Equipo no encontrado"))
+            .getId();
+    }
+
+    public Integer obtenerEquipoIdPorOfertaYUsuario(Integer ofertaId, Integer userId) {
+        // Este método necesita OfertaVentaRepository inyectado
+        // Si no lo tienes en EquipoFantasyService, mueve la lógica al MercadoService
+        throw new RuntimeException("Implementar con OfertaVentaRepository");
     }
 
     private EquipoFantasyResponse cambiarTipoRespuesta(EquipoFantasy equipo){

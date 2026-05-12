@@ -15,14 +15,6 @@ public class Mercado {
     @OneToOne
     private LigaFantasy ligaFantasy;
 
-    //@OneToMany(mappedBy = "ligaFantasy")
-    //private List<JugadorFantasy> jugadoresDisponibles;
-
-    //@OneToMany
-    //private List<Pair<JugadorFantasy,Integer>> pujas; //esto aun no tengo claro si lo hare asi,
-    //igual creo una clase puja, pero aun no lo se 
-    
-
     private LocalDateTime horaCreacionMercado;
 
     public Mercado(){}

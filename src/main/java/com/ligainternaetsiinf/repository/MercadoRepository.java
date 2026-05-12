@@ -8,6 +8,6 @@ import java.util.Optional;
 
 public interface MercadoRepository extends JpaRepository<Mercado, Integer> {
 
-
+    Optional<Mercado> findByLigaFantasyId(Integer ligaId);
 
 }

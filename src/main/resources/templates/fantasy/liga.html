@@ -29,7 +29,7 @@
         <nav class="menu-opciones">
             <a class="menu-item" onclick="toggleMenu(); window.location.href='/fantasy/mis-ligas'">🏆 Mis Ligas</a>
             <a class="menu-item" onclick="toggleMenu()">📅 Partidos <span class="proximamente-badge">Próximamente</span></a>
-            <a class="menu-item" onclick="toggleMenu()">📈 Mercado <span class="proximamente-badge">Próximamente</span></a>
+            <a class="menu-item" onclick="toggleMenu(); irAMercado()">📈 Mercado</a>
             <a class="menu-item" onclick="toggleMenu()">👤 Perfil <span class="proximamente-badge">Próximamente</span></a>
         </nav>
         <div class="menu-footer">
@@ -74,9 +74,7 @@
         <button class="bottom-nav-item" onclick="irAPlantilla()">
             👤 Mi Plantilla
         </button>
-        <button class="bottom-nav-item proximamente-btn" disabled>
-            📈 Mercado
-        </button>
+        <button class="bottom-nav-item" onclick="irAMercado()">📈 Mercado</button>
         <button class="bottom-nav-item proximamente-btn" disabled>
             🔔 Noticias
         </button>

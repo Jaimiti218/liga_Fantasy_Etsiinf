@@ -30,6 +30,8 @@ public class JugadorFantasy {
 
     private LocalDateTime fechaCompra;
 
+    private boolean enVenta = false;
+
     public JugadorFantasy(){}
 
     public JugadorFantasy(Jugador jugadorReal, LigaFantasy ligaFantasy){
@@ -84,5 +86,8 @@ public class JugadorFantasy {
 
     public boolean isAlineado(){ return alineado; }
     public void setAlineado(boolean alineado){ this.alineado = alineado; }
+
+    public boolean isEnVenta(){ return enVenta; }
+    public void setEnVenta(boolean enVenta){ this.enVenta = enVenta; }
 
 }

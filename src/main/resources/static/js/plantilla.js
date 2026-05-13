@@ -569,19 +569,26 @@ async function renderizarPuntos() {
     campo.innerHTML = '<div style="color:rgba(255,255,255,0.7);text-align:center;padding:2rem">Cargando...</div>';
 
     try {
-        const res = await fetch(`/equipos-fantasy/${equipoId}/puntos/jornada/${jornadaActual}`, {
+        const res = await fetch(`/equipos-fantasy/${equipoId}/puntos/jornada/${jornadaActual}/info`, {
             credentials: 'include'
         });
+
         if (!res.ok) {
             campo.innerHTML = '<div style="color:rgba(255,255,255,0.7);text-align:center;padding:2rem">Sin datos para esta jornada</div>';
             return;
         }
+
         const datos = await res.json();
-        if (datos.length === 0) {
+
+        if (!datos.jugadores || datos.jugadores.length === 0) {
             campo.innerHTML = '<div style="color:rgba(255,255,255,0.7);text-align:center;padding:2rem">Sin alineación registrada para esta jornada</div>';
             return;
         }
-        renderizarCampoPuntos(campo, datos);
+
+        // Usar la formación guardada para esa jornada, no la actual
+        const formacionJornada = datos.formacion || formacionActual;
+        renderizarCampoPuntos(campo, datos.jugadores, formacionJornada);
+
     } catch (e) {
         campo.innerHTML = '<div style="color:rgba(255,255,255,0.7);text-align:center;padding:2rem">Error al cargar</div>';
     }
@@ -589,7 +596,7 @@ async function renderizarPuntos() {
 
 function renderizarCampoPuntos(campo, datos) {
     campo.innerHTML = '';
-    const lineas  = parsearFormacion(formacionActual);
+    const lineas = parsearFormacion(formacion);
     const portero  = datos.find(j => j.posicion === 'PORTERO');
     const defensas = datos.filter(j => j.posicion === 'DEFENSA');
     const medios   = datos.filter(j => j.posicion === 'MEDIOCENTRO');

@@ -20,7 +20,7 @@ public class Puja {
     private InstanciaMercado instancia;
 
     private long cantidad;
-    private LocalDateTime fecha;
+    private LocalDateTime fecha; //esto no lo veo del todo util pero bueno
     private boolean ganadora;
 
     public Puja(){}

@@ -3,6 +3,8 @@ package com.ligainternaetsiinf.config;
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -28,11 +30,21 @@ public class SecurityConfig {
     }
 
     @Bean
+    public TaskScheduler taskScheduler() {
+        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        scheduler.setPoolSize(5);
+        scheduler.setThreadNamePrefix("jornada-scheduler-");
+        return scheduler;
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                .ignoringRequestMatchers("/users/login", "/logout" , "/mercado/**", "/users/register", "/jugadores/**", "/equipos/**", "/ligas-fantasy/**", "/equipos-fantasy/**", "/jugadores-fantasy/**")
+                .ignoringRequestMatchers("/users/login", "/logout" , "/mercado/**", "/users/register",
+                 "/jugadores/**", "/equipos/**", "/ligas-fantasy/**", "/equipos-fantasy/**", "/jugadores-fantasy/**",
+                "/partidos/**")
             )
             .formLogin(login -> login.disable())
             .httpBasic(basic -> basic.disable())
@@ -45,6 +57,7 @@ public class SecurityConfig {
                 .requestMatchers("/users/register", "/users/login", "/users/me").permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/jugadores").permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/equipos").permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/partidos", "/partidos/**").permitAll()
                 .requestMatchers("/", "/fantasy/auth", "/fantasy/mis-ligas", "/fantasy/liga/**", "/fantasy/plantilla/**", "/fantasy/mercado/**").permitAll()
                 // Todo lo demás requiere autenticación
                 .anyRequest().authenticated()

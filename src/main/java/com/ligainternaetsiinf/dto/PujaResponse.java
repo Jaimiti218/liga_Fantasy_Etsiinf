@@ -2,7 +2,7 @@ package com.ligainternaetsiinf.dto;
 
 import java.time.LocalDateTime;
 
-public class PujaResponse {
+public class PujaResponse { /*aqui hay atributos que yo creo sinceramente que sobran */
     private Integer id;
     private Integer jugadorFantasyId;
     private String jugadorNombre;

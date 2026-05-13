@@ -2,6 +2,7 @@ package com.ligainternaetsiinf.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +16,13 @@ import com.ligainternaetsiinf.dto.JugadorFantasyDetalleResponse;
 import com.ligainternaetsiinf.dto.JugadorFantasyResponse;
 import com.ligainternaetsiinf.dto.PuntosJornadaJugadorResponse;
 import com.ligainternaetsiinf.dto.PuntosJornadaResponse;
+import com.ligainternaetsiinf.model.AlineacionEquipoJornada;
 import com.ligainternaetsiinf.model.EquipoFantasy;
 import com.ligainternaetsiinf.model.EstadisticasJugadorPartido;
 import com.ligainternaetsiinf.model.Jugador;
 import com.ligainternaetsiinf.model.JugadorFantasy;
 import com.ligainternaetsiinf.model.Partido;
+import com.ligainternaetsiinf.repository.AlineacionEquipoJornadaRepository;
 import com.ligainternaetsiinf.repository.EquipoFantasyRepository;
 import com.ligainternaetsiinf.repository.EstadisticasJugadorPartidoRepository;
 import com.ligainternaetsiinf.repository.JugadorFantasyRepository;
@@ -46,6 +49,9 @@ public class EquipoFantasyService {
 
     @Autowired
     private PartidoRepository partidoRepository;
+
+    @Autowired
+    private AlineacionEquipoJornadaRepository alineacionRepository;
 
     public EquipoFantasyResponse obtenerEquipo(Integer equipoId){
 
@@ -157,14 +163,15 @@ public class EquipoFantasyService {
     }
 
     public List<PuntosJornadaResponse> obtenerPuntosJornada(Integer equipoId, Integer jornada) {
-        EquipoFantasy equipo = equipoFantasyRepository.findById(equipoId)
-            .orElseThrow(() -> new RuntimeException("Equipo no encontrado"));
 
-        // Jugadores alineados usando el nuevo atributo boolean
-        List<JugadorFantasy> alineados = jugadorFantasyRepository
-            .findByEquipoFantasyIdAndAlineadoTrue(equipoId);
+        // Usar la alineación registrada para esa jornada, no la actual
+        Optional<AlineacionEquipoJornada> alineacionOpt =
+            alineacionRepository.findByEquipoFantasyIdAndJornada(equipoId, jornada);
 
-        if (alineados.isEmpty()) return new ArrayList<>();
+        if (alineacionOpt.isEmpty()) return new ArrayList<>();
+
+        AlineacionEquipoJornada alineacion = alineacionOpt.get();
+        List<JugadorFantasy> alineados     = alineacion.getJugadoresAlineados();
 
         List<Partido> partidos = partidoRepository.findByJornada(jornada);
         List<PuntosJornadaResponse> resultado = new ArrayList<>();
@@ -187,12 +194,12 @@ public class EquipoFantasyService {
                     if (stats.isPresent()) {
                         EstadisticasJugadorPartido e = stats.get();
                         puntosJornada += e.getPuntosObtenidos();
-                        goles        += e.getGoles();
-                        asistencias  += e.getAsistencias();
-                        amarillas    += e.getTarjetasAmarillas();
-                        rojas        += e.getTarjetasRojas();
-                        paradas      += e.getParadas();
-                        jugo          = e.isJugo();
+                        goles         += e.getGoles();
+                        asistencias   += e.getAsistencias();
+                        amarillas     += e.getTarjetasAmarillas();
+                        rojas         += e.getTarjetasRojas();
+                        paradas       += e.getParadas();
+                        jugo           = e.isJugo();
                     }
                 }
             }
@@ -263,6 +270,27 @@ public class EquipoFantasyService {
         // Este método necesita OfertaVentaRepository inyectado
         // Si no lo tienes en EquipoFantasyService, mueve la lógica al MercadoService
         throw new RuntimeException("Implementar con OfertaVentaRepository");
+    }
+
+    public void registrarAlineacionesJornada(Integer jornada) {
+        List<EquipoFantasy> todosLosEquipos = equipoFantasyRepository.findAll();
+
+        for (EquipoFantasy equipo : todosLosEquipos) {
+            // Solo registrar si no existe ya para esta jornada
+            if (alineacionRepository.findByEquipoFantasyIdAndJornada(equipo.getId(), jornada).isPresent()) {
+                continue;
+            }
+
+            List<JugadorFantasy> alineados = jugadorFantasyRepository
+                .findByEquipoFantasyIdAndAlineadoTrue(equipo.getId());
+
+            if (alineados.isEmpty()) continue;
+
+            AlineacionEquipoJornada registro = new AlineacionEquipoJornada(
+                equipo, alineados, jornada, equipo.getFormacion()
+            );
+            alineacionRepository.save(registro);
+        }
     }
 
     private EquipoFantasyResponse cambiarTipoRespuesta(EquipoFantasy equipo){

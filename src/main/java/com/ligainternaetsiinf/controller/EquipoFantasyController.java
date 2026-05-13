@@ -88,4 +88,6 @@ public class EquipoFantasyController {
             @PathVariable Integer jugadorFantasyId) {
         return equipoFantasyService.obtenerPuntosJugadorPorJornadas(jugadorFantasyId);
     }
+
+    
 }

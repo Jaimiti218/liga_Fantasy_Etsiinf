@@ -4,7 +4,9 @@ import java.time.LocalDateTime;
 import jakarta.persistence.*;
 
 @Entity
-public class OfertaVenta {
+public class OfertaVenta {  /*cuando termine una instancia de mercado habra que comprobar todas las OfertaVenta
+    que se habian hecho en esa instancia, y si el atributo enVenta del jugadoFantasy es true y aceptada aqui es
+    false, creas una nueva ofertaVenta para el mismo jugador pero con una cantidad distinta */
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

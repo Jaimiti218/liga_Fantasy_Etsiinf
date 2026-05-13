@@ -18,15 +18,19 @@ public class OfertaVenta {  /*cuando termine una instancia de mercado habra que 
     @ManyToOne
     private EquipoFantasy equipoVendedor;
 
+    @ManyToOne
+    private EquipoFantasy equipoComprador;
+
     private long cantidad;
     private LocalDateTime fecha;
     private boolean aceptada;
 
     public OfertaVenta(){}
 
-    public OfertaVenta(JugadorFantasy jugador, EquipoFantasy vendedor, long cantidad){
+    public OfertaVenta(JugadorFantasy jugador, EquipoFantasy vendedor,  EquipoFantasy comprador, long cantidad){
         this.jugadorFantasy = jugador;
         this.equipoVendedor = vendedor;
+        this.equipoComprador = comprador;
         this.cantidad = cantidad;
         this.fecha = LocalDateTime.now();
         this.aceptada = false;
@@ -39,4 +43,5 @@ public class OfertaVenta {  /*cuando termine una instancia de mercado habra que 
     public boolean isAceptada(){ return aceptada; }
     public void setAceptada(boolean aceptada){ this.aceptada = aceptada; }
     public LocalDateTime getFecha(){ return fecha; }
+    public EquipoFantasy getEquipoComprador(){ return equipoComprador; }
 }

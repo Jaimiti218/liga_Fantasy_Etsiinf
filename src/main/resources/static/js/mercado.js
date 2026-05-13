@@ -137,11 +137,13 @@ function renderizarMercado(jugadores) {
     const contenedor = document.getElementById('lista-mercado');
 
     if (!jugadores || jugadores.length === 0) {
-        contenedor.innerHTML = '<div class="cargando-ligas">No hay jugadores disponibles en este mercado.</div>';
+        contenedor.innerHTML = '<div class="cargando-ligas">No hay jugadores disponibles.</div>';
         return;
     }
 
-    contenedor.innerHTML = jugadores.map(j => `
+    contenedor.innerHTML = jugadores.map(j => {
+        const enVenta = j.enVenta && j.nombreEquipoFantasyDueno;
+        return `
         <div class="jugador-card-mercado">
             <div class="jugador-foto-grande">
                 <span>${ICONOS_POSICION[j.posicion] ?? '👤'}</span>
@@ -150,7 +152,10 @@ function renderizarMercado(jugadores) {
                 <div class="jugador-card-nombre">${j.nombre}</div>
                 <div class="jugador-card-equipo">
                     <span class="badge-equipo">${j.nombreEquipoReal || 'Sin equipo'}</span>
-                    <span class="badge-posicion ${j.posicion}">${j.posicion.charAt(0) + j.posicion.slice(1).toLowerCase()}</span>
+                    <span class="badge-posicion ${j.posicion}">
+                        ${j.posicion.charAt(0) + j.posicion.slice(1).toLowerCase()}
+                    </span>
+                    ${enVenta ? `<span class="badge-en-venta">🏷 ${j.nombreEquipoFantasyDueno}</span>` : ''}
                 </div>
                 <div class="jugador-card-stats" style="margin-top:0.4rem">
                     <div class="jugador-mini-stat">
@@ -166,13 +171,13 @@ function renderizarMercado(jugadores) {
                         <span class="valor">${formatearDinero(j.valorMercado)}</span>
                     </div>
                 </div>
-                <div class="temporizador-jugador">⏱ --:--:--</div>
+                ${!enVenta ? `<div class="temporizador-jugador">⏱ --:--:--</div>` : ''}
             </div>
             <button class="btn-fichar" onclick="abrirModalPuja(${j.id}, '${escapar(j.nombre)}', ${j.valorMercado})">
                 Fichar
             </button>
-        </div>
-    `).join('');
+        </div>`;
+    }).join('');
 }
 
 // ─── Modal puja ───────────────────────────────────────────────────────────────

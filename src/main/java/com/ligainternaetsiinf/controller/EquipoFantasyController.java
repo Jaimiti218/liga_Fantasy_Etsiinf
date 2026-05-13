@@ -1,6 +1,7 @@
 package com.ligainternaetsiinf.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -87,6 +88,13 @@ public class EquipoFantasyController {
     public List<PuntosJornadaJugadorResponse> obtenerPuntosJugadorPorJornadas(
             @PathVariable Integer jugadorFantasyId) {
         return equipoFantasyService.obtenerPuntosJugadorPorJornadas(jugadorFantasyId);
+    }
+
+    @GetMapping("/{equipoId}/puntos/jornada/{jornada}/info")
+    public Map<String, Object> obtenerInfoJornada(
+            @PathVariable Integer equipoId,
+            @PathVariable Integer jornada) {
+        return equipoFantasyService.obtenerInfoJornada(equipoId, jornada);
     }
 
     

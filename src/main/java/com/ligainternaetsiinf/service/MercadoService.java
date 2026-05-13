@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +29,8 @@ import com.ligainternaetsiinf.repository.JugadorFantasyRepository;
 import com.ligainternaetsiinf.repository.MercadoRepository;
 import com.ligainternaetsiinf.repository.OfertaVentaRepository;
 import com.ligainternaetsiinf.repository.PujaRepository;
+import java.time.Instant;
+import java.time.ZoneId;
 
 @Service
 public class MercadoService {
@@ -38,12 +41,15 @@ public class MercadoService {
     @Autowired private EquipoFantasyRepository equipoFantasyRepository;
     @Autowired private PujaRepository pujaRepository;
     @Autowired private OfertaVentaRepository ofertaVentaRepository;
+    @Autowired
+    private TaskScheduler taskScheduler;
 
     // ─── Crear primera instancia al crear la liga ─────────────────────────────
     public void crearPrimeraInstancia(Mercado mercado) {
         List<JugadorFantasy> disponibles = obtenerJugadoresParaMercado(mercado.getLiga());
         InstanciaMercado instancia = new InstanciaMercado(mercado, disponibles);
         instanciaRepository.save(instancia);
+        programarResolucion(instancia);
     }
 
     // ─── Obtener instancia activa de una liga ─────────────────────────────────
@@ -143,17 +149,32 @@ public class MercadoService {
         }
 
         JugadorFantasy jugador = oferta.getJugadorFantasy();
-        EquipoFantasy vendedor = oferta.getEquipoVendedor();
+        EquipoFantasy vendedor  = oferta.getEquipoVendedor();
 
-        // Transferir dinero y desasociar jugador
+        // Transferir dinero al vendedor
         vendedor.setDinero(vendedor.getDinero() + oferta.getCantidad());
-        jugador.setEquipoFantasy(null);
+        equipoFantasyRepository.save(vendedor);
+
+        if (oferta.getEquipoComprador() != null) {
+            // Venta entre usuarios: el jugador pasa al comprador
+            EquipoFantasy comprador = oferta.getEquipoComprador();
+            comprador.setDinero(comprador.getDinero() - oferta.getCantidad());
+            jugador.setEquipoFantasy(comprador);
+            jugador.setClausula(oferta.getCantidad()); // clausula = precio de compra
+            jugador.setClausulaBloqueadaHasta(LocalDateTime.now().plusDays(14));
+            jugador.setFechaCompra(LocalDateTime.now());
+            equipoFantasyRepository.save(comprador);
+        } else {
+            // Venta al sistema: el jugador queda libre
+            jugador.setEquipoFantasy(null);
+            jugador.setClausula(null);
+            jugador.setClausulaBloqueadaHasta(null);
+        }
+
         jugador.setEnVenta(false);
         jugador.setAlineado(false);
-
         oferta.setAceptada(true);
 
-        equipoFantasyRepository.save(vendedor);
         jugadorFantasyRepository.save(jugador);
         ofertaVentaRepository.save(oferta);
     }
@@ -196,19 +217,23 @@ public class MercadoService {
         return resultado;
     }
 
-    // ─── Job programado: resolver instancias cada hora ────────────────────────
-    @Scheduled(fixedDelay = 3600000) // cada hora
-    public void resolverInstanciasVencidas() {
-        List<InstanciaMercado> pendientes = instanciaRepository.findByResueltaFalse();
-        LocalDateTime ahora = LocalDateTime.now();
+    private void programarResolucion(InstanciaMercado instancia) {
+        Instant fechaCierre = instancia.getFin()
+            .atZone(ZoneId.systemDefault())
+            .toInstant();
 
-        for (InstanciaMercado instancia : pendientes) {
-            if (instancia.getFin().isBefore(ahora)) {
-                resolverInstancia(instancia);
-                crearNuevaInstancia(instancia);
+        Integer instanciaId = instancia.getId();
+
+        taskScheduler.schedule(() -> {
+            InstanciaMercado inst = instanciaRepository.findById(instanciaId)
+                .orElse(null);
+            if (inst != null && !inst.isResuelta()) {
+                resolverInstancia(inst);
+                crearNuevaInstancia(inst);
             }
-        }
+        }, fechaCierre);
     }
+    
 
     // ─── Resolver una instancia vencida ──────────────────────────────────────
     private void resolverInstancia(InstanciaMercado instancia) {
@@ -240,7 +265,7 @@ public class MercadoService {
             jugador.setEquipoFantasy(comprador);
             jugador.setEnVenta(false);
             jugador.setAlineado(false);
-            jugador.setClausula(jugador.getJugadorReal().getValorMercado());
+            jugador.setClausula(ganadora.getCantidad());
             jugador.setClausulaBloqueadaHasta(LocalDateTime.now().plusDays(14));
             jugador.setFechaCompra(LocalDateTime.now());
 
@@ -273,7 +298,7 @@ public class MercadoService {
             long ofertaCantidad = (long)(valor * factor);
 
             OfertaVenta oferta = new OfertaVenta(
-                jugador, jugador.getEquipoFantasy(), ofertaCantidad
+                jugador, jugador.getEquipoFantasy(), null, ofertaCantidad
             );
             ofertaVentaRepository.save(oferta);
         }
@@ -285,23 +310,28 @@ public class MercadoService {
         List<JugadorFantasy> nuevosJugadores = obtenerJugadoresParaMercado(liga);
         InstanciaMercado nueva = new InstanciaMercado(anterior.getMercado(), nuevosJugadores);
         instanciaRepository.save(nueva);
+        programarResolucion(nueva);
     }
 
     // ─── Seleccionar 5 jugadores para el mercado ──────────────────────────────
     private List<JugadorFantasy> obtenerJugadoresParaMercado(LigaFantasy liga) {
-        // Jugadores sin equipo + jugadores en venta, mezclados aleatoriamente
-        List<JugadorFantasy> sinEquipo = jugadorFantasyRepository
-            .findByLigaFantasyIdAndEquipoFantasyIsNull(liga.getId());
+        List<JugadorFantasy> sinEquipo = new ArrayList<>(jugadorFantasyRepository
+            .findByLigaFantasyIdAndEquipoFantasyIsNull(liga.getId()));
         List<JugadorFantasy> enVenta = jugadorFantasyRepository
             .findByLigaFantasyIdAndEnVentaTrue(liga.getId());
 
-        List<JugadorFantasy> candidatos = new ArrayList<>(sinEquipo);
+        // Seleccionar 5 aleatorios de los sin equipo
+        Collections.shuffle(sinEquipo);
+        List<JugadorFantasy> resultado = new ArrayList<>(
+            sinEquipo.subList(0, Math.min(5, sinEquipo.size()))
+        );
+
+        // Añadir todos los que están en venta (sin duplicados)
         for (JugadorFantasy jf : enVenta) {
-            if (!candidatos.contains(jf)) candidatos.add(jf);
+            if (!resultado.contains(jf)) resultado.add(jf);
         }
 
-        Collections.shuffle(candidatos);
-        return candidatos.subList(0, Math.min(5, candidatos.size()));
+        return resultado;
     }
 
     // ─── Calcular valor total del equipo ──────────────────────────────────────
@@ -325,6 +355,9 @@ public class MercadoService {
         List<JugadorFantasyDetalleResponse> jugadores = new ArrayList<>();
         for (JugadorFantasy jf : instancia.getJugadoresDisponibles()) {
             var jr = jf.getJugadorReal();
+            String dueno = (jf.getEquipoFantasy() != null && jf.isEnVenta())
+            ? jf.getEquipoFantasy().getUser().getUsername()
+            : null;
             int partidos = jr.getPartidosJugados();
             double media = partidos > 0 ? (double) jr.getPuntosFantasy() / partidos : 0.0;
             jugadores.add(new JugadorFantasyDetalleResponse(
@@ -332,7 +365,7 @@ public class MercadoService {
                 jr.getValorMercado(),
                 jr.getEquipo() != null ? jr.getEquipo().getName() : null,
                 jr.getPuntosFantasy(), media, partidos,
-                jf.getClausula(), jf.getClausulaBloqueadaHasta(), jf.isAlineado()
+                jf.getClausula(), jf.getClausulaBloqueadaHasta(), jf.isAlineado(), dueno
             ));
         }
         return new InstanciaMercadoResponse(instancia.getId(), instancia.getFin(), jugadores);

@@ -1,5 +1,6 @@
 package com.ligainternaetsiinf.service;
 
+import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
@@ -97,17 +98,15 @@ public class PartidoService {
     private void programarRegistroAlineaciones(Partido partido) {
         if (partido.getFecha() == null || partido.getJornada() == null) return;
 
-        // Solo programar si la fecha es futura
         if (partido.getFecha().isBefore(java.time.LocalDateTime.now())) return;
 
-        Date fechaEjecucion = Date.from(
-            partido.getFecha().atZone(ZoneId.systemDefault()).toInstant()
-        );
+        Instant fechaEjecucion = partido.getFecha()
+            .atZone(ZoneId.systemDefault())
+            .toInstant();
 
         Integer jornada = partido.getJornada();
 
         taskScheduler.schedule(() -> {
-            // Comprobar que no se hayan registrado ya las alineaciones para esta jornada
             boolean yaRegistrado = !alineacionRepository.findByJornada(jornada).isEmpty();
             if (!yaRegistrado) {
                 System.out.println("Registrando alineaciones para jornada " + jornada);

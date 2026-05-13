@@ -131,3 +131,12 @@
     display: block;
     margin-top: 0.2rem;
 }
+
+.badge-en-venta {
+    background: #f39c12;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+}

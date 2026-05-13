@@ -1,7 +1,9 @@
 package com.ligainternaetsiinf.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -156,7 +158,7 @@ public class EquipoFantasyService {
                 jf.getId(), jr.getId(), jr.getFullName(), jr.getPosicion(),
                 jr.getValorMercado(), nombreEquipo, jr.getPuntosFantasy(),
                 media, partidosJugados, jf.getClausula(),
-                jf.getClausulaBloqueadaHasta(), jf.isAlineado() // ← directo
+                jf.getClausulaBloqueadaHasta(), jf.isAlineado(), null
             ));
         }
         return resultado;
@@ -291,6 +293,14 @@ public class EquipoFantasyService {
             );
             alineacionRepository.save(registro);
         }
+    }
+
+    public Map<String, Object> obtenerInfoJornada(Integer equipoId, Integer jornada) {
+        var alineacion = alineacionRepository.findByEquipoFantasyIdAndJornada(equipoId, jornada);
+        Map<String, Object> info = new HashMap<>();
+        info.put("formacion", alineacion.map(AlineacionEquipoJornada::getFormacion).orElse("2-3-1"));
+        info.put("jugadores", obtenerPuntosJornada(equipoId, jornada));
+        return info;
     }
 
     private EquipoFantasyResponse cambiarTipoRespuesta(EquipoFantasy equipo){

@@ -75,9 +75,8 @@ async function cargarClasificacion() {
 // ─── Renderizar clasificación ─────────────────────────────────────────────────
 function renderizarClasificacion(lista) {
     const contenedor = document.getElementById('tabla-clasificacion');
-
     if (lista.length === 0) {
-        contenedor.innerHTML = '<div class="cargando-ligas">Aún no hay equipos en esta liga.</div>';
+        contenedor.innerHTML = '<div class="cargando-ligas">Aún no hay equipos.</div>';
         return;
     }
 
@@ -92,13 +91,19 @@ function renderizarClasificacion(lista) {
         return `
             <div class="fila-clasificacion ${esMio ? 'mi-equipo-fila' : ''}">
                 <span class="${clasePos}">${pos}</span>
-                <span class="fila-username">${equipo.userNombre}</span>
+                <span class="fila-username ${!esMio ? 'fila-clickable' : ''}"
+                      onclick="${!esMio ? `verEquipo(${equipo.equipoId})` : ''}">
+                    ${equipo.userNombre}
+                </span>
                 <span class="fila-puntos">${equipo.puntos} pts</span>
             </div>
         `;
     }).join('');
 }
 
+function verEquipo(equipoId) {
+    window.location.href = `/fantasy/equipo/${equipoId}?liga=${ligaId}`;
+}
 // ─── Utilidades ───────────────────────────────────────────────────────────────
 function formatearDinero(cantidad) {
     if (cantidad >= 1000000) return (cantidad / 1000000).toFixed(1) + 'M';

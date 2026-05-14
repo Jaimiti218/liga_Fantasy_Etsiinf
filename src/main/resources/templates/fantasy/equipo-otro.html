@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipo – Fantasy ETSIINF</title>
+    <link rel="stylesheet" th:href="@{/css/fantasy.css}">
+    <link rel="stylesheet" th:href="@{/css/plantilla.css}">
+</head>
+<body>
+
+    <nav class="fantasy-navbar">
+        <div class="nav-izquierda">
+            <button class="btn-menu" onclick="toggleMenu()">☰</button>
+            <span class="logo">👤 Equipo</span>
+        </div>
+        <div class="nav-derecha">
+            <button class="btn-nav-volver" onclick="volverALiga()">← Liga</button>
+            <span id="nav-username" class="nav-username"></span>
+        </div>
+    </nav>
+
+    <!-- Menú lateral igual que en plantilla.html -->
+    <div id="menu-overlay" class="menu-overlay hidden" onclick="toggleMenu()"></div>
+    <div id="menu-lateral" class="menu-lateral hidden">
+        <div class="menu-header">
+            <span id="menu-username"></span>
+            <button class="btn-cerrar-menu" onclick="toggleMenu()">✕</button>
+        </div>
+        <nav class="menu-opciones">
+            <a class="menu-item" onclick="toggleMenu(); window.location.href='/fantasy/mis-ligas'">🏆 Mis Ligas</a>
+            <a class="menu-item" onclick="toggleMenu()">📅 Partidos <span class="proximamente-badge">Próximamente</span></a>
+            <a class="menu-item" onclick="toggleMenu(); irAMercado()">📈 Mercado</a>
+            <a class="menu-item" onclick="toggleMenu()">👤 Perfil <span class="proximamente-badge">Próximamente</span></a>
+        </nav>
+        <div class="menu-footer">
+            <button class="btn-volver-inicio" onclick="window.location.href='/'">← Volver al inicio</button>
+            <button class="btn-cerrar-sesion-menu" onclick="cerrarSesionCompleta()">Cerrar sesión</button>
+        </div>
+    </div>
+
+    <!-- Cabecera del usuario visitado -->
+    <div class="perfil-cabecera" id="perfil-cabecera">
+        <div id="perfil-avatar" class="perfil-avatar">👤</div>
+        <div>
+            <div class="perfil-nombre" id="perfil-nombre">Cargando...</div>
+            <div class="perfil-equipo-stats">
+                <span id="perfil-puntos">— pts</span>
+                <span>·</span>
+                <span id="perfil-dinero">—</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="plantilla-tabs">
+        <button class="tab-btn active" id="tab-plantilla" onclick="cambiarTab('plantilla')">Plantilla</button>
+        <button class="tab-btn" id="tab-puntos" onclick="cambiarTab('puntos')">Puntos</button>
+    </div>
+
+    <main class="plantilla-contenido">
+
+        <!-- TAB PLANTILLA -->
+        <div id="seccion-plantilla" class="tab-seccion">
+            <div id="lista-plantilla-otro" class="lista-plantilla">
+                <div class="cargando-ligas">Cargando plantilla...</div>
+            </div>
+        </div>
+
+        <!-- TAB PUNTOS -->
+        <div id="seccion-puntos" class="tab-seccion hidden">
+            <div class="jornada-nav">
+                <button class="btn-jornada" onclick="cambiarJornada(-1)">‹</button>
+                <span id="jornada-label">Jornada 1</span>
+                <button class="btn-jornada" onclick="cambiarJornada(1)">›</button>
+            </div>
+            <div class="campo-futbol" id="campo-puntos"></div>
+        </div>
+
+    </main>
+
+    <!-- MODAL OFERTA DE COMPRA -->
+    <div id="modal-oferta-compra" class="modal-overlay hidden">
+        <div class="modal">
+            <h3>Oferta de compra</h3>
+            <p class="subtexto" id="oferta-jugador-nombre"></p>
+            <div class="saldo-disponible">
+                💰 Tu saldo: <strong id="oferta-saldo">—</strong>
+            </div>
+            <div id="error-oferta" class="mensaje-error hidden"></div>
+            <div class="campo">
+                <label>Cantidad de tu oferta (€)</label>
+                <input type="text" id="input-oferta" placeholder="Ej: 12.000.000"
+                       oninput="formatearInputDinero(this)"/>
+            </div>
+            <div class="modal-botones">
+                <button class="btn-primary" onclick="confirmarOfertaCompra()">Enviar oferta</button>
+                <button class="btn-ghost" onclick="cerrarModalOferta()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PAGAR CLÁUSULA -->
+    <div id="modal-clausula-otro" class="modal-overlay hidden">
+        <div class="modal">
+            <h3>Pagar cláusula</h3>
+            <p class="subtexto" id="clausula-otro-nombre"></p>
+            <div class="campo">
+                <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem">
+                    <span style="font-size:0.85rem;color:#666">Valor de cláusula</span>
+                    <strong id="clausula-otro-valor" style="color:#0f3460"></strong>
+                </div>
+            </div>
+            <div class="saldo-disponible">
+                💰 Tu saldo: <strong id="clausula-otro-saldo">—</strong>
+            </div>
+            <div id="error-clausula-otro" class="mensaje-error hidden"></div>
+            <div class="modal-botones">
+                <button class="btn-primary" onclick="confirmarPagarClausula()">Pagar cláusula</button>
+                <button class="btn-ghost" onclick="cerrarModalClausulaOtro()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DETALLE JUGADOR (igual que en plantilla) -->
+    <div id="modal-detalle-jugador" class="modal-overlay hidden">
+        <div class="modal-detalle">
+            <div class="detalle-header">
+                <div class="detalle-foto"><span id="detalle-icono">👤</span></div>
+                <div class="detalle-header-info">
+                    <div class="detalle-top">
+                        <span class="badge-equipo" id="detalle-equipo"></span>
+                        <span class="badge-posicion" id="detalle-posicion-badge"></span>
+                        <span id="detalle-nombre" class="detalle-nombre"></span>
+                        <span class="detalle-pfsy">PFSY <strong id="detalle-puntos"></strong></span>
+                    </div>
+                    <div class="detalle-sub">
+                        <span>Media <strong id="detalle-media"></strong></span>
+                        <span>💰 <strong id="detalle-valor"></strong></span>
+                    </div>
+                </div>
+                <button class="btn-cerrar-detalle" onclick="cerrarDetalleJugador()">✕</button>
+            </div>
+            <div class="detalle-jornadas-nav">
+                <button class="btn-jornada" onclick="cambiarJornadaDetalle(-1)">‹</button>
+                <span id="detalle-jornada-label">Jornada —</span>
+                <span class="detalle-jornada-pts" id="detalle-jornada-puntos">—</span>
+                <button class="btn-jornada" onclick="cambiarJornadaDetalle(1)">›</button>
+            </div>
+            <div id="detalle-stats-tabla" class="detalle-stats-tabla"></div>
+            <button class="btn-ghost" style="width:100%;margin-top:1rem" onclick="cerrarDetalleJugador()">Cerrar</button>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <button class="bottom-nav-item" onclick="volverALiga()">🏆 Clasificación</button>
+        <button class="bottom-nav-item" onclick="irAMiPlantilla()">👤 Mi Plantilla</button>
+        <button class="bottom-nav-item" onclick="irAMercado()">📈 Mercado</button>
+        <button class="bottom-nav-item proximamente-btn" disabled>🔔 Noticias</button>
+    </nav>
+
+    <script th:src="@{/js/sesion.js}"></script>
+    <script th:src="@{/js/fantasy-navbar.js}"></script>
+    <script th:src="@{/js/equipo-otro.js}"></script>
+</body>
+</html>

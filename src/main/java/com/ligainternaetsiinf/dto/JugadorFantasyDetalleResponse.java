@@ -17,6 +17,8 @@ public class JugadorFantasyDetalleResponse {
     private LocalDateTime clausulaBloqueadaHasta;
     private boolean alineado;
     private String nombreEquipoFantasyDueno;
+    private Integer userIdDueno;
+    private boolean enVenta;
 
     public static final String PORTERO   = "PORTERO";
     public static final String DEFENSA  = "DEFENSA";
@@ -28,7 +30,8 @@ public class JugadorFantasyDetalleResponse {
     public JugadorFantasyDetalleResponse(Integer id, Integer jugadorRealId, String nombre,
             String posicion, long valorMercado, String nombreEquipoReal,
             int puntosTotal, double mediaPuntos, int partidosJugados,
-            Long clausula, LocalDateTime clausulaBloqueadaHasta, boolean alineado, String nombreEquipoFantasyDueno){
+            Long clausula, LocalDateTime clausulaBloqueadaHasta, boolean alineado, String nombreEquipoFantasyDueno,
+            Integer userIdDueno, boolean enVenta){
         this.id = id;
         this.jugadorRealId = jugadorRealId;
         this.nombre = nombre;
@@ -41,6 +44,8 @@ public class JugadorFantasyDetalleResponse {
         this.clausulaBloqueadaHasta = clausulaBloqueadaHasta;
         this.alineado = alineado;
         this.nombreEquipoFantasyDueno = nombreEquipoFantasyDueno;
+        this.userIdDueno = userIdDueno;
+        this.enVenta = enVenta;
 
         if (!List.of(PORTERO, DEFENSA, MEDIOCENTRO, DELANTERO).contains(posicion)) {
             throw new IllegalArgumentException("La posicion de un jugador tiene que ser PORTERO, DEFENSA, MEDIOCENTRO O DELANTERO");
@@ -62,4 +67,6 @@ public class JugadorFantasyDetalleResponse {
     public LocalDateTime getClausulaBloqueadaHasta(){ return clausulaBloqueadaHasta; }
     public boolean isAlineado(){ return alineado; }
     public String getNombreEquipoFantasyDueno(){ return nombreEquipoFantasyDueno; }
+    public Integer getUserIdDueno(){ return userIdDueno; }
+    public boolean isEnVenta(){ return enVenta; }
 }

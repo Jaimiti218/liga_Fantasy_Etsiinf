@@ -50,4 +50,9 @@ public class ViewController {
     public String mercado() {
         return "fantasy/mercado";
     }
+
+    @GetMapping("/fantasy/equipo/{equipoId}")
+    public String verEquipo() {
+        return "fantasy/equipo-otro";
+    }
 }

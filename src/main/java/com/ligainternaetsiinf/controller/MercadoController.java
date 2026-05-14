@@ -1,12 +1,14 @@
 package com.ligainternaetsiinf.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import com.ligainternaetsiinf.dto.InstanciaMercadoResponse;
+import com.ligainternaetsiinf.dto.JugadorFantasyDetalleResponse;
 import com.ligainternaetsiinf.dto.OfertaVentaResponse;
 import com.ligainternaetsiinf.dto.PujaResponse;
 import com.ligainternaetsiinf.security.CustomUserDetails;
@@ -71,12 +73,31 @@ public class MercadoController {
     }
 
     @GetMapping("/mis-ventas")
-    public List<OfertaVentaResponse> misVentas(
+    public List<JugadorFantasyDetalleResponse> misVentas(
             @RequestParam Integer ligaId,
             Authentication authentication) {
         CustomUserDetails ud = (CustomUserDetails) authentication.getPrincipal();
         Integer equipoId = equipoFantasyService
             .obtenerEquipoIdPorUsuarioYLiga(ligaId, ud.getId());
         return mercadoService.obtenerMisVentas(equipoId);
+    }
+
+    @DeleteMapping("/puja/{pujaId}")
+    public void eliminarPuja(@PathVariable Integer pujaId, Authentication authentication) {
+        CustomUserDetails ud = (CustomUserDetails) authentication.getPrincipal();
+        mercadoService.eliminarPuja(pujaId, ud.getId());
+    }
+
+    @PutMapping("/puja/{pujaId}")
+    public PujaResponse editarPuja(@PathVariable Integer pujaId,
+            @RequestParam long cantidad,
+            Authentication authentication) {
+        CustomUserDetails ud = (CustomUserDetails) authentication.getPrincipal();
+        return mercadoService.editarPuja(pujaId, cantidad, ud.getId());
+    }
+
+    @GetMapping("/liga/{ligaId}/contadores-pujas")
+    public Map<Integer, Long> obtenerContadorPujas(@PathVariable Integer ligaId) {
+        return mercadoService.obtenerContadorPujas(ligaId);
     }
 }

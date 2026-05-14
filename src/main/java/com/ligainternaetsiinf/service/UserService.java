@@ -27,7 +27,7 @@ public class UserService {
 
         User user = new User(email, passwordEncoder.encode(password), username);
         userRepository.save(user);
-        return (new UserResponse(user.getId(), user.getUsername(), user.getRole()));
+        return (new UserResponse(user.getId(), user.getUsername(), user.getRole(), user.getFotoPerfil()));
     }
 
     public LoginResponse loginUser(String email){
@@ -38,5 +38,12 @@ public class UserService {
         }
 
         return (new LoginResponse(aux.get().getId(), aux.get().getUsername(), aux.get().getRole()));
+    }
+
+    public void actualizarFotoPerfil(Integer userId, String foto) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        user.setFotoPerfil(foto);
+        userRepository.save(user);
     }
 }

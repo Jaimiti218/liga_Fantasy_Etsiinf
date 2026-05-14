@@ -5,6 +5,10 @@ let finMercado    = null;
 let misDatos      = null;
 let pujaJugadorId = null;
 let contadorInterval = null;
+let misPujasActivas = []; // {jugadorFantasyId, pujaId, cantidad}
+let pujaEditandoId = null;
+let contadoresPujas = {};
+
 
 const ICONOS_POSICION = {
     'PORTERO': '🧤', 'DEFENSA': '🛡',
@@ -24,6 +28,45 @@ document.addEventListener('DOMContentLoaded', async () => {
 function irAClasificacion() { window.location.href = `/fantasy/liga/${ligaId}`; }
 function irAPlantilla()      { window.location.href = `/fantasy/plantilla/${equipoId}?liga=${ligaId}`; }
 
+function toggleAccionesPuja(event, jugadorId) {
+    event.stopPropagation();
+    const menu = document.getElementById(`puja-menu-${jugadorId}`);
+    const abierto = !menu.classList.contains('hidden');
+    // Cerrar todos
+    document.querySelectorAll('.acciones-dropdown').forEach(d => d.classList.add('hidden'));
+    if (!abierto) menu.classList.remove('hidden');
+}
+
+function editarPuja(jugadorId, nombre, valorMercado, pujaId) {
+    pujaJugadorId = jugadorId;
+    pujaEditandoId = pujaId;
+    const pujaActual = misPujasActivas.find(p => p.id === pujaId);
+    document.getElementById('puja-jugador-nombre').textContent = nombre;
+    document.getElementById('puja-saldo').textContent = formatearDineroCompleto(misDatos?.dinero ?? 0);
+    document.getElementById('puja-valor-mercado').textContent = formatearDineroCompleto(valorMercado);
+    document.getElementById('input-puja').value = pujaActual ? pujaActual.cantidad.toLocaleString('es-ES') : '';
+    document.getElementById('error-puja').classList.add('hidden');
+    document.getElementById('modal-puja').classList.remove('hidden');
+    document.querySelectorAll('.acciones-dropdown').forEach(d => d.classList.add('hidden'));
+}
+
+async function eliminarPuja(pujaId, jugadorId) {
+    if (!confirm('¿Seguro que quieres eliminar esta puja?')) return;
+    try {
+        const res = await fetch(`/mercado/puja/${pujaId}`, {
+            method: 'DELETE',
+            credentials: 'include'
+        });
+        if (!res.ok) { alert('Error al eliminar la puja.'); return; }
+        mostrarToast('✓ Puja eliminada');
+        await cargarMisPujas();
+        await cargarMercado();
+        await actualizarSaldo();
+    } catch (e) {
+        alert('Error de conexión.');
+    }
+}
+
 // ─── Cargar equipo del usuario ────────────────────────────────────────────────
 async function cargarDatosEquipo() {
     try {
@@ -34,6 +77,18 @@ async function cargarDatosEquipo() {
         misDatos = await res.json();
         equipoId = misDatos.id;
     } catch (e) {}
+}
+
+async function cargarMisPujas() {
+    try {
+        const res = await fetch(`/mercado/mis-pujas?ligaId=${ligaId}`, {
+            credentials: 'include'
+        });
+        if (!res.ok) return;
+        misPujasActivas = await res.json();
+    } catch (e) {
+        misPujasActivas = [];
+    }
 }
 
 // ─── Tabs principales ─────────────────────────────────────────────────────────
@@ -61,17 +116,16 @@ function cambiarOpTab(sub) {
 // ─── Cargar mercado ───────────────────────────────────────────────────────────
 async function cargarMercado() {
     try {
-        const res = await fetch(`/mercado/liga/${ligaId}`, { credentials: 'include' });
-        if (!res.ok) {
-            document.getElementById('lista-mercado').innerHTML =
-                '<div class="cargando-ligas">No hay mercado activo en esta liga.</div>';
-            return;
-        }
-
-        const instancia = await res.json();
+        await cargarMisPujas();
+        const [resMercado, resContadores] = await Promise.all([
+            fetch(`/mercado/liga/${ligaId}`, { credentials: 'include' }),
+            fetch(`/mercado/liga/${ligaId}/contadores-pujas`, { credentials: 'include' })
+        ]);
+        if (!resMercado.ok) { /* error */ return; }
+        contadoresPujas = resContadores.ok ? await resContadores.json() : {};
+        const instancia = await resMercado.json();
         instanciaId = instancia.id;
         finMercado  = new Date(instancia.fin);
-
         iniciarContador();
         actualizarSaldo();
         renderizarMercado(instancia.jugadores);
@@ -114,26 +168,31 @@ async function actualizarSaldo() {
     if (!misDatos) return;
 
     const saldo = misDatos.dinero;
-    document.getElementById('saldo-disponible').textContent = formatearDinero(saldo);
+    const elSaldo = document.getElementById('saldo-disponible');
+    elSaldo.textContent = formatearDineroCompleto(saldo);
+    elSaldo.style.color = saldo < 0 ? '#cb0606' : 'white';
 
-    // Calcular total de pujas activas
     try {
         const res = await fetch(`/mercado/mis-pujas?ligaId=${ligaId}`, {
             credentials: 'include'
         });
         if (!res.ok) return;
-        const pujas = await res.json();
+        const pujas      = await res.json();
         const totalPujas = pujas.reduce((sum, p) => sum + p.cantidad, 0);
 
         if (totalPujas > 0) {
-            document.getElementById('saldo-tras-pujas').textContent =
-                formatearDinero(saldo - totalPujas);
+            const saldoFinal = saldo - totalPujas;
+            document.getElementById('saldo-label-pujas').textContent =
+                `Pujas activas: -${formatearDineroCompleto(totalPujas)}`;
+            const elFinal = document.getElementById('saldo-final-pujas');
+            elFinal.textContent = formatearDineroCompleto(saldoFinal);
+            elFinal.style.color = saldoFinal < 0 ? '#ac0101' : 'white';
             document.getElementById('saldo-tras-pujas-container').classList.remove('hidden');
         }
     } catch (e) {}
 }
 
-function renderizarMercado(jugadores) {
+async function renderizarMercado(jugadores) {
     const contenedor = document.getElementById('lista-mercado');
 
     if (!jugadores || jugadores.length === 0) {
@@ -141,15 +200,64 @@ function renderizarMercado(jugadores) {
         return;
     }
 
+    const jornadasMap = {};
+    await Promise.all(jugadores.map(async j => {
+        jornadasMap[j.id] = await cargarJornadasJugador(j.id);
+    }));
+
     contenedor.innerHTML = jugadores.map(j => {
-        const enVenta = j.enVenta && j.nombreEquipoFantasyDueno;
+        const enVenta      = j.enVenta && j.nombreEquipoFantasyDueno;
+        const esMioEnVenta = enVenta && j.userIdDueno !== undefined && j.userIdDueno === misDatos?.userId;
+        const pujaActiva   = misPujasActivas.find(p => p.jugadorFantasyId === j.id);
+        const jornadas     = jornadasMap[j.id] ?? [];
+        const ultimas5     = jornadas.slice(-5);
+        const numPujas = contadoresPujas[j.id] ?? 0;
+        while (ultimas5.length < 5) ultimas5.unshift(null);
+
+        const jornadasHtml = ultimas5.map(jorn => {
+            if (!jorn) return `<div class="jornada-mini jornada-vacia">—</div>`;
+            const color = jorn.puntos >= 8 ? 'alta' : jorn.puntos >= 4 ? 'media' : 'baja';
+            return `<div class="jornada-mini jornada-${color}">
+                J${jorn.jornada}<br><strong>${jorn.jugo ? jorn.puntos : '—'}</strong>
+            </div>`;
+        }).join('');
+
+        let botonAccion;
+        if (esMioEnVenta) {
+            // El dueño no ve botón de fichar
+            botonAccion = '';
+        } else if (pujaActiva) {
+            botonAccion = `
+                <div style="position:relative">
+                    <button class="btn-acciones-puja" onclick="toggleAccionesPuja(event, ${j.id})">
+                        Acciones ▾
+                    </button>
+                    <div id="puja-menu-${j.id}" class="acciones-dropdown hidden">
+                        <div class="acciones-item" onclick="editarPuja(${j.id}, '${escapar(j.nombre)}', ${j.valorMercado}, ${pujaActiva.id})">
+                            ✏️ Editar puja
+                        </div>
+                        <div class="acciones-item" style="color:#c0392b" onclick="eliminarPuja(${pujaActiva.id}, ${j.id})">
+                            🗑️ Eliminar puja
+                        </div>
+                    </div>
+                </div>`;
+        } else {
+            botonAccion = `
+                <button class="btn-fichar" onclick="abrirModalPuja(${j.id}, '${escapar(j.nombre)}', ${j.valorMercado})">
+                    Fichar
+                </button>`;
+        }
+
         return `
-        <div class="jugador-card-mercado">
+        <div class="jugador-card-mercado" onclick="abrirDetalleJugadorMercado(${j.id})" style="cursor:pointer">
             <div class="jugador-foto-grande">
                 <span>${ICONOS_POSICION[j.posicion] ?? '👤'}</span>
             </div>
             <div class="jugador-card-info" style="flex:1">
-                <div class="jugador-card-nombre">${j.nombre}</div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem">
+                    <div class="jugador-card-nombre">${j.nombre}</div>
+                    ${numPujas > 0 ? `<span class="contador-pujas">${numPujas} puja${numPujas > 1 ? 's' : ''}</span>` : ''}
+                </div>
                 <div class="jugador-card-equipo">
                     <span class="badge-equipo">${j.nombreEquipoReal || 'Sin equipo'}</span>
                     <span class="badge-posicion ${j.posicion}">
@@ -171,11 +279,13 @@ function renderizarMercado(jugadores) {
                         <span class="valor">${formatearDinero(j.valorMercado)}</span>
                     </div>
                 </div>
+                <div class="jornadas-recientes">${jornadasHtml}</div>
                 ${!enVenta ? `<div class="temporizador-jugador">⏱ --:--:--</div>` : ''}
+                ${pujaActiva ? `<div class="puja-actual-badge">Tu puja: ${formatearDinero(pujaActiva.cantidad)}</div>` : ''}
             </div>
-            <button class="btn-fichar" onclick="abrirModalPuja(${j.id}, '${escapar(j.nombre)}', ${j.valorMercado})">
-                Fichar
-            </button>
+            <div onclick="event.stopPropagation()">
+                ${botonAccion}
+            </div>
         </div>`;
     }).join('');
 }
@@ -206,10 +316,16 @@ async function confirmarPuja() {
     }
 
     try {
-        const res = await fetch(
-            `/mercado/pujar?jugadorFantasyId=${pujaJugadorId}&instanciaId=${instanciaId}&cantidad=${cantidad}`,
-            { method: 'POST', credentials: 'include' }
-        );
+        let url, method;
+        if (pujaEditandoId) {
+            url    = `/mercado/puja/${pujaEditandoId}?cantidad=${cantidad}`;
+            method = 'PUT';
+        } else {
+            url    = `/mercado/pujar?jugadorFantasyId=${pujaJugadorId}&instanciaId=${instanciaId}&cantidad=${cantidad}`;
+            method = 'POST';
+        }
+
+        const res = await fetch(url, { method, credentials: 'include' });
 
         if (!res.ok) {
             const texto = await res.text();
@@ -217,8 +333,11 @@ async function confirmarPuja() {
             return;
         }
 
+        pujaEditandoId = null;
         cerrarModalPuja();
-        mostrarToast('✓ Puja realizada');
+        mostrarToast('✓ Puja guardada');
+        await cargarMisPujas();
+        await cargarMercado();
         await actualizarSaldo();
 
     } catch (e) {
@@ -269,38 +388,51 @@ async function cargarVentas() {
         const res = await fetch(`/mercado/mis-ventas?ligaId=${ligaId}`, {
             credentials: 'include'
         });
-        if (!res.ok) { contenedor.innerHTML = '<div class="cargando-ligas">Error al cargar.</div>'; return; }
+        if (!res.ok) { contenedor.innerHTML = '<div class="cargando-ligas">Error.</div>'; return; }
 
-        const ventas = await res.json();
-        if (ventas.length === 0) {
+        const jugadores = await res.json();
+        if (jugadores.length === 0) {
             contenedor.innerHTML = '<div class="cargando-ligas">No tienes jugadores en venta.</div>';
             return;
         }
 
-        contenedor.innerHTML = ventas.map(v => `
+        contenedor.innerHTML = jugadores.map(j => `
             <div class="venta-card">
                 <div class="jugador-foto-grande">
-                    <span>${ICONOS_POSICION[v.posicion] ?? '👤'}</span>
+                    <span>${ICONOS_POSICION[j.posicion] ?? '👤'}</span>
                 </div>
                 <div class="puja-info">
-                    <div class="puja-nombre">${v.jugadorNombre}</div>
+                    <div class="puja-nombre">${j.nombre}</div>
                     <div class="puja-detalle">
-                        ${v.equipoReal || 'Sin equipo'} ·
-                        ${v.posicion.charAt(0) + v.posicion.slice(1).toLowerCase()}
+                        ${j.nombreEquipoReal || 'Sin equipo'} ·
+                        ${j.posicion.charAt(0) + j.posicion.slice(1).toLowerCase()}
                     </div>
-                    <div class="puja-detalle">Valor: ${formatearDinero(v.valorMercado)}</div>
-                    <div class="puja-detalle" style="color:#27ae60;font-weight:700">
-                        Oferta: ${formatearDinero(v.cantidad)}
+                    <div class="puja-detalle">Valor: ${formatearDinero(j.valorMercado)}</div>
+                    <div class="puja-detalle" style="color:#f39c12;font-weight:600">
+                        ⏳ En espera de ofertas
                     </div>
                 </div>
-                <button class="btn-aceptar-oferta" onclick="aceptarOferta(${v.id})">
-                    Aceptar
+                <button class="btn-quitar-mercado-ventas" 
+                        onclick="quitarDelMercadoDesdeVentas(${j.id})">
+                    Quitar
                 </button>
             </div>
         `).join('');
     } catch (e) {
         contenedor.innerHTML = '<div class="cargando-ligas">Error al cargar.</div>';
     }
+}
+
+async function quitarDelMercadoDesdeVentas(jugadorFantasyId) {
+    if (!confirm('¿Quieres retirar este jugador del mercado?')) return;
+    try {
+        const res = await fetch(`/mercado/vender/${jugadorFantasyId}`, {
+            method: 'DELETE', credentials: 'include'
+        });
+        if (!res.ok) { alert('Error.'); return; }
+        mostrarToast('✓ Jugador retirado del mercado');
+        cargarVentas();
+    } catch (e) { alert('Error de conexión.'); }
 }
 
 async function aceptarOferta(ofertaId) {
@@ -348,6 +480,10 @@ function formatearDinero(cantidad) {
     return cantidad.toString();
 }
 
+function formatearDineroCompleto(cantidad) {
+    return cantidad.toLocaleString('es-ES') + ' €';
+}
+
 function mostrarToast(texto) {
     let toast = document.getElementById('toast');
     if (!toast) {
@@ -369,4 +505,107 @@ function mostrarErrorElement(id, texto) {
 
 function escapar(str) {
     return String(str).replace(/'/g, "\\'").replace(/"/g, '\\"');
+}
+
+async function cargarJornadasJugador(jugadorFantasyId) {
+    try {
+        const res = await fetch(`/equipos-fantasy/jugador/${jugadorFantasyId}/jornadas`, {
+            credentials: 'include'
+        });
+        if (!res.ok) return [];
+        return await res.json();
+    } catch (e) { return []; }
+}
+
+async function abrirDetalleJugadorMercado(jugadorFantasyId) {
+    // Buscar el jugador en la instancia actual
+    const res = await fetch(`/mercado/liga/${ligaId}`, { credentials: 'include' });
+    if (!res.ok) return;
+    const instancia = await res.json();
+    const jugador   = instancia.jugadores.find(j => j.id === jugadorFantasyId);
+    if (!jugador) return;
+
+    const jornadas = await cargarJornadasJugador(jugadorFantasyId);
+
+    document.getElementById('detalle-icono').textContent          = ICONOS_POSICION[jugador.posicion] ?? '👤';
+    document.getElementById('detalle-nombre').textContent         = jugador.nombre;
+    document.getElementById('detalle-equipo').textContent         = jugador.nombreEquipoReal || 'Sin equipo';
+    document.getElementById('detalle-posicion-badge').textContent = jugador.posicion.charAt(0) + jugador.posicion.slice(1).toLowerCase();
+    document.getElementById('detalle-posicion-badge').className   = `badge-posicion ${jugador.posicion}`;
+    document.getElementById('detalle-puntos').textContent         = jugador.puntosTotal;
+    document.getElementById('detalle-media').textContent          = jugador.mediaPuntos.toFixed(2);
+    document.getElementById('detalle-valor').textContent          = formatearDineroCompleto(jugador.valorMercado);
+
+    window._jornadasDetalle      = jornadas;
+    window._jornadaDetalleActual = jornadas.length > 0 ? jornadas.length - 1 : 0;
+    window._jugadorDetalleActual = jugador;
+
+    if (jornadas.length === 0) {
+        document.getElementById('detalle-jornada-label').textContent  = 'Sin jornadas';
+        document.getElementById('detalle-jornada-puntos').textContent = '—';
+        document.getElementById('detalle-stats-tabla').innerHTML      =
+            '<div class="sin-datos">Sin jornadas jugadas todavía</div>';
+    } else {
+        renderizarJornadaDetalle();
+    }
+
+    document.getElementById('modal-detalle-jugador').classList.remove('hidden');
+}
+
+function renderizarJornadaDetalle() {
+    const jornadas = window._jornadasDetalle;
+    const jugador  = window._jugadorDetalleActual;
+    const idx      = window._jornadaDetalleActual;
+    const jorn     = jornadas[idx];
+
+    document.getElementById('detalle-jornada-label').textContent  = `Jornada ${jorn.jornada}`;
+    document.getElementById('detalle-jornada-puntos').textContent = jorn.jugo ? jorn.puntos : '—';
+
+    const stats     = document.getElementById('detalle-stats-tabla');
+    const esPortero = jugador?.posicion === 'PORTERO';
+
+    if (!jorn.jugo) {
+        stats.innerHTML = '<div class="sin-datos">No jugó en esta jornada</div>';
+        return;
+    }
+
+    stats.innerHTML = `
+        <div class="stat-fila">
+            <span class="stat-cantidad">${jorn.goles}</span>
+            <span class="stat-nombre">Goles</span>
+            <span class="stat-puntos ${jorn.goles > 0 ? 'positivo' : 'neutro'}">${jorn.goles * 4}</span>
+        </div>
+        <div class="stat-fila">
+            <span class="stat-cantidad">${jorn.asistencias}</span>
+            <span class="stat-nombre">Asistencias</span>
+            <span class="stat-puntos ${jorn.asistencias > 0 ? 'positivo' : 'neutro'}">${jorn.asistencias * 2}</span>
+        </div>
+        <div class="stat-fila">
+            <span class="stat-cantidad">${jorn.tarjetasAmarillas}</span>
+            <span class="stat-nombre">Tarjetas amarillas</span>
+            <span class="stat-puntos ${jorn.tarjetasAmarillas > 0 ? 'negativo' : 'neutro'}">${jorn.tarjetasAmarillas * -1}</span>
+        </div>
+        <div class="stat-fila">
+            <span class="stat-cantidad">${jorn.tarjetasRojas}</span>
+            <span class="stat-nombre">Tarjetas rojas</span>
+            <span class="stat-puntos ${jorn.tarjetasRojas > 0 ? 'negativo' : 'neutro'}">${jorn.tarjetasRojas * -3}</span>
+        </div>
+        ${esPortero ? `
+        <div class="stat-fila">
+            <span class="stat-cantidad">${jorn.paradas}</span>
+            <span class="stat-nombre">Paradas</span>
+            <span class="stat-puntos ${jorn.paradas > 0 ? 'positivo' : 'neutro'}">${jorn.paradas}</span>
+        </div>` : ''}
+    `;
+}
+
+function cambiarJornadaDetalle(delta) {
+    const nueva = window._jornadaDetalleActual + delta;
+    if (nueva < 0 || nueva >= window._jornadasDetalle.length) return;
+    window._jornadaDetalleActual = nueva;
+    renderizarJornadaDetalle();
+}
+
+function cerrarDetalleJugador() {
+    document.getElementById('modal-detalle-jugador').classList.add('hidden');
 }

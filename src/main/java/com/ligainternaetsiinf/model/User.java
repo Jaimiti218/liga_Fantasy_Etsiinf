@@ -17,6 +17,8 @@ public class User {
 
     private String role; //esto podra ser "USER" para la gente normal o "ADMIN" para los administradores
 
+    @Column(columnDefinition = "LONGTEXT")
+    private String fotoPerfil; // base64 o null
     @OneToMany
     private List<LigaFantasy> ligasFantasy;
 
@@ -46,5 +48,8 @@ public class User {
     public void setUsername(String username){ this.username = username; }
 
     public List<LigaFantasy> getLigasFantasy(){  return ligasFantasy;  }
+
+    public String getFotoPerfil(){ return fotoPerfil; }
+    public void setFotoPerfil(String fotoPerfil){ this.fotoPerfil = fotoPerfil; }
 
 }

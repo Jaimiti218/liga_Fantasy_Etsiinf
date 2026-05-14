@@ -172,6 +172,31 @@
         </div>
     </div>
 
+    <!-- MODAL CONFIRMAR VENTA -->
+    <div id="modal-confirmar-venta" class="modal-overlay hidden">
+        <div class="modal">
+            <h3>Añadir al mercado</h3>
+            <p class="subtexto" id="venta-jugador-nombre"></p>
+            <div class="campo">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem">
+                    <span style="font-size:0.85rem;color:#666">Valor de mercado</span>
+                    <strong id="venta-valor-mercado" style="color:#0f3460"></strong>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                    <span style="font-size:0.85rem;color:#666">Cláusula actual</span>
+                    <strong id="venta-clausula" style="color:#27ae60"></strong>
+                </div>
+            </div>
+            <div class="saldo-disponible">
+                💰 Tu saldo: <strong id="venta-saldo">—</strong>
+            </div>
+            <div class="modal-botones">
+                <button class="btn-primary" onclick="confirmarPonerEnVenta()">Añadir al mercado</button>
+                <button class="btn-ghost" onclick="cerrarModalVenta()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
     <nav class="bottom-nav">
         <button class="bottom-nav-item" onclick="volverALiga()">🏆 Clasificación</button>
         <button class="bottom-nav-item active">👤 Mi Plantilla</button>

@@ -1,5 +1,5 @@
 .saldo-mercado {
-    background: #c0392b;
+    background: #32c02b;
     border-radius: 12px;
     padding: 1rem 1.25rem;
     margin-bottom: 1rem;
@@ -139,4 +139,33 @@
     font-weight: 600;
     padding: 0.15rem 0.5rem;
     border-radius: 4px;
+}
+
+.btn-acciones-puja {
+    background: #e8f0fe;
+    border: 1.5px solid #0f3460;
+    color: #0f3460;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.puja-actual-badge {
+    font-size: 0.72rem;
+    color: #27ae60;
+    font-weight: 700;
+    margin-top: 0.2rem;
+}
+
+.contador-pujas {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    background: #e8f0fe;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    white-space: nowrap;
 }

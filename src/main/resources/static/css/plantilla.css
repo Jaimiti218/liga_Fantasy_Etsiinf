@@ -679,7 +679,62 @@
 .stat-nombre   { flex: 1; font-size: 0.9rem; color: rgba(255,255,255,0.75); }
 .stat-puntos   { font-size: 1rem; font-weight: 700; min-width: 30px; text-align: right; }
 .stat-puntos.positivo { color: #4caf50; }
-.stat-puntos.negativo { color: #f44336; }
+.stat-puntos.negativo { color: #cf1b0e; }
 .stat-puntos.neutro   { color: rgba(255,255,255,0.4); }
 
 .sin-datos { text-align: center; color: rgba(255,255,255,0.5); padding: 2rem; font-size: 0.9rem; }
+
+
+.btn-quitar-mercado {
+    background: #fff0f0;
+    border: 1.5px solid #f5c6c6;
+    color: #c0392b;
+    padding: 0.4rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-quitar-mercado:hover { background: #ffe0e0; }
+
+.perfil-cabecera {
+    background: linear-gradient(135deg, #0f3460, #1a4a80);
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: white;
+}
+
+.perfil-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.perfil-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.perfil-nombre {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.perfil-equipo-stats {
+    font-size: 0.82rem;
+    opacity: 0.8;
+    margin-top: 0.2rem;
+    display: flex;
+    gap: 0.5rem;
+}

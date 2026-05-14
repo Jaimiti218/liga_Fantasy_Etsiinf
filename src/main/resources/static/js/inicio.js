@@ -4,7 +4,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     usuarioActual = await obtenerUsuarioActual();
 
     if (usuarioActual) {
-        document.getElementById('saludo-usuario').textContent = '👋 ' + usuarioActual.username;
+        document.getElementById('saludo-usuario').innerHTML = getAvatarHtml(usuarioActual.fotoPerfil, 28) +
+        ' ' + usuarioActual.username;
         document.getElementById('saludo-usuario').classList.remove('hidden');
         document.getElementById('btn-sesion').textContent = 'Cerrar sesión';
 

@@ -10,6 +10,7 @@ let jornadaActual         = 1;
 let accionesAbierto       = null;
 let jugadorClausulaActual = null;
 const MAX_JUGADORES       = 13;
+let jugadorVentaActual = null;
 
 const ICONOS_POSICION = {
     'PORTERO':     '🧤',
@@ -367,15 +368,22 @@ async function renderizarPlantilla() {
                     </div>
                 </div>
                 <div onclick="event.stopPropagation()" style="position:relative">
-                    <button class="btn-acciones" onclick="toggleAcciones(event, ${j.id})">Acciones ▾</button>
-                    <div id="acciones-${j.id}" class="acciones-dropdown hidden">
-                        <div class="acciones-item" onclick="abrirModalClausula(${j.id}, '${escapar(j.nombre)}')">
-                            📈 Subir cláusula
-                        </div>
-                        <div class="acciones-item" onclick="ponerEnVentaDesde(${j.id})">
-                            🛒 Añadir al mercado
-                        </div>
-                    </div>
+                    ${j.enVenta
+                        ? `<button class="btn-quitar-mercado" onclick="quitarDelMercado(${j.id})">
+                            🔴 Quitar
+                        </button>`
+                        : `<button class="btn-acciones" onclick="toggleAcciones(event, ${j.id})">
+                            Acciones ▾
+                        </button>
+                        <div id="acciones-${j.id}" class="acciones-dropdown hidden">
+                            <div class="acciones-item" onclick="abrirModalClausula(${j.id}, '${escapar(j.nombre)}')">
+                                📈 Subir cláusula
+                            </div>
+                            <div class="acciones-item" onclick="ponerEnVentaDesde(${j.id})">
+                                🛒 Añadir al mercado
+                            </div>
+                        </div>`
+                    }
                 </div>
             </div>
         </div>`;
@@ -383,17 +391,32 @@ async function renderizarPlantilla() {
 }
 
 
-async function ponerEnVentaDesde(jugadorFantasyId) {
+function ponerEnVentaDesde(jugadorFantasyId) {
     cerrarAcciones();
+    const jugador = plantillaData.find(j => j.id === jugadorFantasyId);
+    if (!jugador) return;
+
+    jugadorVentaActual = jugadorFantasyId;
+    document.getElementById('venta-jugador-nombre').textContent    = jugador.nombre;
+    document.getElementById('venta-valor-mercado').textContent     = formatearDinero(jugador.valorMercado);
+    document.getElementById('venta-clausula').textContent          = jugador.clausula ? formatearDinero(jugador.clausula) : 'Sin cláusula';
+    document.getElementById('venta-saldo').textContent             = formatearDinero(window.dineroEquipo ?? 0);
+    document.getElementById('modal-confirmar-venta').classList.remove('hidden');
+}
+
+function cerrarModalVenta() {
+    document.getElementById('modal-confirmar-venta').classList.add('hidden');
+    jugadorVentaActual = null;
+}
+
+async function confirmarPonerEnVenta() {
+    if (!jugadorVentaActual) return;
     try {
-        const res = await fetch(`/mercado/vender/${jugadorFantasyId}`, {
+        const res = await fetch(`/mercado/vender/${jugadorVentaActual}`, {
             method: 'POST', credentials: 'include'
         });
-        if (!res.ok) {
-            const texto = await res.text();
-            alert(texto || 'Error al poner en venta.');
-            return;
-        }
+        if (!res.ok) { alert('Error al poner en venta.'); return; }
+        cerrarModalVenta();
         mostrarToast('✓ Jugador puesto en venta');
         await cargarPlantilla();
         renderizarPlantilla();
@@ -679,4 +702,19 @@ function escapar(str) {
 
 function irAMercado() {
     window.location.href = `/fantasy/mercado/${ligaId}`;
+}
+
+async function quitarDelMercado(jugadorFantasyId) {
+    if (!confirm('¿Quieres quitar este jugador del mercado?')) return;
+    try {
+        const res = await fetch(`/mercado/vender/${jugadorFantasyId}`, {
+            method: 'DELETE', credentials: 'include'
+        });
+        if (!res.ok) { alert('Error al quitar del mercado.'); return; }
+        mostrarToast('✓ Jugador retirado del mercado');
+        await cargarPlantilla();
+        renderizarPlantilla();
+    } catch (e) {
+        alert('Error de conexión.');
+    }
 }

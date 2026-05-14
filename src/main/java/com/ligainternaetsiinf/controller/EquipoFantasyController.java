@@ -97,5 +97,19 @@ public class EquipoFantasyController {
         return equipoFantasyService.obtenerInfoJornada(equipoId, jornada);
     }
 
+    // Obtener equipo de otro usuario en una liga (público dentro de la liga)
+    @GetMapping("/{equipoId}/plantilla-publica")
+    public List<JugadorFantasyDetalleResponse> verPlantillaDeOtro(
+            @PathVariable Integer equipoId) {
+        return equipoFantasyService.obtenerPlantillaDetalle(equipoId);
+    }
+
+    @GetMapping("/{equipoId}/puntos/jornada/{jornada}/info-publico")
+    public Map<String, Object> verPuntosJornadaDeOtro(
+            @PathVariable Integer equipoId,
+            @PathVariable Integer jornada) {
+        return equipoFantasyService.obtenerInfoJornada(equipoId, jornada);
+    }
+
     
 }

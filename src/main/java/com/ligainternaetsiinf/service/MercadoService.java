@@ -3,7 +3,9 @@ package com.ligainternaetsiinf.service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 
@@ -18,6 +20,7 @@ import com.ligainternaetsiinf.dto.OfertaVentaResponse;
 import com.ligainternaetsiinf.dto.PujaResponse;
 import com.ligainternaetsiinf.model.EquipoFantasy;
 import com.ligainternaetsiinf.model.InstanciaMercado;
+import com.ligainternaetsiinf.model.Jugador;
 import com.ligainternaetsiinf.model.JugadorFantasy;
 import com.ligainternaetsiinf.model.LigaFantasy;
 import com.ligainternaetsiinf.model.Mercado;
@@ -77,10 +80,7 @@ public class MercadoService {
         InstanciaMercado instancia = instanciaRepository.findById(instanciaId)
             .orElseThrow(() -> new RuntimeException("Instancia no encontrada"));
 
-        // Verificar que el jugador está en esta instancia
-        if (!instancia.getJugadoresDisponibles().contains(jugador)) {
-            throw new RuntimeException("Este jugador no está disponible en el mercado actual");
-        }
+        
 
         // Verificar límite de saldo negativo (máximo 20% del valor del equipo)
         long valorEquipo = calcularValorEquipo(equipo);
@@ -124,6 +124,20 @@ public class MercadoService {
 
         jugador.setEnVenta(true);
         jugadorFantasyRepository.save(jugador);
+
+        // Añadir a la instancia activa si existe
+        LigaFantasy liga = jugador.getLigaFantasy();
+        Mercado mercado  = mercadoRepository.findByLigaFantasyId(liga.getId()).orElse(null);
+        if (mercado != null) {
+            instanciaRepository.findByMercadoAndResueltaFalse(mercado).ifPresent(instancia -> {
+                if (!instancia.getJugadoresDisponibles().contains(jugador)) {
+                    instancia.getJugadoresDisponibles().add(jugador);
+                    instanciaRepository.save(instancia);
+                }
+            });
+        }
+
+        
     }
 
     // ─── Retirar jugador del mercado ──────────────────────────────────────────
@@ -137,6 +151,16 @@ public class MercadoService {
 
         jugador.setEnVenta(false);
         jugadorFantasyRepository.save(jugador);
+
+        // Quitar de la instancia activa
+        LigaFantasy liga = jugador.getLigaFantasy();
+        Mercado mercado  = mercadoRepository.findByLigaFantasyId(liga.getId()).orElse(null);
+        if (mercado != null) {
+            instanciaRepository.findByMercadoAndResueltaFalse(mercado).ifPresent(instancia -> {
+                instancia.getJugadoresDisponibles().remove(jugador);
+                instanciaRepository.save(instancia);
+            });
+        }
     }
 
     // ─── Aceptar oferta de venta ──────────────────────────────────────────────
@@ -176,6 +200,15 @@ public class MercadoService {
         oferta.setAceptada(true);
 
         jugadorFantasyRepository.save(jugador);
+
+        LigaFantasy liga = jugador.getLigaFantasy();
+        Mercado mercado  = mercadoRepository.findByLigaFantasyId(liga.getId()).orElse(null);
+        if (mercado != null) {
+            instanciaRepository.findByMercadoAndResueltaFalse(mercado).ifPresent(instancia -> {
+                instancia.getJugadoresDisponibles().remove(jugador);
+                instanciaRepository.save(instancia);
+            });
+        }
         ofertaVentaRepository.save(oferta);
     }
 
@@ -206,14 +239,60 @@ public class MercadoService {
         return resultado;
     }
 
+    public void eliminarPuja(Integer pujaId, Integer userId) {
+        Puja puja = pujaRepository.findById(pujaId)
+            .orElseThrow(() -> new RuntimeException("Puja no encontrada"));
+        if (!puja.getEquipoFantasy().getUser().getId().equals(userId)) {
+            throw new RuntimeException("Esta puja no es tuya");
+        }
+        pujaRepository.delete(puja);
+    }
+
+    public PujaResponse editarPuja(Integer pujaId, long nuevaCantidad, Integer userId) {
+        Puja puja = pujaRepository.findById(pujaId)
+            .orElseThrow(() -> new RuntimeException("Puja no encontrada"));
+        if (!puja.getEquipoFantasy().getUser().getId().equals(userId)) {
+            throw new RuntimeException("Esta puja no es tuya");
+        }
+
+        // Validar límite de saldo negativo
+        EquipoFantasy equipo  = puja.getEquipoFantasy();
+        long valorEquipo      = calcularValorEquipo(equipo);
+        long maxNegativo      = -(valorEquipo / 5);
+        long pujasTotales     = calcularPujasTotales(equipo, puja.getInstancia()) - puja.getCantidad();
+        long saldoTras        = equipo.getDinero() - pujasTotales - nuevaCantidad;
+
+        if (saldoTras < maxNegativo) {
+            long maxPuja = equipo.getDinero() - pujasTotales - maxNegativo;
+            throw new RuntimeException("Puedes pujar como máximo " + formatearDinero(Math.max(0, maxPuja)));
+        }
+
+        puja.setCantidad(nuevaCantidad);
+        pujaRepository.save(puja);
+        return toPujaResponse(puja);
+    }
+
     // ─── Obtener mis ventas ───────────────────────────────────────────────────
-    public List<OfertaVentaResponse> obtenerMisVentas(Integer equipoId) {
+    public List<JugadorFantasyDetalleResponse> obtenerMisVentas(Integer equipoId) {
+        List<JugadorFantasy> enVenta = jugadorFantasyRepository
+            .findByEquipoFantasyIdAndEnVentaTrue(equipoId);
         EquipoFantasy equipo = equipoFantasyRepository.findById(equipoId)
             .orElseThrow(() -> new RuntimeException("Equipo no encontrado"));
 
-        List<OfertaVenta> ofertas = ofertaVentaRepository.findByEquipoVendedorAndAceptadaFalse(equipo);
-        List<OfertaVentaResponse> resultado = new ArrayList<>();
-        for (OfertaVenta o : ofertas) resultado.add(toOfertaResponse(o));
+        List<JugadorFantasyDetalleResponse> resultado = new ArrayList<>();
+        for (JugadorFantasy jf : enVenta) {
+            Jugador jr = jf.getJugadorReal();
+            int partidos = jr.getPartidosJugados();
+            double media = partidos > 0 ? (double) jr.getPuntosFantasy() / partidos : 0.0;
+            resultado.add(new JugadorFantasyDetalleResponse(
+                jf.getId(), jr.getId(), jr.getFullName(), jr.getPosicion(),
+                jr.getValorMercado(),
+                jr.getEquipo() != null ? jr.getEquipo().getName() : null,
+                jr.getPuntosFantasy(), media, partidos,
+                jf.getClausula(), jf.getClausulaBloqueadaHasta(), jf.isAlineado(), null, 
+                equipo.getUser().getId(), jf.isEnVenta()
+            ));
+        }
         return resultado;
     }
 
@@ -358,6 +437,9 @@ public class MercadoService {
             String dueno = (jf.getEquipoFantasy() != null && jf.isEnVenta())
             ? jf.getEquipoFantasy().getUser().getUsername()
             : null;
+            Integer userIdDueno = (jf.getEquipoFantasy() != null && jf.isEnVenta())
+            ? jf.getEquipoFantasy().getUser().getId()
+            : null;
             int partidos = jr.getPartidosJugados();
             double media = partidos > 0 ? (double) jr.getPuntosFantasy() / partidos : 0.0;
             jugadores.add(new JugadorFantasyDetalleResponse(
@@ -365,7 +447,8 @@ public class MercadoService {
                 jr.getValorMercado(),
                 jr.getEquipo() != null ? jr.getEquipo().getName() : null,
                 jr.getPuntosFantasy(), media, partidos,
-                jf.getClausula(), jf.getClausulaBloqueadaHasta(), jf.isAlineado(), dueno
+                jf.getClausula(), jf.getClausulaBloqueadaHasta(), jf.isAlineado(), dueno, userIdDueno,
+                jf.isEnVenta()
             ));
         }
         return new InstanciaMercadoResponse(instancia.getId(), instancia.getFin(), jugadores);
@@ -395,5 +478,22 @@ public class MercadoService {
         if (cantidad >= 1000000) return (cantidad / 1000000) + "M";
         if (cantidad >= 1000) return (cantidad / 1000) + "K";
         return String.valueOf(cantidad);
+    }
+
+    public Map<Integer, Long> obtenerContadorPujas(Integer ligaId) {
+        Mercado mercado = mercadoRepository.findByLigaFantasyId(ligaId)
+            .orElseThrow(() -> new RuntimeException("Mercado no encontrado"));
+        InstanciaMercado instancia = instanciaRepository
+            .findByMercadoAndResueltaFalse(mercado)
+            .orElseThrow(() -> new RuntimeException("No hay instancia activa"));
+
+        List<JugadorFantasy> jugadores = instancia.getJugadoresDisponibles();
+        Map<Integer, Long> contadores = new HashMap<>();
+        for (JugadorFantasy jf : jugadores) {
+            long numPujas = pujaRepository
+                .findByJugadorFantasyAndInstancia(jf, instancia).size();
+            if (numPujas > 0) contadores.put(jf.getId(), numPujas);
+        }
+        return contadores;
     }
 }

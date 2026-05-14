@@ -55,8 +55,10 @@
                     <span class="saldo-valor" id="saldo-disponible">—</span>
                 </div>
                 <div class="saldo-mercado-tras-pujas hidden" id="saldo-tras-pujas-container">
-                    <span class="saldo-label-small">Tras tus pujas activas:</span>
+                    <span class="saldo-label-small" id="saldo-label-pujas">Pujas activas: —</span>
                     <span class="saldo-valor-small" id="saldo-tras-pujas">—</span>
+                    <span class="saldo-label-small">Saldo si ganas todo:</span>
+                    <span class="saldo-valor-small" id="saldo-final-pujas">—</span>
                 </div>
             </div>
 
@@ -124,6 +126,36 @@
         <button class="bottom-nav-item active">📈 Mercado</button>
         <button class="bottom-nav-item proximamente-btn" disabled>🔔 Noticias</button>
     </nav>
+
+    <!-- MODAL DETALLE JUGADOR -->
+    <div id="modal-detalle-jugador" class="modal-overlay hidden">
+        <div class="modal-detalle">
+            <div class="detalle-header">
+                <div class="detalle-foto"><span id="detalle-icono">👤</span></div>
+                <div class="detalle-header-info">
+                    <div class="detalle-top">
+                        <span class="badge-equipo" id="detalle-equipo"></span>
+                        <span class="badge-posicion" id="detalle-posicion-badge"></span>
+                        <span id="detalle-nombre" class="detalle-nombre"></span>
+                        <span class="detalle-pfsy">PFSY <strong id="detalle-puntos"></strong></span>
+                    </div>
+                    <div class="detalle-sub">
+                        <span>Media <strong id="detalle-media"></strong></span>
+                        <span>💰 <strong id="detalle-valor"></strong></span>
+                    </div>
+                </div>
+                <button class="btn-cerrar-detalle" onclick="cerrarDetalleJugador()">✕</button>
+            </div>
+            <div class="detalle-jornadas-nav">
+                <button class="btn-jornada" onclick="cambiarJornadaDetalle(-1)">‹</button>
+                <span id="detalle-jornada-label">Jornada —</span>
+                <span class="detalle-jornada-pts" id="detalle-jornada-puntos">—</span>
+                <button class="btn-jornada" onclick="cambiarJornadaDetalle(1)">›</button>
+            </div>
+            <div id="detalle-stats-tabla" class="detalle-stats-tabla"></div>
+            <button class="btn-ghost" style="width:100%;margin-top:1rem" onclick="cerrarDetalleJugador()">Cerrar</button>
+        </div>
+    </div>
 
     <script th:src="@{/js/sesion.js}"></script>
     <script th:src="@{/js/fantasy-navbar.js}"></script>

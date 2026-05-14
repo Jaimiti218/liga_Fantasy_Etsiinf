@@ -158,7 +158,8 @@ public class EquipoFantasyService {
                 jf.getId(), jr.getId(), jr.getFullName(), jr.getPosicion(),
                 jr.getValorMercado(), nombreEquipo, jr.getPuntosFantasy(),
                 media, partidosJugados, jf.getClausula(),
-                jf.getClausulaBloqueadaHasta(), jf.isAlineado(), null
+                jf.getClausulaBloqueadaHasta(), jf.isAlineado(), null, 
+                equipo.getUser().getId(),jf.isEnVenta()
             ));
         }
         return resultado;

@@ -521,3 +521,9 @@ body {
 .mi-equipo-fila .fila-puntos {
     color: #90caf9;
 }
+
+.fila-clickable {
+    cursor: pointer;
+    text-decoration: underline;
+}
+.fila-clickable:hover { color: #90caf9; }

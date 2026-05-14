@@ -1,5 +1,7 @@
 package com.ligainternaetsiinf.controller;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -10,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -82,6 +85,17 @@ public class UserController {
         // Necesitas el username real, no el email , asi que buscamos el usuario
         User user = userRepository.findByEmail(userDetails.getUsername())
             .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        return ResponseEntity.ok(new UserResponse(user.getId(), user.getUsername(), user.getRole()));
+        return ResponseEntity.ok(new UserResponse(
+            user.getId(), user.getUsername(), user.getRole(), user.getFotoPerfil()
+        ));
+    }
+
+    @PutMapping("/foto-perfil")
+    public ResponseEntity<?> actualizarFoto(@RequestBody Map<String, String> body,
+            Authentication authentication) {
+        CustomUserDetails ud = (CustomUserDetails) authentication.getPrincipal();
+        String foto = body.get("foto");
+        userService.actualizarFotoPerfil(ud.getId(), foto);
+        return ResponseEntity.ok().build();
     }
 }

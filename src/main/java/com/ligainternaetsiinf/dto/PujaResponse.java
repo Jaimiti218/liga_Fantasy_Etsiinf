@@ -11,12 +11,13 @@ public class PujaResponse { /*aqui hay atributos que yo creo sinceramente que so
     private String equipoReal;
     private long cantidad;
     private LocalDateTime fecha;
+    private String duenoNombre;
 
     public PujaResponse(){}
 
     public PujaResponse(Integer id, Integer jugadorFantasyId, String jugadorNombre,
             String posicion, long valorMercado, String equipoReal,
-            long cantidad, LocalDateTime fecha){
+            long cantidad, LocalDateTime fecha, String duenoNombre){
         this.id = id;
         this.jugadorFantasyId = jugadorFantasyId;
         this.jugadorNombre = jugadorNombre;
@@ -25,6 +26,7 @@ public class PujaResponse { /*aqui hay atributos que yo creo sinceramente que so
         this.equipoReal = equipoReal;
         this.cantidad = cantidad;
         this.fecha = fecha;
+        this.duenoNombre = duenoNombre;
     }
 
     public Integer getId(){ return id; }
@@ -35,4 +37,6 @@ public class PujaResponse { /*aqui hay atributos que yo creo sinceramente que so
     public String getEquipoReal(){ return equipoReal; }
     public long getCantidad(){ return cantidad; }
     public LocalDateTime getFecha(){ return fecha; }
+
+    public String getDuenoNombre(){ return duenoNombre; }
 }

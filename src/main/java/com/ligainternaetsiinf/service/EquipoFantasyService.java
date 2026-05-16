@@ -84,7 +84,12 @@ public class EquipoFantasyService {
         List<ClasificacionResponse> resultado = new ArrayList<>();
 
         for(EquipoFantasy ef : equipos){
-            resultado.add(new ClasificacionResponse(ef.getId(), ef.getUser().getUsername(), ef.getPuntos()));
+            resultado.add(new ClasificacionResponse(
+                ef.getId(),
+                ef.getUser().getUsername(),
+                ef.getPuntos(),
+                ef.getUser().getFotoPerfil()
+            ));
         }
 
         return resultado;

@@ -98,4 +98,16 @@ public class UserController {
         userService.actualizarFotoPerfil(ud.getId(), foto);
         return ResponseEntity.ok().build();
     }
+
+    @PutMapping("/username")
+    public ResponseEntity<?> actualizarUsername(@RequestBody Map<String, String> body,
+            Authentication authentication) {
+        CustomUserDetails ud = (CustomUserDetails) authentication.getPrincipal();
+        String nuevoUsername = body.get("username");
+        if (nuevoUsername == null || nuevoUsername.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("El nombre no puede estar vacío");
+        }
+        userService.actualizarUsername(ud.getId(), nuevoUsername.trim());
+        return ResponseEntity.ok().build();
+    }
 }

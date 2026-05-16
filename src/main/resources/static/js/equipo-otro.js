@@ -112,15 +112,34 @@ async function renderizarPlantillaOtro() {
             </div>`;
         }).join('');
 
-        const clausulaBloq  = j.clausulaBloqueadaHasta ? new Date(j.clausulaBloqueadaHasta) : null;
-        const ahora         = new Date();
-        const bloqueada     = clausulaBloq && clausulaBloq > ahora;
+        // Estado de la cláusula
+        const clausulaBloq = j.clausulaBloqueadaHasta ? new Date(j.clausulaBloqueadaHasta) : null;
+        const ahora        = new Date();
+        const bloqueada    = clausulaBloq && clausulaBloq > ahora;
 
+        // Badge de cláusula para las stats (igual que en mi plantilla)
+        let clausulaHtml = '';
+        if (j.clausula === null || j.clausula === undefined) {
+            clausulaHtml = '<span class="clausula-badge" style="background:#eee;color:#999">Sin cláusula</span>';
+        } else if (bloqueada) {
+            const diff   = clausulaBloq - ahora;
+            const dias   = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const horas  = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const tiempo = dias > 0 ? `${dias}d ${horas}h` : `${horas}h`;
+            clausulaHtml = `
+                <span class="clausula-badge clausula-bloqueada">🔒 ${tiempo}</span>
+                <span class="clausula-badge clausula-valor-bloqueada">${formatearDinero(j.clausula)}</span>
+            `;
+        } else {
+            clausulaHtml = `<span class="clausula-badge clausula-abierta">✓ ${formatearDinero(j.clausula)}</span>`;
+        }
+
+        // Texto y estilo para el botón de cláusula en el dropdown
         const clausulaEstilo = bloqueada ? 'color:#aaa;cursor:not-allowed' : 'color:#333';
         const clausulaTexto  = j.clausula
             ? (bloqueada
                 ? `🔒 Cláusula bloqueada (${Math.ceil((clausulaBloq - ahora) / 86400000)}d)`
-                : `✓ Cláusula: ${formatearDinero(j.clausula)}`)
+                : `✓ Pagar cláusula: ${formatearDinero(j.clausula)}`)
             : 'Sin cláusula';
 
         return `
@@ -151,6 +170,10 @@ async function renderizarPlantillaOtro() {
                     <div class="jugador-mini-stat">
                         <span class="label">Valor</span>
                         <span class="valor">${formatearDinero(j.valorMercado)}</span>
+                    </div>
+                    <div class="jugador-mini-stat">
+                        <span class="label">Cláusula</span>
+                        <span class="valor">${clausulaHtml}</span>
                     </div>
                 </div>
                 <div onclick="event.stopPropagation()" style="position:relative">

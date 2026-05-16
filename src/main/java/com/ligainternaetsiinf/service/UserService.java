@@ -46,4 +46,11 @@ public class UserService {
         user.setFotoPerfil(foto);
         userRepository.save(user);
     }
+
+    public void actualizarUsername(Integer userId, String nuevoUsername) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        user.setUsername(nuevoUsername);
+        userRepository.save(user);
+    }
 }

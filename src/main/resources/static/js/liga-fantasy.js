@@ -87,13 +87,17 @@ function renderizarClasificacion(lista) {
         if (pos === 1) clasePos += ' top1';
         else if (pos === 2) clasePos += ' top2';
         else if (pos === 3) clasePos += ' top3';
+        const avatarHtml = equipo.fotoPerfil
+            ? `<img src="${equipo.fotoPerfil}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;margin-right:0.5rem;vertical-align:middle">`
+            : `<span style="display:inline-flex;width:28px;height:28px;border-radius:50%;background:#ddd;align-items:center;justify-content:center;margin-right:0.5rem;font-size:0.9rem">👤</span>`;
 
         return `
             <div class="fila-clasificacion ${esMio ? 'mi-equipo-fila' : ''}">
                 <span class="${clasePos}">${pos}</span>
                 <span class="fila-username ${!esMio ? 'fila-clickable' : ''}"
-                      onclick="${!esMio ? `verEquipo(${equipo.equipoId})` : ''}">
-                    ${equipo.userNombre}
+                    style="display:flex;align-items:center"
+                    onclick="${!esMio ? `verEquipo(${equipo.equipoId})` : ''}">
+                    ${avatarHtml}${equipo.userNombre}
                 </span>
                 <span class="fila-puntos">${equipo.puntos} pts</span>
             </div>

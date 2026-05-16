@@ -2,27 +2,21 @@ package com.ligainternaetsiinf.dto;
 
 public class ClasificacionResponse {
     private Integer equipoId;
-    private String userNombre;
+    private String username;
     private int puntos;
+    private String fotoPerfil; // ← añadir
 
-    public ClasificacionResponse(){}
-
-    public ClasificacionResponse(Integer equipoId, String userNombre, int puntos){
+    public ClasificacionResponse(Integer equipoId, String username, int puntos, String fotoPerfil){
         this.equipoId = equipoId;
-        this.userNombre = userNombre;
+        this.username = username;
         this.puntos = puntos;
+        this.fotoPerfil = fotoPerfil;
     }
 
-    public Integer getEquipoId(){
-        return equipoId;
-    }
+    public Integer getEquipoId(){ return equipoId; }
+    public String getUsername(){ return username; }
+    public int getPuntos(){ return puntos; }
+    public String getFotoPerfil(){ return fotoPerfil; }
 
-    public String getUserNombre(){
-        return userNombre;
-    }
-
-    public int getPuntos(){
-        return puntos;
-    }
     
 }

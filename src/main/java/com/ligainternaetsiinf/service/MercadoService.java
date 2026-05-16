@@ -274,13 +274,22 @@ public class MercadoService {
 
     // ─── Obtener mis ventas ───────────────────────────────────────────────────
     public List<JugadorFantasyDetalleResponse> obtenerMisVentas(Integer equipoId) {
-        List<JugadorFantasy> enVenta = jugadorFantasyRepository
-            .findByEquipoFantasyIdAndEnVentaTrue(equipoId);
         EquipoFantasy equipo = equipoFantasyRepository.findById(equipoId)
             .orElseThrow(() -> new RuntimeException("Equipo no encontrado"));
-
+        List<JugadorFantasy> jugadores = jugadorFantasyRepository
+            .findByEquipoFantasyIdAndEnVentaTrue(equipoId);
+        List<JugadorFantasy> todosJugadoresEquipo = jugadorFantasyRepository.findByEquipoFantasyId(equipoId);
+        for(JugadorFantasy jf : todosJugadoresEquipo){
+            List<OfertaVenta> ofertas = ofertaVentaRepository.findByJugadorFantasyAndAceptadaFalse(jf);
+            if(!ofertas.isEmpty()){
+                if(!jugadores.contains(jf)){
+                    jugadores.add(jf);
+                }
+            }
+        }
+        
         List<JugadorFantasyDetalleResponse> resultado = new ArrayList<>();
-        for (JugadorFantasy jf : enVenta) {
+        for (JugadorFantasy jf : jugadores) {
             Jugador jr = jf.getJugadorReal();
             int partidos = jr.getPartidosJugados();
             double media = partidos > 0 ? (double) jr.getPuntosFantasy() / partidos : 0.0;
@@ -456,11 +465,15 @@ public class MercadoService {
 
     private PujaResponse toPujaResponse(Puja p) {
         var jr = p.getJugadorFantasy().getJugadorReal();
+        String duenoNombre = null;
+        if (p.getJugadorFantasy().getEquipoFantasy() != null) {
+            duenoNombre = p.getJugadorFantasy().getEquipoFantasy().getUser().getUsername();
+        }
         return new PujaResponse(
             p.getId(), p.getJugadorFantasy().getId(), jr.getFullName(),
             jr.getPosicion(), jr.getValorMercado(),
             jr.getEquipo() != null ? jr.getEquipo().getName() : null,
-            p.getCantidad(), p.getFecha()
+            p.getCantidad(), p.getFecha(), duenoNombre
         );
     }
 

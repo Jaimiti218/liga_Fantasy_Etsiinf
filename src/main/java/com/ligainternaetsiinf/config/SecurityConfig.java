@@ -44,7 +44,7 @@ public class SecurityConfig {
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .ignoringRequestMatchers("/users/login", "/logout" , "/mercado/**", "/users/register",
                  "/jugadores/**", "/equipos/**", "/ligas-fantasy/**", "/equipos-fantasy/**", "/jugadores-fantasy/**",
-                "/partidos/**")
+                "/partidos/**", "/users/username")
             )
             .formLogin(login -> login.disable())
             .httpBasic(basic -> basic.disable())

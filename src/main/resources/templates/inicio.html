@@ -17,7 +17,7 @@
             </button>
         </div>
         <div class="nav-derecha">
-            <span id="saludo-usuario" class="saludo hidden"></span>
+            <span id="saludo-usuario" class="saludo hidden" onclick="abrirMenuPerfil()" style="cursor:pointer"></span>
             <button class="btn-nav btn-sesion" id="btn-sesion" onclick="manejarSesion()">Iniciar sesión</button>
         </div>
     </nav>
@@ -43,6 +43,42 @@
             </div>
         </div>
     </main>
+
+    <div id="modal-perfil" class="modal-overlay hidden">
+        <div class="modal-perfil-contenido">
+            <button class="btn-cerrar-perfil" onclick="cerrarMenuPerfil()">✕</button>
+
+            <div class="perfil-avatar-seccion">
+                <div id="avatar-perfil-grande" class="avatar-perfil-grande">👤</div>
+                <label class="btn-cambiar-foto">
+                    📷 Cambiar foto
+                    <input type="file" accept="image/*" style="display:none" onchange="cambiarFoto(this)">
+                </label>
+            </div>
+
+            <div class="perfil-info-seccion">
+                <h2 id="perfil-nombre-display" class="perfil-nombre-display"></h2>
+
+                <div class="campo">
+                    <label>Nombre de usuario</label>
+                    <input type="text" id="input-nuevo-username" placeholder="Tu nombre de usuario"/>
+                </div>
+
+                <div id="error-perfil" class="mensaje-error hidden"></div>
+                <div id="exito-perfil" class="mensaje-exito hidden"></div>
+
+                <button class="btn-primary btn-guardar-perfil" onclick="guardarPerfil()">
+                    Guardar cambios
+                </button>
+            </div>
+
+            <div class="perfil-separador"></div>
+
+            <button class="btn-cerrar-sesion-perfil" onclick="cerrarSesionCompleta()">
+                🚪 Cerrar sesión
+            </button>
+        </div>
+    </div>
 
     <script th:src="@{/js/sesion.js}"></script>
     <script th:src="@{/js/inicio.js}"></script>

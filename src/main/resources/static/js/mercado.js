@@ -372,6 +372,7 @@ async function cargarCompras() {
                         ${p.posicion.charAt(0) + p.posicion.slice(1).toLowerCase()}
                     </div>
                     <div class="puja-detalle">Valor: ${formatearDinero(p.valorMercado)}</div>
+                    ${p.duenoNombre ? `<div class="puja-detalle" style="color:#0f3460;font-weight:600">🏷 Propietario: ${p.duenoNombre}</div>` : ''}
                 </div>
                 <div class="puja-cantidad">${formatearDinero(p.cantidad)}</div>
             </div>

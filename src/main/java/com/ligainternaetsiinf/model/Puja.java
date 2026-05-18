@@ -11,36 +11,72 @@ public class Puja {
     private Integer id;
 
     @ManyToOne
-    private EquipoFantasy equipoFantasy;
+    private EquipoFantasy equipoComprador; // null si es oferta del sistema
+
+    @ManyToOne
+    private EquipoFantasy equipoVendedor; // el que tiene el jugador
 
     @ManyToOne
     private JugadorFantasy jugadorFantasy;
 
     @ManyToOne
-    private InstanciaMercado instancia;
+    private InstanciaMercado instancia; // null si es oferta directa de otro usuario, sea o no a traves del mercado
 
     private long cantidad;
-    private LocalDateTime fecha; //esto no lo veo del todo util pero bueno
-    private boolean ganadora;
+    private LocalDateTime fecha;
+    private boolean aceptada;  // true si se aceptó esta puja
+    private boolean resuelta;  // true si ya no está pendiente (aceptada o rechazada)
 
     public Puja(){}
 
-    public Puja(EquipoFantasy equipo, JugadorFantasy jugador, InstanciaMercado instancia, long cantidad){
-        this.equipoFantasy = equipo;
-        this.jugadorFantasy = jugador;
-        this.instancia = instancia;
-        this.cantidad = cantidad;
-        this.fecha = LocalDateTime.now();
-        this.ganadora = false;
+    // Constructor para puja en mercado normal
+    public Puja(EquipoFantasy comprador, EquipoFantasy vendedor,
+            JugadorFantasy jugador, InstanciaMercado instancia, long cantidad){
+        this.equipoComprador = comprador;
+        this.equipoVendedor  = vendedor;
+        this.jugadorFantasy  = jugador;
+        this.instancia       = instancia;
+        this.cantidad        = cantidad;
+        this.fecha           = LocalDateTime.now();
+        this.aceptada        = false;
+        this.resuelta        = false;
+    }
+
+    // Constructor para oferta directa (sin instancia de mercado)
+    public Puja(EquipoFantasy comprador, EquipoFantasy vendedor,
+            JugadorFantasy jugador, long cantidad){
+        this.equipoComprador = comprador;
+        this.equipoVendedor  = vendedor;
+        this.jugadorFantasy  = jugador;
+        this.instancia       = null;
+        this.cantidad        = cantidad;
+        this.fecha           = LocalDateTime.now();
+        this.aceptada        = false;
+        this.resuelta        = false;
+    }
+
+    // Constructor para oferta del sistema (comprador null)
+    public Puja(EquipoFantasy vendedor, JugadorFantasy jugador, long cantidad){
+        this.equipoComprador = null;
+        this.equipoVendedor  = vendedor;
+        this.jugadorFantasy  = jugador;
+        this.instancia       = null;
+        this.cantidad        = cantidad;
+        this.fecha           = LocalDateTime.now();
+        this.aceptada        = false;
+        this.resuelta        = false;
     }
 
     public Integer getId(){ return id; }
-    public EquipoFantasy getEquipoFantasy(){ return equipoFantasy; }
+    public EquipoFantasy getEquipoComprador(){ return equipoComprador; }
+    public EquipoFantasy getEquipoVendedor(){ return equipoVendedor; }
     public JugadorFantasy getJugadorFantasy(){ return jugadorFantasy; }
     public InstanciaMercado getInstancia(){ return instancia; }
     public long getCantidad(){ return cantidad; }
     public void setCantidad(long cantidad){ this.cantidad = cantidad; }
     public LocalDateTime getFecha(){ return fecha; }
-    public boolean isGanadora(){ return ganadora; }
-    public void setGanadora(boolean ganadora){ this.ganadora = ganadora; }
+    public boolean isAceptada(){ return aceptada; }
+    public void setAceptada(boolean aceptada){ this.aceptada = aceptada; }
+    public boolean isResuelta(){ return resuelta; }
+    public void setResuelta(boolean resuelta){ this.resuelta = resuelta; }
 }

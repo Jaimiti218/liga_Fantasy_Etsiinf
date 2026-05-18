@@ -24,25 +24,62 @@
 
     <main class="contenido">
         <div class="hero">
-            <h1>Bienvenido a la Liga Interna ETSIINF</h1>
+            <h1>Liga Interna ETSIINF</h1>
             <p>Consulta clasificaciones, estadísticas y partidos de la liga de fútbol del campus.</p>
         </div>
 
-        <div class="cards-placeholder">
-            <div class="card-info">
-                <h3>📅 Próximos partidos</h3>
-                <p class="proximamente">Próximamente disponible</p>
-            </div>
-            <div class="card-info">
-                <h3>🏆 Clasificación</h3>
-                <p class="proximamente">Próximamente disponible</p>
-            </div>
-            <div class="card-info">
-                <h3>📰 Noticias</h3>
-                <p class="proximamente">Próximamente disponible</p>
-            </div>
+        <div class="inicio-tabs">
+            <button class="inicio-tab active" id="tab-clasificacion" onclick="cambiarSeccion('clasificacion')">
+                🏆 Clasificación
+            </button>
+            <button class="inicio-tab" id="tab-partidos" onclick="cambiarSeccion('partidos')">
+                📅 Partidos
+            </button>
+            <button class="inicio-tab" id="tab-estadisticas" onclick="cambiarSeccion('estadisticas')">
+                📊 Estadísticas
+            </button>
         </div>
+
+        <!-- CLASIFICACIÓN -->
+        <section id="seccion-clasificacion" class="inicio-seccion">
+            <div id="tabla-clasificacion-wrap">
+                <div class="cargando-inicio">Cargando clasificación...</div>
+            </div>
+        </section>
+
+        <!-- PARTIDOS -->
+        <section id="seccion-partidos" class="inicio-seccion hidden">
+            <div id="lista-partidos-wrap">
+                <div class="cargando-inicio">Cargando partidos...</div>
+            </div>
+        </section>
+
+        <!-- ESTADÍSTICAS -->
+        <section id="seccion-estadisticas" class="inicio-seccion hidden">
+            <div class="estadisticas-filtros">
+                <span class="filtro-label">Ordenar por:</span>
+                <button class="btn-filtro active" onclick="filtrarEstadisticas('puntosFantasy')">Puntos Fantasy</button>
+                <button class="btn-filtro" onclick="filtrarEstadisticas('goles')">Goles</button>
+                <button class="btn-filtro" onclick="filtrarEstadisticas('asistencias')">Asistencias</button>
+                <button class="btn-filtro" onclick="filtrarEstadisticas('tarjetasAmarillas')">Amarillas</button>
+                <button class="btn-filtro" onclick="filtrarEstadisticas('tarjetasRojas')">Rojas</button>
+            </div>
+            <div id="lista-estadisticas-wrap">
+                <div class="cargando-inicio">Cargando estadísticas...</div>
+            </div>
+        </section>
     </main>
+
+    <!-- MODAL ESTADÍSTICAS PARTIDO -->
+    <div id="modal-partido" class="modal-overlay hidden">
+        <div class="modal-partido-contenido">
+            <div class="modal-partido-header">
+                <h3 id="modal-partido-titulo"></h3>
+                <button class="btn-cerrar-perfil" onclick="cerrarModalPartido()">✕</button>
+            </div>
+            <div id="modal-partido-stats"></div>
+        </div>
+    </div>
 
     <div id="modal-perfil" class="modal-overlay hidden">
         <div class="modal-perfil-contenido">

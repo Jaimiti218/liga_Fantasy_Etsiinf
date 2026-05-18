@@ -127,7 +127,8 @@
             <div id="error-clausula" class="mensaje-error hidden"></div>
             <div class="campo">
                 <label>Cantidad a invertir (€)</label>
-                <input type="number" id="input-clausula" placeholder="Ej: 1000000" min="0"/>
+                <input type="text" id="input-clausula" placeholder="Ej: 1.000.000" 
+                    oninput="formatearInputDinero(this)"/>
             </div>
             <p class="clausula-info">La cláusula subirá el doble de lo que inviertas.</p>
             <div class="modal-botones">
@@ -201,7 +202,7 @@
         <button class="bottom-nav-item" onclick="volverALiga()">🏆 Clasificación</button>
         <button class="bottom-nav-item active">👤 Mi Plantilla</button>
         <button class="bottom-nav-item" onclick="irAMercado()">📈 Mercado</button>
-        <button class="bottom-nav-item proximamente-btn" disabled>🔔 Noticias</button>
+        <button class="bottom-nav-item" onclick="irANoticias()">🔔 Noticias</button>
     </nav>
 
     <script th:src="@{/js/sesion.js}"></script>

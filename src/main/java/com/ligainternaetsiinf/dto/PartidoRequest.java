@@ -7,6 +7,7 @@ public class PartidoRequest {
     private Integer equipoVisitanteId;
     private LocalDateTime fecha;
     private Integer jornada;
+    private boolean esPrimero;
 
     public PartidoRequest(){}
 
@@ -18,4 +19,6 @@ public class PartidoRequest {
     public void setFecha(LocalDateTime fecha){ this.fecha = fecha; }
     public Integer getJornada(){ return jornada; }
     public void setJornada(Integer jornada){ this.jornada = jornada; }
+    public boolean getEsPrimero(){ return esPrimero; }
+    public void setEsPrimero(boolean esPrimero){ this.esPrimero = esPrimero; }
 }

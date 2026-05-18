@@ -10,18 +10,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
+import com.ligainternaetsiinf.dto.EstadisticasPartidoResponse;
 import com.ligainternaetsiinf.dto.PartidoRequest;
 import com.ligainternaetsiinf.dto.PartidoResponse;
 import com.ligainternaetsiinf.model.Equipo;
+import com.ligainternaetsiinf.model.EstadisticasJugadorPartido;
 import com.ligainternaetsiinf.model.Partido;
 import com.ligainternaetsiinf.repository.AlineacionEquipoJornadaRepository;
 import com.ligainternaetsiinf.repository.EquipoRepository;
+import com.ligainternaetsiinf.repository.EstadisticasJugadorPartidoRepository;
 import com.ligainternaetsiinf.repository.PartidoRepository;
 
 @Service
 public class PartidoService {
 
     @Autowired private PartidoRepository partidoRepository;
+    @Autowired private EstadisticasJugadorPartidoRepository estadisticasRepository;
     @Autowired private EquipoRepository equipoRepository;
     @Autowired private EquipoFantasyService equipoFantasyService;
     @Autowired private AlineacionEquipoJornadaRepository alineacionRepository;
@@ -40,8 +44,11 @@ public class PartidoService {
         Partido partido = new Partido(local, visitante, request.getFecha(), request.getJornada());
         partidoRepository.save(partido);
 
-        // Programar el registro de alineaciones para cuando empiece este partido
-        programarRegistroAlineaciones(partido);
+        // Programar el registro de alineaciones para cuando empiece este partido SOLO SI ES EL PRIMERO DE LA JORNADA
+        if(request.getEsPrimero()){
+            programarRegistroAlineaciones(partido);
+        }
+        
 
         return toResponse(partido);
     }
@@ -52,8 +59,6 @@ public class PartidoService {
 
         if (request.getFecha() != null) {
             partido.setFecha(request.getFecha());
-            // Reprogramar la tarea con la nueva fecha
-            programarRegistroAlineaciones(partido);
         }
         if (request.getJornada() != null) partido.setJornada(request.getJornada());
 
@@ -113,6 +118,22 @@ public class PartidoService {
                 equipoFantasyService.registrarAlineacionesJornada(jornada);
             }
         }, fechaEjecucion);
+    }
+
+    public List<EstadisticasPartidoResponse> getEstadisticasPartido(Integer partidoId) {
+        List<EstadisticasJugadorPartido> stats = estadisticasRepository.findByPartidoId(partidoId);
+        return stats.stream()
+            .filter(EstadisticasJugadorPartido::isJugo)
+            .map(e -> new EstadisticasPartidoResponse(
+                e.getJugador().getId(),
+                e.getJugador().getFullName(),
+                e.getJugador().getPosicion(),
+                e.getJugador().getEquipo() != null ? e.getJugador().getEquipo().getName() : null,
+                e.getGoles(), e.getAsistencias(),
+                e.getTarjetasAmarillas(), e.getTarjetasRojas(),
+                e.getParadas(), e.isJugo()
+            ))
+            .collect(java.util.stream.Collectors.toList());
     }
 
     private PartidoResponse toResponse(Partido p) {

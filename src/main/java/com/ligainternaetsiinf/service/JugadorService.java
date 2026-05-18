@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ligainternaetsiinf.dto.JugadorEstadisticasResponse;
 import com.ligainternaetsiinf.dto.JugadorFantasyResponse;
 import com.ligainternaetsiinf.dto.JugadorResponse;
 import com.ligainternaetsiinf.dto.JugadorUpdateDTO;
@@ -89,6 +90,18 @@ public class JugadorService {
         }
 
         jugadorRepository.deleteById(id);
+    }
+
+    public List<JugadorEstadisticasResponse> getEstadisticas() {
+        return jugadorRepository.findAll().stream()
+            .map(j -> new JugadorEstadisticasResponse(
+                j.getId(), j.getFullName(), j.getPosicion(),
+                j.getEquipo() != null ? j.getEquipo().getName() : null,
+                j.getGoles(), j.getAsistencias(),
+                j.getTarjetasAmarillas(), j.getTarjetasRojas(),
+                j.getParadas(), j.getPuntosFantasy(), j.getPartidosJugados()
+            ))
+            .collect(java.util.stream.Collectors.toList());
     }
 
     private JugadorResponse cambioTipoRespuesta(Jugador jugador){ /*creamos este metodo ya que el cambio del tipo de dato lo hacemos mucho */

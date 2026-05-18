@@ -49,13 +49,16 @@ async function cargarInfoEquipoOtro() {
         if (!res.ok) return;
         const equipo = await res.json();
 
-        document.getElementById('perfil-nombre').textContent  = equipo.userNombre;
-        document.getElementById('perfil-puntos').textContent  = equipo.puntos + ' pts';
-        document.getElementById('perfil-dinero').textContent  = formatearDinero(equipo.dinero);
+        document.getElementById('perfil-nombre').textContent = equipo.userNombre;
+        document.getElementById('perfil-puntos').textContent = equipo.puntos + ' pts';
+        document.getElementById('perfil-dinero').textContent = formatearDinero(equipo.dinero);
 
-        // Foto de perfil — necesitaría endpoint de usuario, por ahora icono por defecto
-        document.getElementById('perfil-avatar').innerHTML = '👤';
-
+        const avatarEl = document.getElementById('perfil-avatar');
+        if (equipo.fotoPerfil) {
+            avatarEl.innerHTML = `<img src="${equipo.fotoPerfil}" style="width:100%;height:100%;object-fit:cover">`;
+        } else {
+            avatarEl.innerHTML = '👤';
+        }
     } catch (e) {}
 }
 
@@ -229,13 +232,8 @@ async function confirmarOfertaCompra() {
         return;
     }
     try {
-        // Reutilizamos el endpoint de puja del mercado
-        const instanciaRes = await fetch(`/mercado/liga/${ligaId}`, { credentials: 'include' });
-        if (!instanciaRes.ok) { mostrarErrorElement('error-oferta', 'Error al obtener el mercado.'); return; }
-        const instancia = await instanciaRes.json();
-
         const res = await fetch(
-            `/mercado/pujar?jugadorFantasyId=${jugadorAccionId}&instanciaId=${instancia.id}&cantidad=${cantidad}`,
+            `/mercado/oferta-directa?jugadorFantasyId=${jugadorAccionId}&cantidad=${cantidad}`,
             { method: 'POST', credentials: 'include' }
         );
         if (!res.ok) {
@@ -465,4 +463,8 @@ function mostrarErrorElement(id, texto) {
 
 function escapar(str) {
     return String(str).replace(/'/g, "\\'").replace(/"/g, '\\"');
+}
+
+function irANoticias() {
+    window.location.href = `/fantasy/noticias/${ligaId}`;
 }

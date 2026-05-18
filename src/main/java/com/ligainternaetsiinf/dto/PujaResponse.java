@@ -2,7 +2,7 @@ package com.ligainternaetsiinf.dto;
 
 import java.time.LocalDateTime;
 
-public class PujaResponse { /*aqui hay atributos que yo creo sinceramente que sobran */
+public class PujaResponse {
     private Integer id;
     private Integer jugadorFantasyId;
     private String jugadorNombre;
@@ -11,13 +11,14 @@ public class PujaResponse { /*aqui hay atributos que yo creo sinceramente que so
     private String equipoReal;
     private long cantidad;
     private LocalDateTime fecha;
-    private String duenoNombre;
+    private String duenoNombre;  // dueño del jugador (vendedor)
+    private String ofertante;    // quien hace la puja (comprador, o "La Liga")
 
     public PujaResponse(){}
 
     public PujaResponse(Integer id, Integer jugadorFantasyId, String jugadorNombre,
             String posicion, long valorMercado, String equipoReal,
-            long cantidad, LocalDateTime fecha, String duenoNombre){
+            long cantidad, LocalDateTime fecha, String duenoNombre, String ofertante){
         this.id = id;
         this.jugadorFantasyId = jugadorFantasyId;
         this.jugadorNombre = jugadorNombre;
@@ -27,6 +28,7 @@ public class PujaResponse { /*aqui hay atributos que yo creo sinceramente que so
         this.cantidad = cantidad;
         this.fecha = fecha;
         this.duenoNombre = duenoNombre;
+        this.ofertante = ofertante;
     }
 
     public Integer getId(){ return id; }
@@ -37,6 +39,6 @@ public class PujaResponse { /*aqui hay atributos que yo creo sinceramente que so
     public String getEquipoReal(){ return equipoReal; }
     public long getCantidad(){ return cantidad; }
     public LocalDateTime getFecha(){ return fecha; }
-
     public String getDuenoNombre(){ return duenoNombre; }
+    public String getOfertante(){ return ofertante; }
 }

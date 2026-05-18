@@ -409,6 +409,12 @@ function cerrarModalVenta() {
     jugadorVentaActual = null;
 }
 
+function formatearInputDinero(input) {
+    let valor = input.value.replace(/\./g, '').replace(/[^0-9]/g, '');
+    if (valor === '') { input.value = ''; return; }
+    input.value = parseInt(valor).toLocaleString('es-ES');
+}
+
 async function confirmarPonerEnVenta() {
     if (!jugadorVentaActual) return;
     try {
@@ -458,7 +464,7 @@ function cerrarModalClausula() {
 }
 
 async function confirmarSubirClausula() {
-    const cantidad = parseInt(document.getElementById('input-clausula').value);
+    const cantidad = parseInt(document.getElementById('input-clausula').value.replace(/\./g, ''));
     if (!cantidad || cantidad <= 0) {
         mostrarErrorElement('error-clausula', 'Introduce una cantidad válida.');
         return;
@@ -617,9 +623,9 @@ async function renderizarPuntos() {
     }
 }
 
-function renderizarCampoPuntos(campo, datos) {
+function renderizarCampoPuntos(campo, datos, formacion) {  // ← añadir formacion
     campo.innerHTML = '';
-    const lineas = parsearFormacion(formacion);
+    const lineas   = parsearFormacion(formacion);          // ← ahora usa el parámetro
     const portero  = datos.find(j => j.posicion === 'PORTERO');
     const defensas = datos.filter(j => j.posicion === 'DEFENSA');
     const medios   = datos.filter(j => j.posicion === 'MEDIOCENTRO');
@@ -717,4 +723,8 @@ async function quitarDelMercado(jugadorFantasyId) {
     } catch (e) {
         alert('Error de conexión.');
     }
+}
+
+function irANoticias() {
+    window.location.href = `/fantasy/noticias/${ligaId}`;
 }

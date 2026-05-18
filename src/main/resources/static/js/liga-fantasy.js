@@ -97,7 +97,7 @@ function renderizarClasificacion(lista) {
                 <span class="fila-username ${!esMio ? 'fila-clickable' : ''}"
                     style="display:flex;align-items:center"
                     onclick="${!esMio ? `verEquipo(${equipo.equipoId})` : ''}">
-                    ${avatarHtml}${equipo.userNombre}
+                    ${avatarHtml}${equipo.username}
                 </span>
                 <span class="fila-puntos">${equipo.puntos} pts</span>
             </div>
@@ -123,4 +123,8 @@ function irAPlantilla() {
 
 function irAMercado() {
     window.location.href = `/fantasy/mercado/${ligaId}`;
+}
+
+function irANoticias() {
+    window.location.href = `/fantasy/noticias/${ligaId}`;
 }

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ligainternaetsiinf.dto.EquipoClasificacionResponse;
 import com.ligainternaetsiinf.dto.EquipoResponse;
 import com.ligainternaetsiinf.dto.EquipoUpdateDTO;
 import com.ligainternaetsiinf.model.Equipo;
@@ -49,5 +50,10 @@ public class EquipoController {
     public void eliminarEquipo(@PathVariable Integer id){
 
         equipoService.eliminarEquipo(id);
+    }
+
+    @GetMapping("/clasificacion")
+    public List<EquipoClasificacionResponse> getClasificacion() {
+        return equipoService.getClasificacion();
     }
 }

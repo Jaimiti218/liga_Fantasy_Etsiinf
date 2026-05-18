@@ -8,9 +8,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import com.ligainternaetsiinf.dto.InstanciaMercadoResponse;
-import com.ligainternaetsiinf.dto.JugadorFantasyDetalleResponse;
-import com.ligainternaetsiinf.dto.OfertaVentaResponse;
 import com.ligainternaetsiinf.dto.PujaResponse;
+import com.ligainternaetsiinf.dto.VentaResponse;
 import com.ligainternaetsiinf.security.CustomUserDetails;
 import com.ligainternaetsiinf.service.EquipoFantasyService;
 import com.ligainternaetsiinf.service.MercadoService;
@@ -34,10 +33,18 @@ public class MercadoController {
             @RequestParam long cantidad,
             Authentication authentication) {
         CustomUserDetails ud = (CustomUserDetails) authentication.getPrincipal();
-        // Obtener equipoId del usuario en esta liga
         Integer equipoId = equipoFantasyService
             .obtenerEquipoIdPorUsuarioYInstancia(jugadorFantasyId, ud.getId());
         return mercadoService.realizarPuja(equipoId, jugadorFantasyId, instanciaId, cantidad);
+    }
+
+    @PostMapping("/oferta-directa")
+    public void hacerOfertaDirecta(
+            @RequestParam Integer jugadorFantasyId,
+            @RequestParam long cantidad,
+            Authentication authentication) {
+        CustomUserDetails ud = (CustomUserDetails) authentication.getPrincipal();
+        mercadoService.hacerOfertaDirecta(jugadorFantasyId, cantidad, ud.getId());
     }
 
     @PostMapping("/vender/{jugadorFantasyId}")
@@ -56,10 +63,10 @@ public class MercadoController {
         mercadoService.retirarDeVenta(jugadorFantasyId, equipoId);
     }
 
-    @PostMapping("/ventas/{ofertaId}/aceptar")
-    public void aceptarOferta(@PathVariable Integer ofertaId, Authentication authentication) {
+    @PostMapping("/pujas/{pujaId}/aceptar")
+    public void aceptarPuja(@PathVariable Integer pujaId, Authentication authentication) {
         CustomUserDetails ud = (CustomUserDetails) authentication.getPrincipal();
-        mercadoService.aceptarOfertaVentaPorUsuario(ofertaId, ud.getId());
+        mercadoService.aceptarPuja(pujaId, ud.getId());
     }
 
     @GetMapping("/mis-pujas")
@@ -69,11 +76,11 @@ public class MercadoController {
         CustomUserDetails ud = (CustomUserDetails) authentication.getPrincipal();
         Integer equipoId = equipoFantasyService
             .obtenerEquipoIdPorUsuarioYLiga(ligaId, ud.getId());
-        return mercadoService.obtenerMisPujas(equipoId, ligaId);
+        return mercadoService.obtenerMisPujas(equipoId);
     }
 
     @GetMapping("/mis-ventas")
-    public List<JugadorFantasyDetalleResponse> misVentas(
+    public List<VentaResponse> misVentas(
             @RequestParam Integer ligaId,
             Authentication authentication) {
         CustomUserDetails ud = (CustomUserDetails) authentication.getPrincipal();
@@ -99,5 +106,11 @@ public class MercadoController {
     @GetMapping("/liga/{ligaId}/contadores-pujas")
     public Map<Integer, Long> obtenerContadorPujas(@PathVariable Integer ligaId) {
         return mercadoService.obtenerContadorPujas(ligaId);
+    }
+
+    @PostMapping("/pujas/{pujaId}/rechazar")
+    public void rechazarPuja(@PathVariable Integer pujaId, Authentication authentication) {
+        CustomUserDetails ud = (CustomUserDetails) authentication.getPrincipal();
+        mercadoService.rechazarPuja(pujaId, ud.getId());
     }
 }

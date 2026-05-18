@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
@@ -12,17 +13,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ligainternaetsiinf.dto.LigaFantasyResponse;
+import com.ligainternaetsiinf.model.AlineacionEquipoJornada;
 import com.ligainternaetsiinf.model.EquipoFantasy;
 import com.ligainternaetsiinf.model.Jugador;
 import com.ligainternaetsiinf.model.JugadorFantasy;
 import com.ligainternaetsiinf.model.LigaFantasy;
 import com.ligainternaetsiinf.model.Mercado;
+import com.ligainternaetsiinf.model.Puja;
 import com.ligainternaetsiinf.model.User;
+import com.ligainternaetsiinf.repository.AlineacionEquipoJornadaRepository;
 import com.ligainternaetsiinf.repository.EquipoFantasyRepository;
 import com.ligainternaetsiinf.repository.JugadorFantasyRepository;
 import com.ligainternaetsiinf.repository.JugadorRepository;
 import com.ligainternaetsiinf.repository.LigaFantasyRepository;
 import com.ligainternaetsiinf.repository.MercadoRepository;
+import com.ligainternaetsiinf.repository.PujaRepository;
 import com.ligainternaetsiinf.repository.UserRepository;
 
 @Service
@@ -42,6 +47,12 @@ public class LigaFantasyService {
 
     @Autowired
     private JugadorRepository jugadorRepository;
+
+    @Autowired
+    private AlineacionEquipoJornadaRepository alineacionRepository;
+
+    @Autowired
+    private PujaRepository pujaRepository;
 
     @Autowired
     private JugadorFantasyRepository jugadorFantasyRepository;
@@ -163,6 +174,30 @@ public class LigaFantasyService {
             j.setEquipoFantasy(null);
             jugadorFantasyRepository.save(j);
         }
+        //PARA ELIMINAR LAS PUJAS ASOCIADAS A ESTE EQUIPO
+        List<Puja> pujasEquipoSiendoComprador = pujaRepository.findByEquipoComprador(equipo);
+        List<Puja> pujasEquipoSiendoVendedor = pujaRepository.findByEquipoVendedor(equipo);
+
+        if(!pujasEquipoSiendoComprador.isEmpty()){
+            for(Puja p : pujasEquipoSiendoComprador){
+                pujaRepository.delete(p);
+            }
+        }
+        if(!pujasEquipoSiendoVendedor.isEmpty()){
+            for(Puja p : pujasEquipoSiendoVendedor){
+                pujaRepository.delete(p);
+            }
+        }
+        
+
+        //PARA ELIMINAR LAS ALINEACIONES GUARDADAS ASOCIADAS A ESTE EQUIPO
+        Optional<List<AlineacionEquipoJornada>> alineaciones = alineacionRepository.findByEquipoFantasyId(equipo.getId());
+        if(alineaciones.isPresent()){
+            for(AlineacionEquipoJornada a : alineaciones.get()){
+                alineacionRepository.delete(a);
+            }
+        }
+
         equipoFantasyRepository.delete(equipo);
     }
 

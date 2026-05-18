@@ -23,11 +23,13 @@ import com.ligainternaetsiinf.model.EquipoFantasy;
 import com.ligainternaetsiinf.model.EstadisticasJugadorPartido;
 import com.ligainternaetsiinf.model.Jugador;
 import com.ligainternaetsiinf.model.JugadorFantasy;
+import com.ligainternaetsiinf.model.LigaFantasy;
 import com.ligainternaetsiinf.model.Partido;
 import com.ligainternaetsiinf.repository.AlineacionEquipoJornadaRepository;
 import com.ligainternaetsiinf.repository.EquipoFantasyRepository;
 import com.ligainternaetsiinf.repository.EstadisticasJugadorPartidoRepository;
 import com.ligainternaetsiinf.repository.JugadorFantasyRepository;
+import com.ligainternaetsiinf.repository.NoticiaFantasyRepository;
 import com.ligainternaetsiinf.repository.PartidoRepository;
 import com.ligainternaetsiinf.dto.AlineacionDTO;
 import com.ligainternaetsiinf.dto.JugadorFantasyDetalleResponse;
@@ -42,6 +44,9 @@ public class EquipoFantasyService {
 
     @Autowired
     private EquipoFantasyRepository equipoFantasyRepository;
+
+    @Autowired
+    private NoticiaFantasyService noticiaService;
 
     @Autowired
     private JugadorFantasyRepository jugadorFantasyRepository;
@@ -284,7 +289,6 @@ public class EquipoFantasyService {
         List<EquipoFantasy> todosLosEquipos = equipoFantasyRepository.findAll();
 
         for (EquipoFantasy equipo : todosLosEquipos) {
-            // Solo registrar si no existe ya para esta jornada
             if (alineacionRepository.findByEquipoFantasyIdAndJornada(equipo.getId(), jornada).isPresent()) {
                 continue;
             }
@@ -292,11 +296,36 @@ public class EquipoFantasyService {
             List<JugadorFantasy> alineados = jugadorFantasyRepository
                 .findByEquipoFantasyIdAndAlineadoTrue(equipo.getId());
 
-            if (alineados.isEmpty()) continue;
+            String usuarioNombre = equipo.getUser().getUsername();
+            LigaFantasy liga     = equipo.getLigaFantasy();
+
+            if (alineados.size() < 7) {
+                noticiaService.crearNoticiaNoPuntuacion(liga, usuarioNombre,
+                    jornada, "alineación incompleta (" + alineados.size() + "/7 jugadores)");
+                // Guardar alineación vacía para que quede registro pero sin puntuar
+                AlineacionEquipoJornada registro = new AlineacionEquipoJornada(
+                    equipo, List.of(), jornada, equipo.getFormacion()
+                );
+                registro.setPuntua(false);
+                alineacionRepository.save(registro);
+                continue;
+            }
+
+            if (equipo.getDinero() < 0) {
+                noticiaService.crearNoticiaNoPuntuacion(liga, usuarioNombre,
+                    jornada, "saldo negativo");
+                AlineacionEquipoJornada registro = new AlineacionEquipoJornada(
+                    equipo, alineados, jornada, equipo.getFormacion()
+                );
+                registro.setPuntua(false);
+                alineacionRepository.save(registro);
+                continue;
+            }
 
             AlineacionEquipoJornada registro = new AlineacionEquipoJornada(
                 equipo, alineados, jornada, equipo.getFormacion()
             );
+            // setPuntua(true) es el valor por defecto
             alineacionRepository.save(registro);
         }
     }
@@ -326,7 +355,8 @@ public class EquipoFantasyService {
                 equipo.getDinero(),
                 equipo.getPuntos(),
                 jugadores,
-                equipo.getFormacion()
+                equipo.getFormacion(),
+                equipo.getUser().getFotoPerfil()
         );
     }
 }

@@ -41,6 +41,7 @@ public class UserService {
     }
 
     public void actualizarFotoPerfil(Integer userId, String foto) {
+        System.out.println("=== FOTO RECIBIDA, longitud: " + (foto != null ? foto.length() : "null"));
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         user.setFotoPerfil(foto);

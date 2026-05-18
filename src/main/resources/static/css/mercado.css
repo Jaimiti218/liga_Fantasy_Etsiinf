@@ -169,3 +169,16 @@
     border-radius: 12px;
     white-space: nowrap;
 }
+
+.btn-rechazar-oferta {
+    background: #fff0f0;
+    color: #c0392b;
+    border: 1.5px solid #f5c6c6;
+    padding: 0.4rem 0.6rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn-rechazar-oferta:hover { background: #ffe0e0; }

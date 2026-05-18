@@ -54,4 +54,9 @@ public class PartidoController {
             @RequestParam Integer golesVisitante) {
         return partidoService.registrarResultado(id, golesLocal, golesVisitante);
     }
+
+    @GetMapping("/{id}/estadisticas")
+    public List<EstadisticasPartidoResponse> getEstadisticasPartido(@PathVariable Integer id) {
+        return partidoService.getEstadisticasPartido(id);
+    }
 }

@@ -21,6 +21,8 @@ public class AlineacionEquipoJornada {
     private String formacion;
     private LocalDateTime fechaRegistro;
 
+    private boolean puntua = true;
+
     public AlineacionEquipoJornada(){}
 
     public AlineacionEquipoJornada(EquipoFantasy equipo, List<JugadorFantasy> jugadoresAlineados,
@@ -38,4 +40,6 @@ public class AlineacionEquipoJornada {
     public Integer getJornada(){ return jornada; }
     public String getFormacion(){ return formacion; }
     public LocalDateTime getFechaRegistro(){ return fechaRegistro; }
+    public boolean isPuntua(){ return puntua; }
+    public void setPuntua(boolean puntua){ this.puntua = puntua; }
 }

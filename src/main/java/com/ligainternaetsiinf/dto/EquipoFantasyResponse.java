@@ -20,10 +20,12 @@ public class EquipoFantasyResponse {
 
     private String formacion;
 
+    private String fotoPerfil;
+
     public EquipoFantasyResponse(){}
 
     public EquipoFantasyResponse(Integer id, Integer ligaId, String ligaNombre, Integer userId, String userNombre, long dinero, int puntos, 
-        List<String> jugadores, String formacion){
+        List<String> jugadores, String formacion, String fotoPerfil){
 
         this.id = id;
         this.ligaId = ligaId;
@@ -34,6 +36,7 @@ public class EquipoFantasyResponse {
         this.puntos = puntos;
         this.jugadores = jugadores;
         this.formacion = formacion;
+        this.fotoPerfil = fotoPerfil;
     }
 
     public Integer getId(){ return id; }
@@ -52,4 +55,6 @@ public class EquipoFantasyResponse {
 
     public List<String> getJugadores(){ return jugadores; }
     public String getFormacion(){ return formacion; }
+
+    public String getFotoPerfil(){ return fotoPerfil; }
 }

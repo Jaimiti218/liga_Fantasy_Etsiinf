@@ -55,4 +55,9 @@ public class ViewController {
     public String verEquipo() {
         return "fantasy/equipo-otro";
     }
+
+    @GetMapping("/fantasy/noticias/{ligaId}")
+    public String noticias() {
+        return "fantasy/noticias";
+    }
 }

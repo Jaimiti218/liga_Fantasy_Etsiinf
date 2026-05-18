@@ -8,12 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ligainternaetsiinf.dto.EquipoUpdateDTO;
+import com.ligainternaetsiinf.dto.EquipoClasificacionResponse;
 import com.ligainternaetsiinf.dto.EquipoResponse;
 import com.ligainternaetsiinf.dto.JugadorResponse;
 import com.ligainternaetsiinf.model.Equipo;
 import com.ligainternaetsiinf.model.Jugador;
 import com.ligainternaetsiinf.repository.EquipoRepository;
 import com.ligainternaetsiinf.repository.JugadorRepository;
+import com.ligainternaetsiinf.repository.PartidoRepository;
 
 @Service
 public class EquipoService {
@@ -22,6 +24,9 @@ public class EquipoService {
 
     @Autowired
     private JugadorRepository jugadorRepository;
+
+    @Autowired
+    private PartidoRepository partidoRepository;
 
 
     public Equipo crearEquipo(Equipo equipo){ /*El motivo por el que no podemos usar este equipo en el equipoRepository.save es porque
@@ -154,5 +159,26 @@ public class EquipoService {
         }
 
         return new EquipoResponse(equipo.getId(), equipo.getName(), nombresJugadores);
+    }
+
+    public List<EquipoClasificacionResponse> getClasificacion() {
+        return equipoRepository.findAll().stream()
+            .sorted((a, b) -> {
+                if (b.getPuntos() != a.getPuntos()) return b.getPuntos() - a.getPuntos();
+                return b.getDiferenciaDeGoles() - a.getDiferenciaDeGoles();
+            })
+            .map(e -> {
+                int pj = (int) partidoRepository.findAll().stream()
+                    .filter(p -> p.isJugado() &&
+                        (p.getEquipoLocal().getId().equals(e.getId()) ||
+                        p.getEquipoVisitante().getId().equals(e.getId())))
+                    .count();
+                return new EquipoClasificacionResponse(
+                    e.getId(), e.getName(), e.getPuntos(),
+                    e.getGolesAFavor(), e.getGolesEnContra(),
+                    e.getDiferenciaDeGoles(), pj
+                );
+            })
+            .collect(java.util.stream.Collectors.toList());
     }
 }

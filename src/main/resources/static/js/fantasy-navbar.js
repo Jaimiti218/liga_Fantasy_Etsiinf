@@ -6,9 +6,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
     document.getElementById('nav-username').textContent = usuario.username;
-    document.getElementById('saludo-usuario').innerHTML = getAvatarHtml(usuarioActual.fotoPerfil, 28) +
-    ' ' + usuarioActual.username;
-    //document.getElementById('menu-username').textContent = '👋 ' + usuario.username;
+    // Eliminar la línea de saludo-usuario si no existe en todas las páginas fantasy
 });
 
 function toggleMenu() {

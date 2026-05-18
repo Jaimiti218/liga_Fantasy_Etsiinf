@@ -50,4 +50,9 @@ public class JugadorController {
 
         jugadorService.eliminarJugador(id);
     }
+
+    @GetMapping("/estadisticas")
+    public List<JugadorEstadisticasResponse> getEstadisticas() {
+        return jugadorService.getEstadisticas();
+    }
 }

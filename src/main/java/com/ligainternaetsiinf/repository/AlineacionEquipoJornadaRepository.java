@@ -9,5 +9,7 @@ public interface AlineacionEquipoJornadaRepository extends JpaRepository<Alineac
 
     Optional<AlineacionEquipoJornada> findByEquipoFantasyIdAndJornada(Integer equipoId, Integer jornada);
 
+    Optional<List<AlineacionEquipoJornada>> findByEquipoFantasyId(Integer equipoId);
+
     List<AlineacionEquipoJornada> findByJornada(Integer jornada);
 }

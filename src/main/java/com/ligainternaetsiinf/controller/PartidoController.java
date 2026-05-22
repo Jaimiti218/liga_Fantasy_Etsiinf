@@ -6,8 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import com.ligainternaetsiinf.dto.EstadisticasPartidoResponse;
 import com.ligainternaetsiinf.dto.PartidoRequest;
 import com.ligainternaetsiinf.dto.PartidoResponse;
+import com.ligainternaetsiinf.dto.ResultadoRequest;
 import com.ligainternaetsiinf.service.PartidoService;
 
 @RestController
@@ -50,9 +52,8 @@ public class PartidoController {
     @PutMapping("/{id}/resultado")
     public PartidoResponse registrarResultado(
             @PathVariable Integer id,
-            @RequestParam Integer golesLocal,
-            @RequestParam Integer golesVisitante) {
-        return partidoService.registrarResultado(id, golesLocal, golesVisitante);
+            @RequestBody ResultadoRequest request) {
+        return partidoService.registrarResultado(id, request);
     }
 
     @GetMapping("/{id}/estadisticas")

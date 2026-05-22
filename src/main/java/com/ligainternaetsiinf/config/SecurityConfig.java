@@ -3,6 +3,7 @@ package com.ligainternaetsiinf.config;
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -58,6 +59,7 @@ public class SecurityConfig {
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/jugadores").permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/equipos").permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/partidos", "/partidos/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/equipos/clasificacion", "/jugadores/estadisticas", "/partidos", "/partidos/**", "/precios/**").permitAll()
                 .requestMatchers("/", "/fantasy/auth", "/fantasy/mis-ligas", "/fantasy/liga/**", "/fantasy/plantilla/**", "/fantasy/mercado/**").permitAll()
                 // Todo lo demás requiere autenticación
                 .anyRequest().authenticated()

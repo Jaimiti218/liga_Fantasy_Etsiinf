@@ -29,8 +29,8 @@
         <nav class="menu-opciones">
             <a class="menu-item" onclick="toggleMenu(); window.location.href='/fantasy/mis-ligas'">🏆 Mis Ligas</a>
             <a class="menu-item" onclick="toggleMenu()">📅 Partidos <span class="proximamente-badge">Próximamente</span></a>
-            <a class="menu-item" onclick="toggleMenu(); irAMercado()">📈 Mercado</a>
-            <a class="menu-item" onclick="toggleMenu()">👤 Perfil <span class="proximamente-badge">Próximamente</span></a>
+            <a class="menu-item" onclick="toggleMenu(); window.location.href='/fantasy/precios'">📈 Precio Jugadores</a>
+            <a class="menu-item" onclick="toggleMenu(); window.location.href='/?perfil=1'">👤 Perfil</a>
         </nav>
         <div class="menu-footer">
             <button class="btn-volver-inicio" onclick="window.location.href='/'">← Volver al inicio</button>
@@ -58,7 +58,7 @@
 
         <!-- CLASIFICACIÓN -->
         <div class="clasificacion-container">
-            <h2>Clasificación</h2>
+            <h2>Clasificación 🏆</h2>
             <div id="tabla-clasificacion" class="tabla-clasificacion">
                 <div class="cargando-ligas">Cargando clasificación...</div>
             </div>

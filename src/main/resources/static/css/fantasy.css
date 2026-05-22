@@ -271,7 +271,7 @@ body {
 .btn-tres-puntos:hover { background: #f0f0f0; color: #333; }
 
 .dropdown-menu {
-    position: absolute;
+    position: fixed;
     right: 0;
     top: 100%;
     background: white;
@@ -527,3 +527,15 @@ body {
     text-decoration: underline;
 }
 .fila-clickable:hover { color: #90caf9; }
+
+
+.aviso-alineacion {
+    font-size: 1.4rem;
+    vertical-align: middle;
+    cursor: default;
+}
+
+@keyframes parpadeo {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.3; }
+}

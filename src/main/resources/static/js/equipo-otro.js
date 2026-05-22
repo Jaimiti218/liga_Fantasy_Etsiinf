@@ -8,8 +8,8 @@ let jugadorAccionId   = null;
 let jugadorClausulaId = null;
 
 const ICONOS_POSICION = {
-    'PORTERO': '🧤', 'DEFENSA': '🛡',
-    'MEDIOCENTRO': '⚙️', 'DELANTERO': '⚡'
+    'PORTERO': '🧤', 'DEFENSA': '🧱',
+    'MEDIOCENTRO': '⚙️', 'DELANTERO': '🎯'
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -172,7 +172,7 @@ async function renderizarPlantillaOtro() {
                     </div>
                     <div class="jugador-mini-stat">
                         <span class="label">Valor</span>
-                        <span class="valor">${formatearDinero(j.valorMercado)}</span>
+                        <span class="valor jugador-valor-mercado">${formatearDinero(j.valorMercado)}</span>
                     </div>
                     <div class="jugador-mini-stat">
                         <span class="label">Cláusula</span>

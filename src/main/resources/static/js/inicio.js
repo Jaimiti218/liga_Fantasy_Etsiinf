@@ -20,6 +20,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('btn-gestionar').classList.remove('hidden');
         }
     }
+    if (new URLSearchParams(window.location.search).get('perfil') === '1' && usuarioActual) {
+        setTimeout(() => abrirMenuPerfil(), 300);
+    }
 });
 
 function manejarSesion() {
@@ -216,7 +219,7 @@ async function cargarClasificacion() {
                         <tr class="${i < 3 ? 'top-' + (i+1) : ''}">
                             <td class="pos-num">${i + 1}</td>
                             <td class="equipo-nombre">
-                                <span class="equipo-icono">⚽</span>${e.nombre}
+                                ${e.nombre}
                             </td>
                             <td>${e.partidosJugados}</td>
                             <td class="puntos-td">${e.puntos}</td>
@@ -347,7 +350,12 @@ async function cargarEstadisticas() {
     try {
         const res = await fetch('/jugadores/estadisticas');
         estadisticasData = await res.json();
-        filtrarEstadisticas('puntosFantasy');
+        // Quitar active de todos los filtros
+        document.querySelectorAll('.btn-filtro').forEach(b => b.classList.remove('active'));
+        // Ordenar alfabéticamente sin seleccionar ningún filtro
+        renderizarEstadisticas([...estadisticasData].sort((a, b) =>
+            a.nombre.localeCompare(b.nombre)
+        ));
     } catch (err) {
         wrap.innerHTML = '<div class="cargando-inicio">Error al cargar estadísticas.</div>';
     }
@@ -356,10 +364,12 @@ async function cargarEstadisticas() {
 function filtrarEstadisticas(campo) {
     document.querySelectorAll('.btn-filtro').forEach(b => b.classList.remove('active'));
     event.target.classList.add('active');
-
     const ordenados = [...estadisticasData].sort((a, b) => b[campo] - a[campo]);
-    const wrap = document.getElementById('lista-estadisticas-wrap');
+    renderizarEstadisticas(ordenados);
+}
 
+function renderizarEstadisticas(datos) {
+    const wrap = document.getElementById('lista-estadisticas-wrap');
     wrap.innerHTML = `
     <div class="tabla-clasificacion-wrap">
         <table class="tabla-clasificacion-real">
@@ -369,16 +379,16 @@ function filtrarEstadisticas(campo) {
                     <th>Jugador</th>
                     <th>Equipo</th>
                     <th>Pos</th>
-                    <th>⚽</th>
-                    <th>👟</th>
-                    <th>🟨</th>
-                    <th>🟥</th>
-                    <th>🧤</th>
+                    <th>Goles ⚽</th>
+                    <th>Asistencias 👟</th>
+                    <th>Tarjetas Amarillas 🟨</th>
+                    <th>Tarjetas Rojas 🟥</th>
+                    <th>Paradas 🧤</th>
                     <th>PFSY</th>
                 </tr>
             </thead>
             <tbody>
-                ${ordenados.map((j, i) => `
+                ${datos.map((j, i) => `
                     <tr>
                         <td class="pos-num">${i + 1}</td>
                         <td class="equipo-nombre">${j.nombre}</td>

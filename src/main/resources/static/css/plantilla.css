@@ -738,3 +738,14 @@
     display: flex;
     gap: 0.5rem;
 }
+
+.jugador-valor-mercado {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #000000;
+    background: rgb(243, 215, 3);
+    padding: 0.15rem 0.5rem;
+    border-radius: 6px;
+    margin-top: 0.2rem;
+    display: inline-block;
+}

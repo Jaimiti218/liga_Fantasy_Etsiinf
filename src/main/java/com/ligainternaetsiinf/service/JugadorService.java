@@ -29,13 +29,19 @@ public class JugadorService {
         if(jugadorRepository.findByFullName(jugador.getFullName()).isPresent()){
             throw new RuntimeException("Ya existe este jugador!");
         }
+        if(jugador.getEquipo() != null){
+            Optional<Equipo> aux = equipoRepository.findByName(jugador.getEquipo().getName());
 
-        Optional<Equipo> aux = equipoRepository.findByName(jugador.getEquipo().getName());
-
-        if(!aux.isPresent()){
-            throw new RuntimeException("No existe ese equipo");
+            if(!aux.isPresent()){
+                throw new RuntimeException("No existe ese equipo");
+            }
+            return jugadorRepository.save(new Jugador(jugador.getFullName(), aux.get(), jugador.getPosicion()));
         }
-        return jugadorRepository.save(new Jugador(jugador.getFullName(), aux.get(), jugador.getPosicion()));
+        else{
+            return jugadorRepository.save(new Jugador(jugador.getFullName(), null, jugador.getPosicion()));
+        }
+        
+        
     }
 
     public List<JugadorResponse> listarJugadores(){

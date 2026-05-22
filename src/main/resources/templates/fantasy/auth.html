@@ -37,7 +37,8 @@
             <div class="campo">
                 <label for="password-login">Contraseña</label>
                 <div class="input-password">
-                    <input type="password" id="password-login" placeholder="Tu contraseña" />
+                    <input type="password" id="password-login" placeholder="Tu contraseña"
+                        onkeydown="if(event.key==='Enter') hacerLogin()"/>
                     <button type="button" class="toggle-password" onclick="togglePassword('password-login', this)">👁</button>
                 </div>
             </div>
@@ -67,7 +68,8 @@
             <div class="campo">
                 <label for="password-registro">Contraseña</label>
                 <div class="input-password">
-                    <input type="password" id="password-registro" placeholder="Mínimo 6 caracteres" />
+                    <input type="password" id="password-registro2" placeholder="Repite tu contraseña"
+                        onkeydown="if(event.key==='Enter') hacerRegistro()"/>
                     <button type="button" class="toggle-password" onclick="togglePassword('password-registro', this)">👁</button>
                 </div>
             </div>

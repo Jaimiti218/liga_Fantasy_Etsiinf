@@ -11,8 +11,8 @@ let contadoresPujas = {};
 
 
 const ICONOS_POSICION = {
-    'PORTERO': '🧤', 'DEFENSA': '🛡',
-    'MEDIOCENTRO': '⚙️', 'DELANTERO': '⚡'
+    'PORTERO': '🧤', 'DEFENSA': '🧱',
+    'MEDIOCENTRO': '⚙️', 'DELANTERO': '🎯'
 };
 
 document.addEventListener('DOMContentLoaded', async () => {

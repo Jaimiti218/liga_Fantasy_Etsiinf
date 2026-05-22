@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Noticias – Fantasy ETSIINF</title>
+    <title>Precio Jugadores – Fantasy ETSIINF</title>
     <link rel="stylesheet" th:href="@{/css/fantasy.css}">
-    <link rel="stylesheet" th:href="@{/css/noticias.css}">
+    <link rel="stylesheet" th:href="@{/css/plantilla.css}">
+    <link rel="stylesheet" th:href="@{/css/precios.css}">
 </head>
 <body>
 
     <nav class="fantasy-navbar">
         <div class="nav-izquierda">
             <button class="btn-menu" onclick="toggleMenu()">☰</button>
-            <span class="logo">🔔 Noticias</span>
+            <span class="logo">📈 Precio Jugadores</span>
         </div>
         <div class="nav-derecha">
             <span id="nav-username" class="nav-username"></span>
@@ -27,10 +28,9 @@
         </div>
         <nav class="menu-opciones">
             <a class="menu-item" onclick="toggleMenu(); window.location.href='/fantasy/mis-ligas'">🏆 Mis Ligas</a>
-            <a class="menu-item" onclick="toggleMenu()">📅 Partidos <span class="proximamente-badge">Próximamente</span></a>
-            <a class="menu-item" onclick="toggleMenu(); window.location.href='/fantasy/precios'">📈 Precio Jugadores</a>
+            <a class="menu-item" onclick="toggleMenu(); window.location.href='/'">📅 Partidos</a>
+            <a class="menu-item active-menu" onclick="toggleMenu()">📈 Precio Jugadores</a>
             <a class="menu-item" onclick="toggleMenu(); window.location.href='/?perfil=1'">👤 Perfil</a>
-            <a class="menu-item active-menu" onclick="toggleMenu()">🔔 Noticias</a>
         </nav>
         <div class="menu-footer">
             <button class="btn-volver-inicio" onclick="window.location.href='/'">← Volver al inicio</button>
@@ -38,21 +38,29 @@
         </div>
     </div>
 
-    <main class="noticias-contenido">
-        <div id="lista-noticias">
-            <div class="cargando-ligas">Cargando noticias...</div>
+    <div class="plantilla-tabs">
+        <button class="tab-btn active" id="tab-subidas" onclick="cambiarTab('subidas')">
+            🟢 Mayores subidas
+        </button>
+        <button class="tab-btn" id="tab-bajadas" onclick="cambiarTab('bajadas')">
+            🔴 Mayores bajadas
+        </button>
+    </div>
+
+    <div class="periodo-selector">
+        <button class="btn-periodo active" id="periodo-semana" onclick="cambiarPeriodo('semana')">Últimos 7 días</button>
+        <button class="btn-periodo" id="periodo-dia"    onclick="cambiarPeriodo('dia')">Último día</button>
+        <button class="btn-periodo" id="periodo-mes"    onclick="cambiarPeriodo('mes')">Último mes</button>
+    </div>
+
+    <main class="precios-contenido">
+        <div id="lista-precios">
+            <div class="cargando-ligas">Cargando datos...</div>
         </div>
     </main>
 
-    <nav class="bottom-nav">
-        <button class="bottom-nav-item" onclick="irAClasificacion()">🏆 Clasificación</button>
-        <button class="bottom-nav-item" onclick="irAPlantilla()">👤 Mi Plantilla</button>
-        <button class="bottom-nav-item" onclick="irAMercado()">📈 Mercado</button>
-        <button class="bottom-nav-item active">🔔 Noticias</button>
-    </nav>
-
     <script th:src="@{/js/sesion.js}"></script>
     <script th:src="@{/js/fantasy-navbar.js}"></script>
-    <script th:src="@{/js/noticias.js}"></script>
+    <script th:src="@{/js/precios.js}"></script>
 </body>
 </html>

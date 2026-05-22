@@ -13,10 +13,12 @@ import com.ligainternaetsiinf.model.EquipoFantasy;
 import com.ligainternaetsiinf.model.Jugador;
 import com.ligainternaetsiinf.model.JugadorFantasy;
 import com.ligainternaetsiinf.model.LigaFantasy;
+import com.ligainternaetsiinf.model.Puja;
 import com.ligainternaetsiinf.repository.EquipoFantasyRepository;
 import com.ligainternaetsiinf.repository.JugadorFantasyRepository;
 import com.ligainternaetsiinf.repository.JugadorRepository;
 import com.ligainternaetsiinf.repository.LigaFantasyRepository;
+import com.ligainternaetsiinf.repository.PujaRepository;
 
 @Service
 public class JugadorFantasyService {
@@ -33,6 +35,8 @@ public class JugadorFantasyService {
     @Autowired
     private EquipoFantasyRepository equipoFantasyRepository;
 
+    @Autowired
+    private PujaRepository pujaRepository;
 
     public void crearJugadorFantasy(Integer jugadorRealId){
         /*este metodo se va a usar cuando, a mitad de temporada, por ejemplo en la ventana de fichajes de invierno, cuando se pueden
@@ -134,10 +138,28 @@ public class JugadorFantasyService {
             throw new RuntimeException("El jugador se encuentra bloqueado");
         }
 
-        jugador.setEquipoFantasy(equipoComprador);
-        jugador.setFechaCompra(LocalDateTime.now());
-        jugador.setClausulaBloqueadaHasta(LocalDateTime.now().plusDays(14));
+        long valorClausula = jugador.getClausula();
+        long valorJugador  = jugador.getJugadorReal().getValorMercado();
 
+        // Registrar como puja de clausulazo
+        Puja clausulazo = new Puja(equipoComprador, equipoActual, jugador, valorClausula);
+        clausulazo.setEsClausulazo(true);
+        clausulazo.setAceptada(true);
+        clausulazo.setResuelta(true);
+        clausulazo.setValorClausulaMomento(valorClausula);
+        pujaRepository.save(clausulazo);
+
+        // Transferir dinero
+        equipoComprador.setDinero(equipoComprador.getDinero() - valorClausula);
+        equipoActual.setDinero(equipoActual.getDinero() + valorClausula);
+        equipoFantasyRepository.save(equipoComprador);
+        equipoFantasyRepository.save(equipoActual);
+
+        jugador.setEquipoFantasy(equipoComprador);
+        jugador.setClausula(valorClausula);
+        jugador.setClausulaBloqueadaHasta(LocalDateTime.now().plusDays(14));
+        jugador.setFechaCompra(LocalDateTime.now());
+        jugadorFantasyRepository.save(jugador);
         jugadorFantasyRepository.save(jugador);
 
         return cambioTipoRespuesta(jugador);

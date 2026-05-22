@@ -104,7 +104,7 @@ public class EquipoService {
             }
 
             for(Jugador j : equipoAModificar.getJugadores()){
-                if(!equipoActualizado.getJugadores().contains(j)){ /*esto es para cuando has eliminado a un jugador del equipo */
+                if(!equipoActualizado.getJugadores().contains(j.getFullName())){ /*esto es para cuando has eliminado a un jugador del equipo */
                     j.setEquipo(null);
                     jugadorRepository.save(j);
                 }
@@ -180,5 +180,11 @@ public class EquipoService {
                 );
             })
             .collect(java.util.stream.Collectors.toList());
+    }
+
+    public EquipoResponse getEquipo(Integer id) {
+        Equipo e = equipoRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Equipo no encontrado"));
+        return cambioTipoRespuesta(e);
     }
 }

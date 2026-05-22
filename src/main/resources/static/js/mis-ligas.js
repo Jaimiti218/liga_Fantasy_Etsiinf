@@ -38,15 +38,14 @@ async function cargarMisLigas() {
     }
 }
 
-// ─── Renderizar ligas ─────────────────────────────────────────────────────────
 async function renderizarLigas(ligas) {
     const contenedor = document.getElementById('lista-ligas');
     contenedor.innerHTML = '';
 
     for (const liga of ligas) {
-        // Obtener info del equipo del usuario en esta liga
         let miEquipo = null;
         let posicion = '—';
+        let tieneAviso = false;
 
         try {
             const resEquipo = await fetch(`/equipos-fantasy/liga/${liga.id}/mi-equipo`, {
@@ -54,9 +53,24 @@ async function renderizarLigas(ligas) {
             });
             if (resEquipo.ok) {
                 miEquipo = await resEquipo.json();
+
+                // Comprobar saldo negativo
+                if (miEquipo.dinero < 0) tieneAviso = true;
+
+                // Comprobar alineación incompleta
+                if (!tieneAviso) {
+                    const resPlantilla = await fetch(
+                        `/equipos-fantasy/${miEquipo.id}/plantilla-publica`,
+                        { credentials: 'include' }
+                    );
+                    if (resPlantilla.ok) {
+                        const plantilla = await resPlantilla.json();
+                        const alineados = plantilla.filter(j => j.alineado).length;
+                        if (alineados < 7) tieneAviso = true;
+                    }
+                }
             }
 
-            // Obtener posición en la clasificación
             const resClasif = await fetch(`/equipos-fantasy/ligas/${liga.id}/clasificacion`, {
                 credentials: 'include'
             });
@@ -71,7 +85,9 @@ async function renderizarLigas(ligas) {
         card.className = 'liga-card';
         card.innerHTML = `
             <div class="liga-card-info" onclick="entrarALiga(${liga.id})">
-                <div class="liga-card-nombre">${liga.name}</div>
+                <div class="liga-card-nombre">
+                    ${liga.name}
+                </div>
                 <div class="liga-card-stats">
                     <div class="liga-stat">
                         <span class="liga-stat-label">Posición</span>
@@ -88,13 +104,14 @@ async function renderizarLigas(ligas) {
                 </div>
             </div>
             <div class="liga-card-menu">
+                ${tieneAviso ? `<span class="aviso-alineacion" title="Alineación incompleta o saldo negativo">⚠️</span>` : ''}
                 <button class="btn-tres-puntos" onclick="toggleDropdown(event, ${liga.id}, '${escapar(liga.code)}')">⋯</button>
                 <div id="dropdown-${liga.id}" class="dropdown-menu hidden">
                     <div class="dropdown-item" onclick="mostrarModalInvitar('${escapar(liga.code)}')">
-                        🔗 Invitar amigo
+                        Invitar amigo
                     </div>
                     <div class="dropdown-item danger" onclick="confirmarAbandonar(${liga.id}, '${escapar(liga.name)}')">
-                        🚪 Abandonar liga
+                        Abandonar liga
                     </div>
                 </div>
             </div>

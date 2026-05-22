@@ -7,6 +7,9 @@ import com.ligainternaetsiinf.model.Puja;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDateTime;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface PujaRepository extends JpaRepository<Puja, Integer> {
 
@@ -44,4 +47,41 @@ public interface PujaRepository extends JpaRepository<Puja, Integer> {
     Optional<Puja> findByEquipoCompradorAndJugadorFantasyAndInstanciaIsNullAndResueltaFalse(EquipoFantasy equipo, JugadorFantasy jugador);
 
     Optional<Puja> findByEquipoCompradorAndJugadorFantasyAndInstanciaAndResueltaFalse(EquipoFantasy equipo, JugadorFantasy jugador, InstanciaMercado instancia);
+
+
+
+    // Compras al sistema: aceptada, sin vendedor previo (jugador libre)
+    @Query("SELECT COUNT(p) FROM Puja p WHERE p.jugadorFantasy.jugadorReal.id = :jugadorId " +
+        "AND p.aceptada = true AND p.equipoVendedor IS NULL AND p.equipoComprador IS NOT NULL " +
+        "AND p.esClausulazo = false AND p.fecha >= :desde")
+    long contarComprasAlSistema(@Param("jugadorId") Integer jugadorId,
+                                @Param("desde") LocalDateTime desde);
+
+    // Ventas al sistema: oferta del sistema aceptada (comprador null)
+    @Query("SELECT COUNT(p) FROM Puja p WHERE p.jugadorFantasy.jugadorReal.id = :jugadorId " +
+        "AND p.aceptada = true AND p.equipoComprador IS NULL " +
+        "AND p.fecha >= :desde")
+    long contarVentasAlSistema(@Param("jugadorId") Integer jugadorId,
+                                @Param("desde") LocalDateTime desde);
+
+    // Pujas activas no resueltas con comprador real
+    @Query("SELECT COUNT(p) FROM Puja p WHERE p.jugadorFantasy.jugadorReal.id = :jugadorId " +
+        "AND p.resuelta = false AND p.equipoComprador IS NOT NULL " +
+        "AND p.fecha >= :desde")
+    long contarPujasActivas(@Param("jugadorId") Integer jugadorId,
+                            @Param("desde") LocalDateTime desde);
+
+    // Puestas en venta: oferta del sistema pendiente (sin comprador, sin resolver)
+    @Query("SELECT COUNT(p) FROM Puja p WHERE p.jugadorFantasy.jugadorReal.id = :jugadorId " +
+        "AND p.equipoComprador IS NULL AND p.resuelta = false " +
+        "AND p.fecha >= :desde")
+    long contarPuestasEnVenta(@Param("jugadorId") Integer jugadorId,
+                            @Param("desde") LocalDateTime desde);
+
+    // Clausulazos ejecutados
+    @Query("SELECT p FROM Puja p WHERE p.jugadorFantasy.jugadorReal.id = :jugadorId " +
+        "AND p.esClausulazo = true AND p.aceptada = true " +
+        "AND p.fecha >= :desde")
+    List<Puja> findClausulazos(@Param("jugadorId") Integer jugadorId,
+                                @Param("desde") LocalDateTime desde);
 }

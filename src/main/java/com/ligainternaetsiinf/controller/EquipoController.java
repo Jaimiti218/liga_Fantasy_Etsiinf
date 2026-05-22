@@ -56,4 +56,9 @@ public class EquipoController {
     public List<EquipoClasificacionResponse> getClasificacion() {
         return equipoService.getClasificacion();
     }
+
+    @GetMapping("/{id}")
+    public EquipoResponse getEquipo(@PathVariable Integer id) {
+        return equipoService.getEquipo(id);
+    }
 }

@@ -60,4 +60,14 @@ public class ViewController {
     public String noticias() {
         return "fantasy/noticias";
     }
+
+    @GetMapping("/fantasy/precios")
+    public String precios() {
+        return "fantasy/precios";
+    }
+
+    @GetMapping("/admin/partidos")
+    public String adminPartidos() {
+        return "admin/partidos";
+    }
 }

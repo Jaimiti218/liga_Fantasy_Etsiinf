@@ -27,6 +27,9 @@ public class Puja {
     private boolean aceptada;  // true si se aceptó esta puja
     private boolean resuelta;  // true si ya no está pendiente (aceptada o rechazada)
 
+    private boolean esClausulazo = false;
+    private Long valorClausulaMomento = null; // valor de la clausula cuando se ejecutó
+
     public Puja(){}
 
     // Constructor para puja en mercado normal
@@ -79,4 +82,8 @@ public class Puja {
     public void setAceptada(boolean aceptada){ this.aceptada = aceptada; }
     public boolean isResuelta(){ return resuelta; }
     public void setResuelta(boolean resuelta){ this.resuelta = resuelta; }
+    public boolean isEsClausulazo(){ return esClausulazo; }
+    public void setEsClausulazo(boolean esClausulazo){ this.esClausulazo = esClausulazo; }
+    public Long getValorClausulaMomento(){ return valorClausulaMomento; }
+    public void setValorClausulaMomento(Long v){ this.valorClausulaMomento = v; }
 }

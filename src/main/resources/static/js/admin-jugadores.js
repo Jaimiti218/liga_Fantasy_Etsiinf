@@ -4,9 +4,9 @@ let idEditando       = null;
 
 const POSICIONES = {
     'PORTERO':     '🧤 Portero',
-    'DEFENSA':     '🛡 Defensa',
+    'DEFENSA':     '🧱 Defensa',
     'MEDIOCENTRO': '⚙️ Mediocentro',
-    'DELANTERO':   '⚡ Delantero'
+    'DELANTERO':   '🎯 Delantero'
 };
 
 document.addEventListener('DOMContentLoaded', async () => {

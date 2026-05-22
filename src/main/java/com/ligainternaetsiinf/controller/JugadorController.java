@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ligainternaetsiinf.dto.JugadorUpdateDTO;
+import com.ligainternaetsiinf.dto.JugadorEstadisticasResponse;
 import com.ligainternaetsiinf.dto.JugadorResponse;
 import com.ligainternaetsiinf.model.Jugador;
 import com.ligainternaetsiinf.service.JugadorService;

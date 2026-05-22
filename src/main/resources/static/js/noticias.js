@@ -51,12 +51,10 @@ async function cargarNoticias() {
                 : '';
             const clasesTitulo = `titulo-${claseColor}`;
             const fecha = new Date(n.fecha[0], n.fecha[1] - 1, n.fecha[2]);
-            const fechaStr = fecha.toLocaleDateString('es-ES', {
+            const fechaStr = new Date(n.fecha + 'T00:00:00').toLocaleDateString('es-ES', {
                 day: '2-digit', month: 'long', year: 'numeric'
             });
-            const horaStr = n.hora
-                ? `${String(n.hora[0]).padStart(2,'0')}:${String(n.hora[1]).padStart(2,'0')}`
-                : '';
+            const horaStr = n.hora ? n.hora.substring(0, 5) : '';
 
             return `
             <div class="noticia-card ${claseColor} ${clasePrivada}">

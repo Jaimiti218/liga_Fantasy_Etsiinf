@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar Partidos – Admin</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <link rel="stylesheet" th:href="@{/css/admin-partidos.css}">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-izquierda">
+        <button class="btn-nav" onclick="window.location.href='/admin'">← Volver</button>
+        <span class="logo">📅 Gestionar Partidos</span>
+    </div>
+</nav>
+
+<main class="admin-contenido">
+
+    <!-- Botón crear jornada -->
+    <div class="admin-toolbar">
+        <button class="btn-primary" onclick="abrirModalCrearJornada()">
+            + Nueva jornada
+        </button>
+    </div>
+
+    <!-- Lista de jornadas -->
+    <div id="lista-jornadas">
+        <div class="cargando">Cargando jornadas...</div>
+    </div>
+
+</main>
+
+<!-- MODAL CREAR/EDITAR JORNADA -->
+<div id="modal-jornada" class="modal-overlay hidden">
+    <div class="modal">
+        <h3 id="modal-jornada-titulo">Nueva jornada</h3>
+        <div class="campo">
+            <label>Número de jornada</label>
+            <input type="number" id="jornada-num" min="1" placeholder="Ej: 1"/>
+        </div>
+        <div class="campo">
+            <label>Fecha y hora de inicio de jornada</label>
+            <input type="datetime-local" id="jornada-fecha-inicio"/>
+            <small style="color:#888">El sistema registrará las alineaciones en este momento.</small>
+        </div>
+        <div id="error-jornada" class="mensaje-error hidden"></div>
+        <div class="modal-botones">
+            <button class="btn-primary" onclick="guardarJornada()">Guardar jornada</button>
+            <button class="btn-ghost" onclick="cerrarModalJornada()">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL CREAR/EDITAR PARTIDO -->
+<div id="modal-partido" class="modal-overlay hidden">
+    <div class="modal">
+        <h3 id="modal-partido-titulo">Nuevo partido</h3>
+        <input type="hidden" id="partido-id"/>
+        <input type="hidden" id="partido-jornada"/>
+        <div class="campo">
+            <label>Equipo local</label>
+            <select id="partido-local"></select>
+        </div>
+        <div class="campo">
+            <label>Equipo visitante</label>
+            <select id="partido-visitante"></select>
+        </div>
+        <div class="campo">
+            <label>Fecha y hora</label>
+            <input type="datetime-local" id="partido-fecha"/>
+        </div>
+        <div class="campo campo-checkbox">
+            <input type="checkbox" id="partido-es-primero"/>
+            <label for="partido-es-primero">Es el primer partido de la jornada (registra alineaciones)</label>
+        </div>
+        <div id="error-partido" class="mensaje-error hidden"></div>
+        <div class="modal-botones">
+            <button class="btn-primary" onclick="guardarPartido()">Guardar</button>
+            <button class="btn-ghost" onclick="cerrarModalPartido()">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL RESULTADO -->
+<div id="modal-resultado" class="modal-overlay hidden">
+    <div class="modal modal-resultado-grande">
+        <h3 id="modal-resultado-titulo">Registrar resultado</h3>
+        <input type="hidden" id="resultado-partido-id"/>
+
+        <div class="resultado-marcador">
+            <div class="resultado-equipo">
+                <div class="resultado-equipo-nombre" id="resultado-local-nombre"></div>
+                <input type="number" id="goles-local" min="0" value="0" class="input-goles"/>
+            </div>
+            <span class="resultado-vs">:</span>
+            <div class="resultado-equipo">
+                <div class="resultado-equipo-nombre" id="resultado-visitante-nombre"></div>
+                <input type="number" id="goles-visitante" min="0" value="0" class="input-goles"/>
+            </div>
+        </div>
+
+        <div class="resultado-jugadores">
+            <h4>Jugadores del partido</h4>
+            <p style="color:#888;font-size:0.85rem">Marca quién jugó y rellena sus estadísticas.</p>
+            <div id="lista-jugadores-resultado"></div>
+        </div>
+
+        <div id="error-resultado" class="mensaje-error hidden"></div>
+
+        <div class="modal-botones">
+            <button class="btn-primary" onclick="confirmarResultado()">Guardar resultado</button>
+            <button class="btn-ghost" onclick="cerrarModalResultado()">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL CONFIRMACIÓN -->
+<div id="modal-confirmar" class="modal-overlay hidden">
+    <div class="modal">
+        <h3>¿Confirmas el resultado?</h3>
+        <p style="color:#555;font-size:0.9rem">
+            Una vez guardado, los puntos fantasy se otorgarán automáticamente a todos los equipos.
+            Esta acción no se puede deshacer.
+        </p>
+        <div id="resumen-confirmacion" style="background:#f8f9ff;border-radius:8px;padding:1rem;margin:0.75rem 0;font-size:0.85rem"></div>
+        <div class="modal-botones">
+            <button class="btn-primary" onclick="ejecutarGuardarResultado()">Confirmar y guardar</button>
+            <button class="btn-ghost" onclick="cerrarModalConfirmar()">Volver a editar</button>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/js/sesion.js}"></script>
+<script th:src="@{/js/admin-partidos.js}"></script>
+</body>
+</html>

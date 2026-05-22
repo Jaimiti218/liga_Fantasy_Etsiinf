@@ -14,9 +14,9 @@ let jugadorVentaActual = null;
 
 const ICONOS_POSICION = {
     'PORTERO':     '🧤',
-    'DEFENSA':     '🛡',
+    'DEFENSA':     '🧱',
     'MEDIOCENTRO': '⚙️',
-    'DELANTERO':   '⚡'
+    'DELANTERO':   '🎯'
 };
 
 // ─── Init ────────────────────────────────────────────────────────────────────
@@ -360,7 +360,7 @@ async function renderizarPlantilla() {
                     </div>
                     <div class="jugador-mini-stat">
                         <span class="label">Valor</span>
-                        <span class="valor">${formatearDinero(j.valorMercado)}</span>
+                        <span class="valor jugador-valor-mercado">${formatearDinero(j.valorMercado)}</span>
                     </div>
                     <div class="jugador-mini-stat">
                         <span class="label">Cláusula</span>
@@ -370,17 +370,17 @@ async function renderizarPlantilla() {
                 <div onclick="event.stopPropagation()" style="position:relative">
                     ${j.enVenta
                         ? `<button class="btn-quitar-mercado" onclick="quitarDelMercado(${j.id})">
-                            🔴 Quitar
+                            Quitar
                         </button>`
                         : `<button class="btn-acciones" onclick="toggleAcciones(event, ${j.id})">
                             Acciones ▾
                         </button>
                         <div id="acciones-${j.id}" class="acciones-dropdown hidden">
                             <div class="acciones-item" onclick="abrirModalClausula(${j.id}, '${escapar(j.nombre)}')">
-                                📈 Subir cláusula
+                                Subir cláusula
                             </div>
                             <div class="acciones-item" onclick="ponerEnVentaDesde(${j.id})">
-                                🛒 Añadir al mercado
+                                Añadir al mercado
                             </div>
                         </div>`
                     }

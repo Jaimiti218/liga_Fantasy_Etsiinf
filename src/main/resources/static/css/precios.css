@@ -1,0 +1,123 @@
+.periodo-selector {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: white;
+    border-bottom: 1px solid #eee;
+    flex-wrap: wrap;
+}
+
+.btn-periodo {
+    padding: 0.35rem 0.9rem;
+    border-radius: 20px;
+    border: 1.5px solid #dee2e6;
+    background: white;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-periodo.active {
+    background: #0f3460;
+    border-color: #0f3460;
+    color: white;
+}
+
+.precios-contenido {
+    padding: 1rem;
+    padding-bottom: 2rem;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.precio-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 0.6rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.precio-pos {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #ccc;
+    min-width: 24px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.precio-icono {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0f3460, #1a4a80);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+}
+
+.precio-info { flex: 1; min-width: 0; }
+
+.precio-nombre {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.precio-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.25rem;
+    flex-wrap: wrap;
+}
+
+.precio-valores {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.25rem;
+    flex-shrink: 0;
+}
+
+.precio-anterior {
+    font-size: 0.75rem;
+    color: #bbb;
+    text-decoration: line-through;
+}
+
+.precio-actual {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #1a1a2e;
+}
+
+.variacion-badge {
+    font-size: 0.82rem;
+    font-weight: 800;
+    padding: 0.2rem 0.6rem;
+    border-radius: 8px;
+    white-space: nowrap;
+}
+
+.variacion-sube { background: #e8f8f0; color: #27ae60; }
+.variacion-baja { background: #fdf0f0; color: #e74c3c; }
+
+.sin-datos-precio {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #aaa;
+    font-size: 0.9rem;
+    line-height: 2;
+}

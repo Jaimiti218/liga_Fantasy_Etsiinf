@@ -44,14 +44,21 @@ async function cargarNoticias() {
         }
 
         contenedor.innerHTML = noticias.map(n => {
-            const claseColor = n.titulo.replace(/\s+/g, '-').toUpperCase();
+            const claseColor = n.titulo
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/\s+/g, '-')
+                .toUpperCase();
             const clasePrivada = n.esPrivada ? 'privada' : '';
             const badgePrivada = n.esPrivada
                 ? '<span class="noticia-privada-badge">🔒 Solo tú</span>'
                 : '';
             const clasesTitulo = `titulo-${claseColor}`;
-            const fecha = new Date(n.fecha[0], n.fecha[1] - 1, n.fecha[2]);
-            const fechaStr = new Date(n.fecha + 'T00:00:00').toLocaleDateString('es-ES', {
+            const fechaStr = Array.isArray(n.fecha)
+            ? new Date(n.fecha[0], n.fecha[1] - 1, n.fecha[2]).toLocaleDateString('es-ES', {
+                day: '2-digit', month: 'long', year: 'numeric'
+            })
+            : new Date(n.fecha + 'T00:00:00').toLocaleDateString('es-ES', {
                 day: '2-digit', month: 'long', year: 'numeric'
             });
             const horaStr = n.hora ? n.hora.substring(0, 5) : '';

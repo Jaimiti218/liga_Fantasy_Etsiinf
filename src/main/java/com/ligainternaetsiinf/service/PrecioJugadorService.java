@@ -31,7 +31,7 @@ public class PrecioJugadorService {
     @Autowired private HistorialPrecioRepository historialRepository;
 
     // ─── Actualización diaria a las 23:30 ────────────────────────────────────
-    @Scheduled(cron = "0 30 23 * * *")
+    @Scheduled(cron = "0 19 22 * * *")
     @Transactional
     public void actualizarPreciosDiarios() {
         LocalDateTime hace24h = LocalDateTime.now().minusHours(24);

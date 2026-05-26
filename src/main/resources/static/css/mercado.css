@@ -182,3 +182,111 @@
     transition: background 0.2s;
 }
 .btn-rechazar-oferta:hover { background: #ffe0e0; }
+
+
+
+
+
+.buscar-toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.buscar-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: white;
+    border: 1.5px solid #ddd;
+    border-radius: 10px;
+    padding: 0.5rem 1rem;
+}
+
+.buscar-input-wrap input {
+    border: none;
+    outline: none;
+    flex: 1;
+    font-size: 0.95rem;
+}
+
+.buscar-filtros {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.buscar-filtros select {
+    flex: 1;
+    min-width: 120px;
+    padding: 0.5rem 0.75rem;
+    border: 1.5px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    background: white;
+    cursor: pointer;
+}
+
+.jugador-busqueda-card {
+    background: white;
+    border-radius: 12px;
+    padding: 0.9rem 1rem;
+    margin-bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.jugador-busqueda-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.jugador-busqueda-foto {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+}
+
+.jugador-busqueda-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.jugador-busqueda-nombre {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.jugador-busqueda-badges {
+    display: flex;
+    gap: 0.3rem;
+    margin-top: 0.2rem;
+    flex-wrap: wrap;
+}
+
+.jugador-busqueda-dueno {
+    font-size: 0.75rem;
+    color: #555;
+    margin-top: 0.2rem;
+}
+
+.jugador-busqueda-derecha .puntos-busqueda {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #0f3460;
+}

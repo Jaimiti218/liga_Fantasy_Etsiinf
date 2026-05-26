@@ -24,6 +24,7 @@ public class ResultadoRequest {
         private int tarjetasAmarillas;
         private int tarjetasRojas;
         private int paradas;
+        private String posicionPartido; // null = usar posición por defecto del jugador
 
         public EstadisticaJugadorRequest(){}
 
@@ -41,5 +42,8 @@ public class ResultadoRequest {
         public void setTarjetasRojas(int tarjetasRojas){ this.tarjetasRojas = tarjetasRojas; }
         public int getParadas(){ return paradas; }
         public void setParadas(int paradas){ this.paradas = paradas; }
+
+        public String getPosicionPartido(){ return posicionPartido; }
+        public void setPosicionPartido(String posicionPartido){ this.posicionPartido = posicionPartido; }
     }
 }

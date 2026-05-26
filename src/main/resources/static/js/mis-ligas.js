@@ -135,14 +135,22 @@ function entrarALiga(ligaId) {
 }
 
 // ─── Dropdown ─────────────────────────────────────────────────────────────────
-function toggleDropdown(event, ligaId, code) {
+function toggleDropdown(event, ligaId, codigo) {
     event.stopPropagation();
+    document.querySelectorAll('.dropdown-menu').forEach(d => {
+        if (d.id !== `dropdown-${ligaId}`) d.classList.add('hidden');
+    });
     const dropdown = document.getElementById(`dropdown-${ligaId}`);
-    const estaAbierto = !dropdown.classList.contains('hidden');
-    cerrarDropdowns();
-    if (!estaAbierto) {
-        dropdown.classList.remove('hidden');
-        dropdownAbierto = ligaId;
+    dropdown.classList.toggle('hidden');
+
+    // Comprobar si se sale de la pantalla y abrir hacia arriba si es necesario
+    if (!dropdown.classList.contains('hidden')) {
+        const rect = dropdown.getBoundingClientRect();
+        if (rect.bottom > window.innerHeight) {
+            dropdown.classList.add('abre-arriba');
+        } else {
+            dropdown.classList.remove('abre-arriba');
+        }
     }
 }
 

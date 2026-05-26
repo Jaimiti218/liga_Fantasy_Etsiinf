@@ -36,6 +36,7 @@
 <div id="modal-jornada" class="modal-overlay hidden">
     <div class="modal">
         <h3 id="modal-jornada-titulo">Nueva jornada</h3>
+        <input type="hidden" id="jornada-id-editar"/>
         <div class="campo">
             <label>Número de jornada</label>
             <input type="number" id="jornada-num" min="1" placeholder="Ej: 1"/>
@@ -70,10 +71,6 @@
         <div class="campo">
             <label>Fecha y hora</label>
             <input type="datetime-local" id="partido-fecha"/>
-        </div>
-        <div class="campo campo-checkbox">
-            <input type="checkbox" id="partido-es-primero"/>
-            <label for="partido-es-primero">Es el primer partido de la jornada (registra alineaciones)</label>
         </div>
         <div id="error-partido" class="mensaje-error hidden"></div>
         <div class="modal-botones">

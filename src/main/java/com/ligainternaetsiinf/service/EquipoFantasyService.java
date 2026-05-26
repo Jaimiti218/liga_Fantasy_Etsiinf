@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ligainternaetsiinf.dto.AlineacionDTO;
 import com.ligainternaetsiinf.dto.ClasificacionResponse;
@@ -244,10 +244,16 @@ public class EquipoFantasyService {
             var stats = estadisticasRepository.findByJugadorIdAndPartidoId(jr.getId(), p.getId());
             if (stats.isPresent()) {
                 EstadisticasJugadorPartido e = stats.get();
+                boolean esLocal = p.getEquipoLocal().getId().equals(jr.getEquipo().getId());
+                int golesEncajados = esLocal ? p.getGolesVisitante() : p.getGolesLocal();
+                String posicionJugada  = e.getPosicionJugada() != null ? e.getPosicionJugada() : jr.getPosicion();
+                String posicionDefecto = jr.getPosicion();
+                
                 resultado.add(new PuntosJornadaJugadorResponse(
                     p.getJornada(), e.getPuntosObtenidos(), e.getGoles(),
                     e.getAsistencias(), e.getTarjetasAmarillas(), e.getTarjetasRojas(),
-                    e.getParadas(), e.isJugo()
+                    e.getParadas(), e.isJugo(), golesEncajados, 
+                    posicionJugada, posicionDefecto
                 ));
             }
         }
@@ -285,6 +291,7 @@ public class EquipoFantasyService {
         throw new RuntimeException("Implementar con OfertaVentaRepository");
     }
 
+    @Transactional
     public void registrarAlineacionesJornada(Integer jornada) {
         List<EquipoFantasy> todosLosEquipos = equipoFantasyRepository.findAll();
 
@@ -331,10 +338,11 @@ public class EquipoFantasyService {
     }
 
     public Map<String, Object> obtenerInfoJornada(Integer equipoId, Integer jornada) {
-        var alineacion = alineacionRepository.findByEquipoFantasyIdAndJornada(equipoId, jornada);
+        var alineacionOpt = alineacionRepository.findByEquipoFantasyIdAndJornada(equipoId, jornada);
         Map<String, Object> info = new HashMap<>();
-        info.put("formacion", alineacion.map(AlineacionEquipoJornada::getFormacion).orElse("2-3-1"));
+        info.put("formacion", alineacionOpt.map(AlineacionEquipoJornada::getFormacion).orElse("2-3-1"));
         info.put("jugadores", obtenerPuntosJornada(equipoId, jornada));
+        info.put("puntua", alineacionOpt.map(AlineacionEquipoJornada::isPuntua).orElse(true));
         return info;
     }
 

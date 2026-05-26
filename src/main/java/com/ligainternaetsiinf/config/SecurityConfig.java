@@ -45,7 +45,7 @@ public class SecurityConfig {
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .ignoringRequestMatchers("/users/login", "/logout" , "/mercado/**", "/users/register",
                  "/jugadores/**", "/equipos/**", "/ligas-fantasy/**", "/equipos-fantasy/**", "/jugadores-fantasy/**",
-                "/partidos/**", "/users/username", "/users/foto-perfil", "/noticias/**")
+                "/partidos/**", "/users/username", "/users/foto-perfil", "/noticias/**", "/jornadas/**")
             )
             .formLogin(login -> login.disable())
             .httpBasic(basic -> basic.disable())
@@ -59,7 +59,7 @@ public class SecurityConfig {
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/jugadores").permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/equipos").permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/partidos", "/partidos/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/equipos/clasificacion", "/jugadores/estadisticas", "/partidos", "/partidos/**", "/precios/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/equipos/clasificacion", "/jugadores/estadisticas", "/jornadas/**","/jornadas", "/partidos", "/partidos/**", "/precios/**").permitAll()
                 .requestMatchers("/", "/fantasy/auth", "/fantasy/mis-ligas", "/fantasy/liga/**", "/fantasy/plantilla/**", "/fantasy/mercado/**").permitAll()
                 // Todo lo demás requiere autenticación
                 .anyRequest().authenticated()

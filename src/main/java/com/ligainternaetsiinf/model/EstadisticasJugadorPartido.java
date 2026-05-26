@@ -22,6 +22,7 @@ public class EstadisticasJugadorPartido {
     private int paradas;
     private boolean jugo; // si el jugador jugó o no ese partido
     private int puntosObtenidos; // puntos fantasy que obtuvo en este partido
+    private String posicionJugada; // posición en la que jugó este partido (puede diferir de la habitual)
 
     public EstadisticasJugadorPartido(){}
 
@@ -56,4 +57,6 @@ public class EstadisticasJugadorPartido {
     public void setJugo(boolean jugo){ this.jugo = jugo; }
     public int getPuntosObtenidos(){ return puntosObtenidos; }
     public void setPuntosObtenidos(int puntosObtenidos){ this.puntosObtenidos = puntosObtenidos; }
+    public String getPosicionJugada(){ return posicionJugada; }
+    public void setPosicionJugada(String posicionJugada){ this.posicionJugada = posicionJugada; }
 }

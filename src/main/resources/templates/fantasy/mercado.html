@@ -28,7 +28,7 @@
         </div>
         <nav class="menu-opciones">
             <a class="menu-item" onclick="toggleMenu(); window.location.href='/fantasy/mis-ligas'">🏆 Mis Ligas</a>
-            <a class="menu-item" onclick="toggleMenu()">📅 Partidos <span class="proximamente-badge">Próximamente</span></a>
+            <a class="menu-item" onclick="toggleMenu(); window.location.href='/?seccion=partidos'">📅 Partidos</a>
             <a class="menu-item" onclick="toggleMenu(); window.location.href='/fantasy/precios'">📈 Precio Jugadores</a>
             <a class="menu-item" onclick="toggleMenu(); window.location.href='/?perfil=1'">👤 Perfil</a>
         </nav>
@@ -42,6 +42,7 @@
     <div class="plantilla-tabs">
         <button class="tab-btn active" id="tab-mercado" onclick="cambiarTab('mercado')">Mercado</button>
         <button class="tab-btn" id="tab-operaciones" onclick="cambiarTab('operaciones')">Mis Operaciones</button>
+        <button class="tab-btn" id="tab-buscar" onclick="cambiarTab('buscar')">Buscar jugadores</button>
     </div>
 
     <main class="plantilla-contenido">
@@ -91,6 +92,37 @@
                     <div class="cargando-ligas">Cargando ventas...</div>
                 </div>
             </div>
+        </div>
+
+        <!--TABBUSCAR JUGADORES-->
+        <div id="seccion-buscar" class="tab-seccion hidden">
+            <div class="buscar-toolbar">
+                <div class="buscar-input-wrap">
+                    <span>🔍</span>
+                    <input type="text" id="buscar-nombre" placeholder="Buscar jugador..." oninput="filtrarBusqueda()"/>
+                </div>
+                <div class="buscar-filtros">
+                    <select id="filtro-equipo" onchange="filtrarBusqueda()">
+                        <option value="">Todos los equipos</option>
+                    </select>
+                    <select id="filtro-posicion" onchange="filtrarBusqueda()">
+                        <option value="">Todas las posiciones</option>
+                        <option value="PORTERO">Portero</option>
+                        <option value="DEFENSA">Defensa</option>
+                        <option value="MEDIOCENTRO">Mediocentro</option>
+                        <option value="DELANTERO">Delantero</option>
+                    </select>
+                    <select id="filtro-orden" onchange="filtrarBusqueda()">
+                        <option value="puntos-desc">Puntos ↓</option>
+                        <option value="puntos-asc">Puntos ↑</option>
+                        <option value="precio-desc">Precio ↓</option>
+                        <option value="precio-asc">Precio ↑</option>
+                        <option value="nombre-asc">Nombre A-Z</option>
+                        <option value="nombre-desc">Nombre Z-A</option>
+                    </select>
+                </div>
+            </div>
+            <div id="lista-busqueda"></div>
         </div>
 
     </main>

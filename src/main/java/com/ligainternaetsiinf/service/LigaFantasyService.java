@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.ligainternaetsiinf.dto.LigaFantasyResponse;
 import com.ligainternaetsiinf.model.AlineacionEquipoJornada;
 import com.ligainternaetsiinf.model.EquipoFantasy;
+import com.ligainternaetsiinf.model.InstanciaMercado;
 import com.ligainternaetsiinf.model.Jugador;
 import com.ligainternaetsiinf.model.JugadorFantasy;
 import com.ligainternaetsiinf.model.LigaFantasy;
@@ -23,6 +24,7 @@ import com.ligainternaetsiinf.model.Puja;
 import com.ligainternaetsiinf.model.User;
 import com.ligainternaetsiinf.repository.AlineacionEquipoJornadaRepository;
 import com.ligainternaetsiinf.repository.EquipoFantasyRepository;
+import com.ligainternaetsiinf.repository.InstanciaMercadoRepository;
 import com.ligainternaetsiinf.repository.JugadorFantasyRepository;
 import com.ligainternaetsiinf.repository.JugadorRepository;
 import com.ligainternaetsiinf.repository.LigaFantasyRepository;
@@ -59,6 +61,9 @@ public class LigaFantasyService {
 
     @Autowired
     private MercadoRepository mercadoRepository;
+
+    @Autowired
+    private InstanciaMercadoRepository instanciaMercadoRepository;
 
     public LigaFantasyResponse crearLiga(String nombre, Integer userId){
 
@@ -206,7 +211,7 @@ public class LigaFantasyService {
 
     private List<JugadorFantasy> asignarEquipoInicial(LigaFantasy liga) {
         List<JugadorFantasy> disponibles = jugadorFantasyRepository
-            .findByLigaFantasyIdAndEquipoFantasyIsNull(liga.getId());
+            .findDisponiblesParaAsignacion(liga.getId());
 
         List<JugadorFantasy> porteros     = new ArrayList<>();
         List<JugadorFantasy> defensas     = new ArrayList<>();
@@ -237,6 +242,7 @@ public class LigaFantasyService {
         if (plantilla.size() < 7) {
             throw new RuntimeException("No hay suficientes jugadores para crear una plantilla");
         }
+        
 
         return plantilla;
     }

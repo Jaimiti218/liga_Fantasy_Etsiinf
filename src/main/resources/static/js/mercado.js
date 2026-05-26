@@ -8,6 +8,7 @@ let contadorInterval = null;
 let misPujasActivas = []; // {jugadorFantasyId, pujaId, cantidad}
 let pujaEditandoId = null;
 let contadoresPujas = {};
+let todosJugadoresLiga = [];
 
 
 const ICONOS_POSICION = {
@@ -105,6 +106,7 @@ function cambiarTab(tab) {
 
     if (tab === 'mercado')     cargarMercado();
     if (tab === 'operaciones') { cargarCompras(); cambiarOpTab('compras'); }
+    if (tab === 'buscar')      cargarBusqueda();
 }
 
 // ─── Tabs operaciones ─────────────────────────────────────────────────────────
@@ -666,24 +668,64 @@ function renderizarJornadaDetalle() {
     document.getElementById('detalle-jornada-label').textContent  = `Jornada ${jorn.jornada}`;
     document.getElementById('detalle-jornada-puntos').textContent = jorn.jugo ? jorn.puntos : '—';
 
-    const stats     = document.getElementById('detalle-stats-tabla');
-    const esPortero = jugador?.posicion === 'PORTERO';
-
+    const stats = document.getElementById('detalle-stats-tabla');
     if (!jorn.jugo) {
         stats.innerHTML = '<div class="sin-datos">No jugó en esta jornada</div>';
         return;
     }
 
+    // Usar posición jugada en este partido (puede diferir de la habitual)
+    const posicion = jorn.posicionJugada ?? jugador?.posicion;
+    const posicionDefecto = jorn.posicionDefecto ?? jugador?.posicion;
+    const jugoBenOtraPosicion = posicion && posicionDefecto && posicion !== posicionDefecto;
+
+    const ptsGol = (posicion === 'PORTERO' || posicion === 'DEFENSA') ? 6
+                 : posicion === 'MEDIOCENTRO' ? 5 : 4;
+
+    const gc = jorn.golesEncajados ?? 0;
+    let ptsPorteria = 0;
+    let labelPorteria = '';
+    if (posicion === 'PORTERO') {
+        ptsPorteria = 7 - gc;
+        labelPorteria = gc === 0 ? 'Portería a cero' : `Portería (${gc} gol${gc > 1 ? 'es' : ''} encajado${gc > 1 ? 's' : ''})`;
+    } else if (posicion === 'DEFENSA') {
+        ptsPorteria = 5 - Math.floor(gc / 2);
+        labelPorteria = gc === 0 ? 'Defensa sin encajar' : `Defensa (${gc} gol${gc > 1 ? 'es' : ''} encajado${gc > 1 ? 's' : ''})`;
+    } else if (posicion === 'MEDIOCENTRO') {
+        ptsPorteria = 2 - Math.floor(gc / 3);
+        labelPorteria = `Mediocampo (${gc} gol${gc > 1 ? 'es' : ''} encajado${gc > 1 ? 's' : ''})`;
+    } else if (posicion === 'DELANTERO') {
+        ptsPorteria = 1 - Math.floor(gc / 4);
+        labelPorteria = `Delantero (${gc} gol${gc > 1 ? 'es' : ''} encajado${gc > 1 ? 's' : ''})`;
+    }
+
+    const esPortero = posicion === 'PORTERO';
+
+    const avisoPosicion = jugoBenOtraPosicion
+        ? `<div class="stat-aviso">⚠️ Jugó como: ${posicion.charAt(0) + posicion.slice(1).toLowerCase()}</div>`
+        : '';
+
     stats.innerHTML = `
+        ${avisoPosicion}
+        <div class="stat-fila">
+            <span class="stat-cantidad">1</span>
+            <span class="stat-nombre">Jugar el partido</span>
+            <span class="stat-puntos positivo">+2</span>
+        </div>
+        <div class="stat-fila">
+            <span class="stat-cantidad">${gc}</span>
+            <span class="stat-nombre">${labelPorteria}</span>
+            <span class="stat-puntos ${ptsPorteria >= 0 ? 'positivo' : 'negativo'}">${ptsPorteria >= 0 ? '+' : ''}${ptsPorteria}</span>
+        </div>
         <div class="stat-fila">
             <span class="stat-cantidad">${jorn.goles}</span>
             <span class="stat-nombre">Goles</span>
-            <span class="stat-puntos ${jorn.goles > 0 ? 'positivo' : 'neutro'}">${jorn.goles * 4}</span>
+            <span class="stat-puntos ${jorn.goles > 0 ? 'positivo' : 'neutro'}">${jorn.goles > 0 ? '+' : ''}${jorn.goles * ptsGol}</span>
         </div>
         <div class="stat-fila">
             <span class="stat-cantidad">${jorn.asistencias}</span>
             <span class="stat-nombre">Asistencias</span>
-            <span class="stat-puntos ${jorn.asistencias > 0 ? 'positivo' : 'neutro'}">${jorn.asistencias * 2}</span>
+            <span class="stat-puntos ${jorn.asistencias > 0 ? 'positivo' : 'neutro'}">${jorn.asistencias > 0 ? '+' : ''}${jorn.asistencias * 3}</span>
         </div>
         <div class="stat-fila">
             <span class="stat-cantidad">${jorn.tarjetasAmarillas}</span>
@@ -699,7 +741,7 @@ function renderizarJornadaDetalle() {
         <div class="stat-fila">
             <span class="stat-cantidad">${jorn.paradas}</span>
             <span class="stat-nombre">Paradas</span>
-            <span class="stat-puntos ${jorn.paradas > 0 ? 'positivo' : 'neutro'}">${jorn.paradas}</span>
+            <span class="stat-puntos ${jorn.paradas > 0 ? 'positivo' : 'neutro'}">${jorn.paradas > 0 ? '+' : ''}${jorn.paradas}</span>
         </div>` : ''}
     `;
 }
@@ -717,4 +759,110 @@ function cerrarDetalleJugador() {
 
 function irANoticias() {
     window.location.href = `/fantasy/noticias/${ligaId}`;
+}
+
+async function cargarBusqueda() {
+    if (todosJugadoresLiga.length > 0) { filtrarBusqueda(); return; }
+    const res = await fetch(`/jugadores-fantasy/liga/${ligaId}/todos`, { credentials: 'include' });
+    if (!res.ok) return;
+    todosJugadoresLiga = await res.json();
+
+    // Rellenar select de equipos
+    const equipos = [...new Set(todosJugadoresLiga.map(j => j.nombreEquipoReal).filter(Boolean))].sort();
+    const sel = document.getElementById('filtro-equipo');
+    equipos.forEach(eq => {
+        const opt = document.createElement('option');
+        opt.value = eq; opt.textContent = eq;
+        sel.appendChild(opt);
+    });
+
+    filtrarBusqueda();
+}
+
+function filtrarBusqueda() {
+    const nombre   = document.getElementById('buscar-nombre').value.toLowerCase();
+    const equipo   = document.getElementById('filtro-equipo').value;
+    const posicion = document.getElementById('filtro-posicion').value;
+    const orden    = document.getElementById('filtro-orden').value;
+
+    let lista = todosJugadoresLiga.filter(j => {
+        if (nombre   && !j.nombre.toLowerCase().includes(nombre)) return false;
+        if (equipo   && j.nombreEquipoReal !== equipo) return false;
+        if (posicion && j.posicion !== posicion) return false;
+        return true;
+    });
+
+    lista.sort((a, b) => {
+        switch (orden) {
+            case 'puntos-desc': return b.puntosTotal - a.puntosTotal;
+            case 'puntos-asc':  return a.puntosTotal - b.puntosTotal;
+            case 'precio-desc': return b.valorMercado - a.valorMercado;
+            case 'precio-asc':  return a.valorMercado - b.valorMercado;
+            case 'nombre-asc':  return a.nombre.localeCompare(b.nombre);
+            case 'nombre-desc': return b.nombre.localeCompare(a.nombre);
+            default: return 0;
+        }
+    });
+
+    renderizarBusqueda(lista);
+}
+
+function renderizarBusqueda(lista) {
+    const contenedor = document.getElementById('lista-busqueda');
+    if (lista.length === 0) {
+        contenedor.innerHTML = '<div style="text-align:center;color:#999;padding:2rem">No se encontraron jugadores</div>';
+        return;
+    }
+    contenedor.innerHTML = lista.map(j => `
+        <div class="jugador-busqueda-card" onclick="abrirDetalleBusqueda(${j.id})">
+            <div class="jugador-busqueda-foto">
+                ${ICONOS_POSICION[j.posicion] ?? '👤'}
+            </div>
+            <div class="jugador-busqueda-info">
+                <div class="jugador-busqueda-nombre">${j.nombre}</div>
+                <div class="jugador-busqueda-badges">
+                    <span class="badge-equipo">${j.nombreEquipoReal || 'Sin equipo'}</span>
+                    <span class="badge-posicion ${j.posicion}">${j.posicion.charAt(0) + j.posicion.slice(1).toLowerCase()}</span>
+                </div>
+                ${j.nombreEquipoFantasyDueno
+                    ? `<div class="jugador-busqueda-dueno">👤 ${j.nombreEquipoFantasyDueno}</div>`
+                    : '<div class="jugador-busqueda-dueno" style="color:#aaa">Sin dueño</div>'}
+            </div>
+            <div class="jugador-busqueda-derecha">
+                <div class="jugador-valor-mercado">${formatearDineroCompleto(j.valorMercado)}</div>
+                <div class="puntos-busqueda">${j.puntosTotal} pts</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function abrirDetalleBusqueda(jugadorFantasyId) {
+    const jugador = todosJugadoresLiga.find(j => j.id === jugadorFantasyId);
+    if (!jugador) return;
+
+    const jornadas = await cargarJornadasJugador(jugadorFantasyId);
+
+    document.getElementById('detalle-icono').textContent          = ICONOS_POSICION[jugador.posicion] ?? '👤';
+    document.getElementById('detalle-nombre').textContent         = jugador.nombre;
+    document.getElementById('detalle-equipo').textContent         = jugador.nombreEquipoReal || 'Sin equipo';
+    document.getElementById('detalle-posicion-badge').textContent = jugador.posicion.charAt(0) + jugador.posicion.slice(1).toLowerCase();
+    document.getElementById('detalle-posicion-badge').className   = `badge-posicion ${jugador.posicion}`;
+    document.getElementById('detalle-puntos').textContent         = jugador.puntosTotal;
+    document.getElementById('detalle-media').textContent          = jugador.mediaPuntos?.toFixed(2) ?? '0.00';
+    document.getElementById('detalle-valor').textContent          = formatearDineroCompleto(jugador.valorMercado);
+
+    window._jornadasDetalle      = jornadas;
+    window._jornadaDetalleActual = jornadas.length > 0 ? jornadas.length - 1 : 0;
+    window._jugadorDetalleActual = jugador;
+
+    if (jornadas.length === 0) {
+        document.getElementById('detalle-jornada-label').textContent  = 'Sin jornadas';
+        document.getElementById('detalle-jornada-puntos').textContent = '—';
+        document.getElementById('detalle-stats-tabla').innerHTML      =
+            '<div class="sin-datos">Sin jornadas jugadas todavía</div>';
+    } else {
+        renderizarJornadaDetalle();
+    }
+
+    document.getElementById('modal-detalle-jugador').classList.remove('hidden');
 }

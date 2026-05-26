@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import com.ligainternaetsiinf.dto.JugadorFantasyDetalleResponse;
 import com.ligainternaetsiinf.dto.JugadorFantasyResponse;
 import com.ligainternaetsiinf.model.JugadorFantasy;
 import com.ligainternaetsiinf.service.JugadorFantasyService;
@@ -61,6 +62,11 @@ public class JugadorFantasyController {
             @RequestParam Integer equipoCompradorId){
 
         return jugadorFantasyService.ejecutarClausulazo(jugadorId, equipoCompradorId);
+    }
+
+    @GetMapping("/liga/{ligaId}/todos")
+    public List<JugadorFantasyDetalleResponse> todosJugadoresDeLiga(@PathVariable Integer ligaId) {
+        return jugadorFantasyService.obtenerTodosJugadoresDeLiga(ligaId);
     }
 
 }

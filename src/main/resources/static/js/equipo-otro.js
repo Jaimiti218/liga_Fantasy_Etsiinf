@@ -109,7 +109,9 @@ async function renderizarPlantillaOtro() {
 
         const jornadasHtml = ultimas5.map(jorn => {
             if (!jorn) return `<div class="jornada-mini jornada-vacia">—</div>`;
-            const color = jorn.puntos >= 8 ? 'alta' : jorn.puntos >= 4 ? 'media' : 'baja';
+            const color = !jorn.jugo ? 'vacia'
+                : jorn.puntos < 0 ? 'baja'
+                : 'alta';
             return `<div class="jornada-mini jornada-${color}">
                 J${jorn.jornada}<br><strong>${jorn.jugo ? jorn.puntos : '—'}</strong>
             </div>`;
@@ -319,30 +321,35 @@ function cambiarJornada(delta) {
     renderizarPuntosOtro();
 }
 
-function renderizarCampoPuntos(campo, datos, formacion) {
+function renderizarCampoPuntos(campo, datos, formacion) {  // ← añadir formacion
     campo.innerHTML = '';
-    const lineas   = formacion.split('-').map(Number);
+    const lineas   = parsearFormacion(formacion);          // ← ahora usa el parámetro
     const portero  = datos.find(j => j.posicion === 'PORTERO');
     const defensas = datos.filter(j => j.posicion === 'DEFENSA');
     const medios   = datos.filter(j => j.posicion === 'MEDIOCENTRO');
     const delant   = datos.filter(j => j.posicion === 'DELANTERO');
 
-    const lPortero = document.createElement('div');
-    lPortero.className = 'linea-campo';
-    if (portero) lPortero.appendChild(crearCartaPuntos(portero));
-    campo.appendChild(lPortero);
+    const lineaPortero = document.createElement('div');
+    lineaPortero.className = 'linea-campo';
+    if (portero) lineaPortero.appendChild(crearCartaPuntos(portero));
+    campo.appendChild(lineaPortero);
 
     [defensas, medios, delant].forEach((grupo, idx) => {
-        const linea = document.createElement('div');
+        const cantidad = lineas[idx] ?? 0;
+        const linea    = document.createElement('div');
         linea.className = 'linea-campo';
-        grupo.slice(0, lineas[idx] ?? 0).forEach(j => linea.appendChild(crearCartaPuntos(j)));
+        grupo.slice(0, cantidad).forEach(j => linea.appendChild(crearCartaPuntos(j)));
         campo.appendChild(linea);
     });
 }
 
+function parsearFormacion(f) { return f.split('-').map(Number); }
+
+
 function crearCartaPuntos(jugador) {
     const carta = document.createElement('div');
-    carta.className = 'carta-jugador';
+    const haPuntuado = jugador.jugo && jugador.puntos !== undefined;
+    carta.className = 'carta-jugador' + (haPuntuado ? ' carta-puntuada' : '');
     carta.style.cursor = 'pointer';
     carta.onclick = () => {
         const jf = plantillaOtro.find(j => j.nombre === jugador.nombre);
@@ -399,22 +406,87 @@ async function abrirDetalleJugador(jugadorFantasyId) {
 function renderizarJornadaDetalle() {
     const jornadas = window._jornadasDetalle;
     const jugador  = window._jugadorDetalleActual;
-    const jorn     = jornadas[window._jornadaDetalleActual];
+    const idx      = window._jornadaDetalleActual;
+    const jorn     = jornadas[idx];
 
     document.getElementById('detalle-jornada-label').textContent  = `Jornada ${jorn.jornada}`;
     document.getElementById('detalle-jornada-puntos').textContent = jorn.jugo ? jorn.puntos : '—';
 
-    const stats     = document.getElementById('detalle-stats-tabla');
-    const esPortero = jugador?.posicion === 'PORTERO';
+    const stats = document.getElementById('detalle-stats-tabla');
+    if (!jorn.jugo) {
+        stats.innerHTML = '<div class="sin-datos">No jugó en esta jornada</div>';
+        return;
+    }
 
-    if (!jorn.jugo) { stats.innerHTML = '<div class="sin-datos">No jugó</div>'; return; }
+    // Usar posición jugada en este partido (puede diferir de la habitual)
+    const posicion = jorn.posicionJugada ?? jugador?.posicion;
+    const posicionDefecto = jorn.posicionDefecto ?? jugador?.posicion;
+    const jugoBenOtraPosicion = posicion && posicionDefecto && posicion !== posicionDefecto;
+
+    const ptsGol = (posicion === 'PORTERO' || posicion === 'DEFENSA') ? 6
+                 : posicion === 'MEDIOCENTRO' ? 5 : 4;
+
+    const gc = jorn.golesEncajados ?? 0;
+    let ptsPorteria = 0;
+    let labelPorteria = '';
+    if (posicion === 'PORTERO') {
+        ptsPorteria = 7 - gc;
+        labelPorteria = gc === 0 ? 'Portería a cero' : `Portería (${gc} gol${gc > 1 ? 'es' : ''} encajado${gc > 1 ? 's' : ''})`;
+    } else if (posicion === 'DEFENSA') {
+        ptsPorteria = 5 - Math.floor(gc / 2);
+        labelPorteria = gc === 0 ? 'Defensa sin encajar' : `Defensa (${gc} gol${gc > 1 ? 'es' : ''} encajado${gc > 1 ? 's' : ''})`;
+    } else if (posicion === 'MEDIOCENTRO') {
+        ptsPorteria = 2 - Math.floor(gc / 3);
+        labelPorteria = `Mediocampo (${gc} gol${gc > 1 ? 'es' : ''} encajado${gc > 1 ? 's' : ''})`;
+    } else if (posicion === 'DELANTERO') {
+        ptsPorteria = 1 - Math.floor(gc / 4);
+        labelPorteria = `Delantero (${gc} gol${gc > 1 ? 'es' : ''} encajado${gc > 1 ? 's' : ''})`;
+    }
+
+    const esPortero = posicion === 'PORTERO';
+
+    const avisoPosicion = jugoBenOtraPosicion
+        ? `<div class="stat-aviso">⚠️ Jugó como: ${posicion.charAt(0) + posicion.slice(1).toLowerCase()}</div>`
+        : '';
 
     stats.innerHTML = `
-        <div class="stat-fila"><span class="stat-cantidad">${jorn.goles}</span><span class="stat-nombre">Goles</span><span class="stat-puntos ${jorn.goles > 0 ? 'positivo' : 'neutro'}">${jorn.goles * 4}</span></div>
-        <div class="stat-fila"><span class="stat-cantidad">${jorn.asistencias}</span><span class="stat-nombre">Asistencias</span><span class="stat-puntos ${jorn.asistencias > 0 ? 'positivo' : 'neutro'}">${jorn.asistencias * 2}</span></div>
-        <div class="stat-fila"><span class="stat-cantidad">${jorn.tarjetasAmarillas}</span><span class="stat-nombre">T. Amarillas</span><span class="stat-puntos ${jorn.tarjetasAmarillas > 0 ? 'negativo' : 'neutro'}">${jorn.tarjetasAmarillas * -1}</span></div>
-        <div class="stat-fila"><span class="stat-cantidad">${jorn.tarjetasRojas}</span><span class="stat-nombre">T. Rojas</span><span class="stat-puntos ${jorn.tarjetasRojas > 0 ? 'negativo' : 'neutro'}">${jorn.tarjetasRojas * -3}</span></div>
-        ${esPortero ? `<div class="stat-fila"><span class="stat-cantidad">${jorn.paradas}</span><span class="stat-nombre">Paradas</span><span class="stat-puntos ${jorn.paradas > 0 ? 'positivo' : 'neutro'}">${jorn.paradas}</span></div>` : ''}
+        ${avisoPosicion}
+        <div class="stat-fila">
+            <span class="stat-cantidad">1</span>
+            <span class="stat-nombre">Jugar el partido</span>
+            <span class="stat-puntos positivo">+2</span>
+        </div>
+        <div class="stat-fila">
+            <span class="stat-cantidad">${gc}</span>
+            <span class="stat-nombre">${labelPorteria}</span>
+            <span class="stat-puntos ${ptsPorteria >= 0 ? 'positivo' : 'negativo'}">${ptsPorteria >= 0 ? '+' : ''}${ptsPorteria}</span>
+        </div>
+        <div class="stat-fila">
+            <span class="stat-cantidad">${jorn.goles}</span>
+            <span class="stat-nombre">Goles</span>
+            <span class="stat-puntos ${jorn.goles > 0 ? 'positivo' : 'neutro'}">${jorn.goles > 0 ? '+' : ''}${jorn.goles * ptsGol}</span>
+        </div>
+        <div class="stat-fila">
+            <span class="stat-cantidad">${jorn.asistencias}</span>
+            <span class="stat-nombre">Asistencias</span>
+            <span class="stat-puntos ${jorn.asistencias > 0 ? 'positivo' : 'neutro'}">${jorn.asistencias > 0 ? '+' : ''}${jorn.asistencias * 3}</span>
+        </div>
+        <div class="stat-fila">
+            <span class="stat-cantidad">${jorn.tarjetasAmarillas}</span>
+            <span class="stat-nombre">Tarjetas amarillas</span>
+            <span class="stat-puntos ${jorn.tarjetasAmarillas > 0 ? 'negativo' : 'neutro'}">${jorn.tarjetasAmarillas * -1}</span>
+        </div>
+        <div class="stat-fila">
+            <span class="stat-cantidad">${jorn.tarjetasRojas}</span>
+            <span class="stat-nombre">Tarjetas rojas</span>
+            <span class="stat-puntos ${jorn.tarjetasRojas > 0 ? 'negativo' : 'neutro'}">${jorn.tarjetasRojas * -3}</span>
+        </div>
+        ${esPortero ? `
+        <div class="stat-fila">
+            <span class="stat-cantidad">${jorn.paradas}</span>
+            <span class="stat-nombre">Paradas</span>
+            <span class="stat-puntos ${jorn.paradas > 0 ? 'positivo' : 'neutro'}">${jorn.paradas > 0 ? '+' : ''}${jorn.paradas}</span>
+        </div>` : ''}
     `;
 }
 

@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ligainternaetsiinf.dto.JugadorFantasyDetalleResponse;
 import com.ligainternaetsiinf.dto.JugadorFantasyResponse;
 import com.ligainternaetsiinf.model.EquipoFantasy;
 import com.ligainternaetsiinf.model.Jugador;
@@ -62,6 +63,29 @@ public class JugadorFantasyService {
                 .orElseThrow(() -> new RuntimeException("Jugador fantasy no encontrado"));
 
         return cambioTipoRespuesta(jugador);
+    }
+
+    public List<JugadorFantasyDetalleResponse> obtenerTodosJugadoresDeLiga(Integer ligaId) {
+        List<JugadorFantasy> jugadores = jugadorFantasyRepository.findByLigaFantasyId(ligaId);
+        List<JugadorFantasyDetalleResponse> resultado = new ArrayList<>();
+        for (JugadorFantasy jf : jugadores) {
+            Jugador jr = jf.getJugadorReal();
+            int partidosJugados = jr.getPartidosJugados();
+            double media = partidosJugados > 0 ? (double) jr.getPuntosFantasy() / partidosJugados : 0.0;
+            String nombreEquipo = jr.getEquipo() != null ? jr.getEquipo().getName() : null;
+            String dueno = jf.getEquipoFantasy() != null
+                ? jf.getEquipoFantasy().getUser().getUsername() : null;
+            Integer userIdDueno = jf.getEquipoFantasy() != null
+                ? jf.getEquipoFantasy().getUser().getId() : null;
+            resultado.add(new JugadorFantasyDetalleResponse(
+                jf.getId(), jr.getId(), jr.getFullName(), jr.getPosicion(),
+                jr.getValorMercado(), nombreEquipo, jr.getPuntosFantasy(),
+                media, partidosJugados, jf.getClausula(),
+                jf.getClausulaBloqueadaHasta(), jf.isAlineado(),
+                dueno, userIdDueno, jf.isEnVenta()
+            ));
+        }
+        return resultado;
     }
 
 

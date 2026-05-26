@@ -19,6 +19,7 @@ public class Equipo {
     private int golesAFavor;
     private int golesEnContra;
     private int diferenciaDeGoles;
+    private int partidosJugados;
 
     public Equipo(){}
 
@@ -57,6 +58,13 @@ public class Equipo {
 
     public void setDiferenciaDeGoles(int diferenciaDeGoles){
         this.diferenciaDeGoles = diferenciaDeGoles;
+    }
+
+    public int getPartidosJugados(){
+        return partidosJugados;
+    }
+    public void setPartidosJugados(int partidosJugados){
+        this.partidosJugados = partidosJugados;
     }
 }
 

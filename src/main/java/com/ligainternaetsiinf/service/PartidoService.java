@@ -52,15 +52,12 @@ public class PartidoService {
             throw new RuntimeException("Un equipo no puede jugar contra sí mismo");
         }
 
+        // Validar que ninguno de los dos equipos juega ya en esta jornada
+        validarEquiposEnJornada(request.getEquipoLocalId(), request.getEquipoVisitanteId(),
+            request.getJornada(), null);
+
         Partido partido = new Partido(local, visitante, request.getFecha(), request.getJornada());
         partidoRepository.save(partido);
-
-        // Programar el registro de alineaciones para cuando empiece este partido SOLO SI ES EL PRIMERO DE LA JORNADA
-        if(request.getEsPrimero()){
-            programarRegistroAlineaciones(partido);
-        }
-        
-
         return toResponse(partido);
     }
 
@@ -68,13 +65,38 @@ public class PartidoService {
         Partido partido = partidoRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Partido no encontrado"));
 
-        if (request.getFecha() != null) {
-            partido.setFecha(request.getFecha());
-        }
-        if (request.getJornada() != null) partido.setJornada(request.getJornada());
+        Equipo local = equipoRepository.findById(request.getEquipoLocalId())
+            .orElseThrow(() -> new RuntimeException("Equipo local no encontrado"));
+        Equipo visitante = equipoRepository.findById(request.getEquipoVisitanteId())
+            .orElseThrow(() -> new RuntimeException("Equipo visitante no encontrado"));
 
+        if (local.getId().equals(visitante.getId())) {
+            throw new RuntimeException("Un equipo no puede jugar contra sí mismo");
+        }
+
+        validarEquiposEnJornada(request.getEquipoLocalId(), request.getEquipoVisitanteId(),
+            request.getJornada(), id);
+
+        partido.setEquipoLocal(local);
+        partido.setEquipoVisitante(visitante);
+        partido.setFecha(request.getFecha());
+        partido.setJornada(request.getJornada());
         partidoRepository.save(partido);
         return toResponse(partido);
+    }
+
+    private void validarEquiposEnJornada(Integer localId, Integer visitanteId,
+            Integer jornada, Integer partidoIdExcluir) {
+        List<Partido> partidos = partidoRepository.findByJornada(jornada);
+        for (Partido p : partidos) {
+            if (partidoIdExcluir != null && p.getId().equals(partidoIdExcluir)) continue;
+            if (p.getEquipoLocal().getId().equals(localId) ||
+                p.getEquipoLocal().getId().equals(visitanteId) ||
+                p.getEquipoVisitante().getId().equals(localId) ||
+                p.getEquipoVisitante().getId().equals(visitanteId)) {
+                throw new RuntimeException("Uno de los equipos ya tiene partido en esta jornada");
+            }
+        }
     }
 
     public void eliminarPartido(Integer id) {
@@ -111,6 +133,33 @@ public class PartidoService {
         partido.setJugado(true);
         partidoRepository.save(partido);
 
+
+        // Actualizar estadísticas del equipo local
+        Equipo equipoLocal = partido.getEquipoLocal();
+        equipoLocal.setGolesAFavor(equipoLocal.getGolesAFavor() + request.getGolesLocal());
+        equipoLocal.setGolesEnContra(equipoLocal.getGolesEnContra() + request.getGolesVisitante());
+        equipoLocal.setDiferenciaDeGoles(equipoLocal.getGolesAFavor() - equipoLocal.getGolesEnContra());
+        equipoLocal.setPartidosJugados(equipoLocal.getPartidosJugados() + 1);
+        if (request.getGolesLocal() > request.getGolesVisitante())
+            equipoLocal.setPuntos(equipoLocal.getPuntos() + 3);
+        else if (request.getGolesLocal().equals(request.getGolesVisitante()))
+            equipoLocal.setPuntos(equipoLocal.getPuntos() + 1);
+        equipoRepository.save(equipoLocal);
+
+        // Actualizar estadísticas del equipo visitante
+        Equipo equipoVisitante = partido.getEquipoVisitante();
+        equipoVisitante.setGolesAFavor(equipoVisitante.getGolesAFavor() + request.getGolesVisitante());
+        equipoVisitante.setGolesEnContra(equipoVisitante.getGolesEnContra() + request.getGolesLocal());
+        equipoVisitante.setDiferenciaDeGoles(equipoVisitante.getGolesAFavor() - equipoVisitante.getGolesEnContra());
+        equipoVisitante.setPartidosJugados(equipoVisitante.getPartidosJugados() + 1);
+        if (request.getGolesVisitante() > request.getGolesLocal())
+            equipoVisitante.setPuntos(equipoVisitante.getPuntos() + 3);
+        else if (request.getGolesVisitante().equals(request.getGolesLocal()))
+            equipoVisitante.setPuntos(equipoVisitante.getPuntos() + 1);
+        equipoRepository.save(equipoVisitante);
+
+
+
         // Guardar estadísticas de cada jugador
         for (ResultadoRequest.EstadisticaJugadorRequest stat : request.getEstadisticas()) {
             if (!stat.isJugo()) continue;
@@ -118,8 +167,12 @@ public class PartidoService {
             Jugador jugador = jugadorRepository.findById(stat.getJugadorId())
                 .orElseThrow(() -> new RuntimeException("Jugador no encontrado: " + stat.getJugadorId()));
 
+            
+            String posicionUsada = (stat.getPosicionPartido() != null && !stat.getPosicionPartido().isBlank())
+                ? stat.getPosicionPartido()
+                : jugador.getPosicion();
             // Calcular puntos de este jugador en este partido
-            int puntos = calcularPuntosJugador(jugador.getPosicion(), stat,
+            int puntos = calcularPuntosJugador(posicionUsada, stat,
                 request.getGolesLocal(), request.getGolesVisitante(), partido);
 
             // Guardar/actualizar estadísticas del partido
@@ -134,6 +187,7 @@ public class PartidoService {
             estadistica.setTarjetasRojas(stat.getTarjetasRojas());
             estadistica.setParadas(stat.getParadas());
             estadistica.setPuntosObtenidos(puntos);
+            estadistica.setPosicionJugada(posicionUsada);
             estadisticasRepository.save(estadistica);
 
             // Actualizar estadísticas acumuladas del jugador real

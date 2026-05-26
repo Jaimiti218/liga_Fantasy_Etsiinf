@@ -12,7 +12,9 @@ import java.util.Optional;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -45,6 +47,9 @@ public class MercadoService {
     @Autowired private PujaRepository pujaRepository;
     @Autowired private NoticiaFantasyService noticiaService;
     @Autowired private TaskScheduler taskScheduler;
+    @Autowired
+    @Lazy
+    private MercadoService self;
 
     // ─── Al arrancar: resolver vencidas y reprogramar futuras ─────────────────
    /*  @EventListener(ApplicationReadyEvent.class)
@@ -415,8 +420,18 @@ public class MercadoService {
     }
 
     // ─── Resolver instancia ───────────────────────────────────────────────────
-    private void resolverInstancia(InstanciaMercado instancia) {
+    @Transactional
+    public void resolverInstancia(Integer instanciaId) {
+        
+        InstanciaMercado instancia = instanciaRepository.findById(instanciaId)
+        .orElseThrow(() -> new RuntimeException("Instancia no encontrada"));
+    
         for (JugadorFantasy jugador : instancia.getJugadoresDisponibles()) {
+            // Solo resolver automáticamente jugadores SIN equipo
+            // Los jugadores con equipo (en venta) los decide el vendedor manualmente
+            if (jugador.getEquipoFantasy() != null) continue;
+
+
             List<Puja> pujas = pujaRepository
                 .findByJugadorFantasyAndInstancia(jugador, instancia)
                 .stream().filter(p -> !p.isResuelta()).toList();
@@ -502,6 +517,17 @@ public class MercadoService {
     }
 
     private void generarOfertaSistemaParaJugador(JugadorFantasy jugador) {
+        // Eliminar oferta anterior del sistema pendiente para este jugador
+        List<Puja> ofertasAnteriores = pujaRepository
+            .findByJugadorFantasyAndResueltaFalse(jugador)
+            .stream()
+            .filter(p -> p.getEquipoComprador() == null)
+            .toList();
+        for (Puja p : ofertasAnteriores) {
+            pujaRepository.delete(p);
+        }
+
+
         long valor   = jugador.getJugadorReal().getValorMercado();
         double factor = 0.9 + (new Random().nextDouble() * 0.2);
         long cantidad = (long)(valor * factor);
@@ -509,8 +535,10 @@ public class MercadoService {
         pujaRepository.save(oferta);
     }
 
-    // ─── Crear nueva instancia ────────────────────────────────────────────────
-    private void crearNuevaInstancia(InstanciaMercado anterior) {
+    @Transactional
+    public void crearNuevaInstancia(Integer instanciaId) {
+        InstanciaMercado anterior = instanciaRepository.findById(instanciaId)
+            .orElseThrow(() -> new RuntimeException("Instancia no encontrada"));
         LigaFantasy liga = anterior.getMercado().getLiga();
         List<JugadorFantasy> nuevos = obtenerJugadoresParaMercado(liga);
         InstanciaMercado nueva = new InstanciaMercado(anterior.getMercado(), nuevos);
@@ -524,11 +552,8 @@ public class MercadoService {
             .atZone(ZoneId.systemDefault()).toInstant();
         Integer instanciaId = instancia.getId();
         taskScheduler.schedule(() -> {
-            InstanciaMercado inst = instanciaRepository.findById(instanciaId).orElse(null);
-            if (inst != null && !inst.isResuelta()) {
-                resolverInstancia(inst);
-                crearNuevaInstancia(inst);
-            }
+            self.resolverInstancia(instanciaId);
+            self.crearNuevaInstancia(instanciaId);
         }, fechaCierre);
     }
 

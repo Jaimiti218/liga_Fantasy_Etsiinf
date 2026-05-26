@@ -309,7 +309,9 @@ async function renderizarPlantilla() {
 
         const jornadasHtml = ultimas5.map(jorn => {
             if (!jorn) return `<div class="jornada-mini jornada-vacia">—</div>`;
-            const color = jorn.puntos >= 8 ? 'alta' : jorn.puntos >= 4 ? 'media' : 'baja';
+            const color = !jorn.jugo ? 'vacia'
+                : jorn.puntos < 0 ? 'baja'
+                : 'alta';
             return `<div class="jornada-mini jornada-${color}" onclick="event.stopPropagation(); abrirDetalleJugador(${j.id})">
                 J${jorn.jornada}<br><strong>${jorn.jugo ? jorn.puntos : '—'}</strong>
             </div>`;
@@ -549,17 +551,58 @@ function renderizarJornadaDetalle() {
         return;
     }
 
-    const esPortero = jugador?.posicion === 'PORTERO';
+    // Usar posición jugada en este partido (puede diferir de la habitual)
+    const posicion = jorn.posicionJugada ?? jugador?.posicion;
+    const posicionDefecto = jorn.posicionDefecto ?? jugador?.posicion;
+    const jugoBenOtraPosicion = posicion && posicionDefecto && posicion !== posicionDefecto;
+
+    const ptsGol = (posicion === 'PORTERO' || posicion === 'DEFENSA') ? 6
+                 : posicion === 'MEDIOCENTRO' ? 5 : 4;
+
+    const gc = jorn.golesEncajados ?? 0;
+    let ptsPorteria = 0;
+    let labelPorteria = '';
+    if (posicion === 'PORTERO') {
+        ptsPorteria = 7 - gc;
+        labelPorteria = gc === 0 ? 'Portería a cero' : `Portería (${gc} gol${gc > 1 ? 'es' : ''} encajado${gc > 1 ? 's' : ''})`;
+    } else if (posicion === 'DEFENSA') {
+        ptsPorteria = 5 - Math.floor(gc / 2);
+        labelPorteria = gc === 0 ? 'Defensa sin encajar' : `Defensa (${gc} gol${gc > 1 ? 'es' : ''} encajado${gc > 1 ? 's' : ''})`;
+    } else if (posicion === 'MEDIOCENTRO') {
+        ptsPorteria = 2 - Math.floor(gc / 3);
+        labelPorteria = `Mediocampo (${gc} gol${gc > 1 ? 'es' : ''} encajado${gc > 1 ? 's' : ''})`;
+    } else if (posicion === 'DELANTERO') {
+        ptsPorteria = 1 - Math.floor(gc / 4);
+        labelPorteria = `Delantero (${gc} gol${gc > 1 ? 'es' : ''} encajado${gc > 1 ? 's' : ''})`;
+    }
+
+    const esPortero = posicion === 'PORTERO';
+
+    const avisoPosicion = jugoBenOtraPosicion
+        ? `<div class="stat-aviso">⚠️ Jugó como: ${posicion.charAt(0) + posicion.slice(1).toLowerCase()}</div>`
+        : '';
+
     stats.innerHTML = `
+        ${avisoPosicion}
+        <div class="stat-fila">
+            <span class="stat-cantidad">1</span>
+            <span class="stat-nombre">Jugar el partido</span>
+            <span class="stat-puntos positivo">+2</span>
+        </div>
+        <div class="stat-fila">
+            <span class="stat-cantidad">${gc}</span>
+            <span class="stat-nombre">${labelPorteria}</span>
+            <span class="stat-puntos ${ptsPorteria >= 0 ? 'positivo' : 'negativo'}">${ptsPorteria >= 0 ? '+' : ''}${ptsPorteria}</span>
+        </div>
         <div class="stat-fila">
             <span class="stat-cantidad">${jorn.goles}</span>
             <span class="stat-nombre">Goles</span>
-            <span class="stat-puntos ${jorn.goles > 0 ? 'positivo' : 'neutro'}">${jorn.goles * 4}</span>
+            <span class="stat-puntos ${jorn.goles > 0 ? 'positivo' : 'neutro'}">${jorn.goles > 0 ? '+' : ''}${jorn.goles * ptsGol}</span>
         </div>
         <div class="stat-fila">
             <span class="stat-cantidad">${jorn.asistencias}</span>
             <span class="stat-nombre">Asistencias</span>
-            <span class="stat-puntos ${jorn.asistencias > 0 ? 'positivo' : 'neutro'}">${jorn.asistencias * 2}</span>
+            <span class="stat-puntos ${jorn.asistencias > 0 ? 'positivo' : 'neutro'}">${jorn.asistencias > 0 ? '+' : ''}${jorn.asistencias * 3}</span>
         </div>
         <div class="stat-fila">
             <span class="stat-cantidad">${jorn.tarjetasAmarillas}</span>
@@ -575,7 +618,7 @@ function renderizarJornadaDetalle() {
         <div class="stat-fila">
             <span class="stat-cantidad">${jorn.paradas}</span>
             <span class="stat-nombre">Paradas</span>
-            <span class="stat-puntos ${jorn.paradas > 0 ? 'positivo' : 'neutro'}">${jorn.paradas}</span>
+            <span class="stat-puntos ${jorn.paradas > 0 ? 'positivo' : 'neutro'}">${jorn.paradas > 0 ? '+' : ''}${jorn.paradas}</span>
         </div>` : ''}
     `;
 }
@@ -597,6 +640,10 @@ async function renderizarPuntos() {
     const campo = document.getElementById('campo-puntos');
     campo.innerHTML = '<div style="color:rgba(255,255,255,0.7);text-align:center;padding:2rem">Cargando...</div>';
 
+    // Limpiar puntuación total
+    let totalEl = document.getElementById('puntos-jornada-total');
+    if (totalEl) totalEl.textContent = '';
+
     try {
         const res = await fetch(`/equipos-fantasy/${equipoId}/puntos/jornada/${jornadaActual}/info`, {
             credentials: 'include'
@@ -614,12 +661,23 @@ async function renderizarPuntos() {
             return;
         }
 
-        // Usar la formación guardada para esa jornada, no la actual
+        // Mostrar aviso si no puntúa
+        if (datos.puntua === false) {
+            const aviso = document.createElement('div');
+            aviso.style.cssText = 'text-align:center;color:#f39c12;font-size:0.85rem;font-weight:600;margin-bottom:0.5rem;padding:0.5rem;background:rgba(243,156,18,0.15);border-radius:8px';
+            aviso.textContent = '⚠️ Esta jornada no puntúas (alineación incompleta o saldo negativo)';
+            campo.appendChild(aviso);
+        }
+
+        // Calcular y mostrar puntuación total
+        const total = datos.jugadores.reduce((sum, j) => sum + (j.jugo ? j.puntos : 0), 0);
+        if (totalEl) totalEl.textContent = `${total} pts`;
+
         const formacionJornada = datos.formacion || formacionActual;
         renderizarCampoPuntos(campo, datos.jugadores, formacionJornada);
 
     } catch (e) {
-        campo.innerHTML = '<div style="color:rgba(255,255,255,0.7);text-align:center;padding:2rem">Error al cargar</div>';
+        campo.innerHTML = '<div style="color:rgba(255,255,255,0.7);text-align:center;padding:2rem\">Error al cargar</div>';
     }
 }
 
@@ -647,7 +705,8 @@ function renderizarCampoPuntos(campo, datos, formacion) {  // ← añadir formac
 
 function crearCartaPuntos(jugador) {
     const carta = document.createElement('div');
-    carta.className = 'carta-jugador';
+    const haPuntuado = jugador.jugo && jugador.puntos !== undefined;
+    carta.className = 'carta-jugador' + (haPuntuado ? ' carta-puntuada' : '');
     carta.style.cursor = 'pointer';
     carta.onclick = () => {
         const jf = plantillaData.find(j => j.nombre === jugador.nombre);

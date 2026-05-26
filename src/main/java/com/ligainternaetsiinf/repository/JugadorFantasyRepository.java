@@ -1,6 +1,9 @@
 package com.ligainternaetsiinf.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
 import com.ligainternaetsiinf.model.JugadorFantasy;
 import com.ligainternaetsiinf.model.LigaFantasy;
 
@@ -24,5 +27,12 @@ public interface JugadorFantasyRepository extends JpaRepository<JugadorFantasy, 
     List<JugadorFantasy> findByLigaFantasyIdAndEnVentaTrue(Integer ligaId);
 
     List<JugadorFantasy> findByEquipoFantasyIdAndEnVentaTrue(Integer equipoId);
+
+    @Query("SELECT jf FROM JugadorFantasy jf WHERE jf.ligaFantasy.id = :ligaId " +
+        "AND jf.equipoFantasy IS NULL " +
+        "AND jf NOT IN " +
+        "(SELECT j FROM InstanciaMercado im JOIN im.jugadoresDisponibles j " +
+        "WHERE im.mercado.ligaFantasy.id = :ligaId AND im.resuelta = false)")
+    List<JugadorFantasy> findDisponiblesParaAsignacion(@Param("ligaId") Integer ligaId);
 
 }

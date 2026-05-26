@@ -23,6 +23,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (new URLSearchParams(window.location.search).get('perfil') === '1' && usuarioActual) {
         setTimeout(() => abrirMenuPerfil(), 300);
     }
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('seccion') === 'partidos') {
+        setTimeout(() => cambiarSeccion('partidos'), 100);
+    }
 });
 
 function manejarSesion() {
@@ -242,7 +246,7 @@ async function cargarClasificacion() {
 async function cargarPartidos() {
     const wrap = document.getElementById('lista-partidos-wrap');
     try {
-        const res     = await fetch('/partidos');
+        const res = await fetch('/partidos');
         const partidos = await res.json();
 
         if (partidos.length === 0) {
@@ -250,7 +254,6 @@ async function cargarPartidos() {
             return;
         }
 
-        // Agrupar por jornada
         const porJornada = {};
         partidos.forEach(p => {
             const j = p.jornada ?? 0;
@@ -264,21 +267,24 @@ async function cargarPartidos() {
                 <div class="jornada-grupo">
                     <div class="jornada-titulo">Jornada ${jornada}</div>
                     ${porJornada[jornada].map(p => {
-                        const fecha = p.fecha
+                        const fechaStr = p.fecha
                             ? new Date(p.fecha).toLocaleDateString('es-ES', {
-                                day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
+                                day: '2-digit', month: 'short',
+                                hour: '2-digit', minute: '2-digit'
                               })
                             : 'Sin fecha';
-                        const resultado = p.jugado
+                        const resultadoHtml = p.jugado
                             ? `<span class="resultado-badge">${p.golesLocal} - ${p.golesVisitante}</span>`
-                            : `<span class="fecha-badge">${fecha}</span>`;
-                        const clickable = p.jugado ? `onclick="verEstadisticasPartido(${p.id}, '${p.equipoLocalNombre} vs ${p.equipoVisitanteNombre}')"` : '';
+                            : '';
+                        const clickable = p.jugado
+                            ? `onclick="verEstadisticasPartido(${p.id}, '${p.equipoLocalNombre} vs ${p.equipoVisitanteNombre}')"` 
+                            : '';
                         return `
                         <div class="partido-card ${p.jugado ? 'jugado' : 'pendiente'}" ${clickable}>
                             <div class="partido-equipos">
-                                <span class="equipo-local">${p.equipoLocalNombre}</span>
-                                <div class="partido-centro">${resultado}</div>
-                                <span class="equipo-visitante">${p.equipoVisitanteNombre}</span>
+                                <span class="partido-nombres">${p.equipoLocalNombre} 🆚 ${p.equipoVisitanteNombre}</span>
+                                <span class="partido-fecha-admin">${fechaStr}</span>
+                                ${resultadoHtml}
                             </div>
                             ${p.jugado ? '<div class="ver-stats">Ver estadísticas →</div>' : ''}
                         </div>`;

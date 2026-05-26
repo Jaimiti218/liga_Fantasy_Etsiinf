@@ -62,5 +62,9 @@ public class LigaFantasy {
 
     public List<EquipoFantasy> getEquipos(){ return equipos; }
 
+    public Mercado getMercado(){
+        return mercado;
+    }
+
 
 }

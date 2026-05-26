@@ -196,6 +196,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    overflow: visible
 }
 
 .cargando-ligas {
@@ -218,6 +219,42 @@ body {
     transition: transform 0.15s, box-shadow 0.15s;
     position: relative;
 }
+
+.liga-card {
+    overflow: visible;
+}
+
+.liga-card-menu {
+    position: relative;
+}
+
+.dropdown-menu {
+    position: absolute;
+    left: 100%;
+    top: 0;
+    z-index: 9999;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    min-width: 160px;
+    overflow: hidden;
+    margin-left: 8px;
+}
+
+@media (max-width: 480px) {
+    .dropdown-menu {
+        left: auto;
+        right: 100%;
+        margin-left: 0;
+        margin-right: 8px;
+    }
+}
+
+.dropdown-menu.abre-arriba {
+    top: auto;
+    bottom: 100%;
+}
+
 .liga-card:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.12); }
 
 .liga-card-info { flex: 1; }
@@ -254,9 +291,7 @@ body {
     color: #0f3460;
 }
 
-.liga-card-menu {
-    position: relative;
-}
+
 
 .btn-tres-puntos {
     background: none;
@@ -270,17 +305,7 @@ body {
 }
 .btn-tres-puntos:hover { background: #f0f0f0; color: #333; }
 
-.dropdown-menu {
-    position: fixed;
-    right: 0;
-    top: 100%;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-    min-width: 160px;
-    z-index: 10;
-    overflow: hidden;
-}
+
 
 .dropdown-item {
     padding: 0.75rem 1rem;
@@ -539,3 +564,4 @@ body {
     0%, 100% { opacity: 1; }
     50%       { opacity: 0.3; }
 }
+

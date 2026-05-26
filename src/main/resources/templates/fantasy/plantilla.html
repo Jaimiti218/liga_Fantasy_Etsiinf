@@ -28,7 +28,7 @@
         </div>
         <nav class="menu-opciones">
             <a class="menu-item" onclick="toggleMenu(); window.location.href='/fantasy/mis-ligas'">🏆 Mis Ligas</a>
-            <a class="menu-item" onclick="toggleMenu()">📅 Partidos <span class="proximamente-badge">Próximamente</span></a>
+            <a class="menu-item" onclick="toggleMenu(); window.location.href='/?seccion=partidos'">📅 Partidos</a>
             <a class="menu-item" onclick="toggleMenu(); window.location.href='/fantasy/precios'">📈 Precio Jugadores</a>
             <a class="menu-item" onclick="toggleMenu(); window.location.href='/?perfil=1'">👤 Perfil</a>
         </nav>
@@ -111,6 +111,7 @@
                 <span id="jornada-label">Jornada 1</span>
                 <button class="btn-jornada" onclick="cambiarJornada(1)">›</button>
             </div>
+            <div style="text-align:center;color:white;font-size:1.4rem;font-weight:800;margin:0.5rem 0" id="puntos-jornada-total"></div>
             <div class="campo-futbol" id="campo-puntos"></div>
         </div>
 

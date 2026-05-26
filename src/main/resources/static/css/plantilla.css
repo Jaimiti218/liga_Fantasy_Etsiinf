@@ -123,6 +123,15 @@
     position: relative;
 }
 
+.carta-jugador.carta-puntuada {
+    background: rgba(39, 174, 96, 0.85);
+    border: 2px solid #27ae60;
+}
+.carta-jugador.carta-puntuada .carta-nombre,
+.carta-jugador.carta-puntuada .carta-puntos-jornada {
+    color: white;
+}
+
 .carta-jugador:hover {
     transform: translateY(-3px);
     box-shadow: 0 4px 16px rgba(0,0,0,0.3);
@@ -748,4 +757,14 @@
     border-radius: 6px;
     margin-top: 0.2rem;
     display: inline-block;
+}
+
+.stat-aviso {
+    background: #fff3cd;
+    color: #856404;
+    border-radius: 6px;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
 }

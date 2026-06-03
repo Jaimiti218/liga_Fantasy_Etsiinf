@@ -9,7 +9,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -42,9 +42,25 @@ public class UserController {
     private AuthenticationManager authenticationManager;
 
     @PostMapping("/register")
-    public UserResponse register(@RequestBody RegisterRequest user){
+    public LoginResponse register(@RequestBody RegisterRequest user, HttpServletRequest request) {
+        userService.registerUser(user.getEmail(), user.getUsername(), user.getPassword());
         
-        return userService.registerUser(user.getEmail(),user.getUsername(), user.getPassword());
+        // Login automático tras registro
+        Authentication authentication = authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword())
+        );
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+        request.getSession(true).setAttribute(
+            HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context
+        );
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        return new LoginResponse(
+            userDetails.getId(),
+            userDetails.getUsername(),
+            userDetails.getAuthorities().iterator().next().getAuthority()
+        );
     }
 
     @PostMapping("/login")

@@ -48,10 +48,11 @@ async function cargarInfoEquipoOtro() {
         });
         if (!res.ok) return;
         const equipo = await res.json();
+        const valorPlantilla = equipo.valorPlantilla ?? 0;
 
         document.getElementById('perfil-nombre').textContent = equipo.userNombre;
         document.getElementById('perfil-puntos').textContent = equipo.puntos + ' pts';
-        document.getElementById('perfil-dinero').textContent = formatearDinero(equipo.dinero);
+        document.getElementById('perfil-dinero').textContent = formatearDinero(valorPlantilla) + ' valor plantilla';
 
         const avatarEl = document.getElementById('perfil-avatar');
         if (equipo.fotoPerfil) {

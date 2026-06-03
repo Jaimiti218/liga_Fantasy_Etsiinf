@@ -573,7 +573,7 @@
 }
 .jornada-mini:hover     { transform: translateY(-2px); }
 .jornada-mini.jornada-alta  { background: #27ae60; }
-.jornada-mini.jornada-media { background: #f39c12; }
+.jornada-mini.jornada-media { background: #27ae60; }
 .jornada-mini.jornada-baja  { background: #e74c3c; }
 .jornada-mini.jornada-vacia { background: #ddd; color: #999; }
 

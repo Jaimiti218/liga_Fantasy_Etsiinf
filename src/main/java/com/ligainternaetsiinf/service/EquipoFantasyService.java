@@ -89,11 +89,14 @@ public class EquipoFantasyService {
         List<ClasificacionResponse> resultado = new ArrayList<>();
 
         for(EquipoFantasy ef : equipos){
+            long valorPlantilla = ef.getJugadores().stream()
+                .mapToLong(jf -> jf.getJugadorReal().getValorMercado())
+                .sum();
             resultado.add(new ClasificacionResponse(
                 ef.getId(),
                 ef.getUser().getUsername(),
                 ef.getPuntos(),
-                ef.getUser().getFotoPerfil()
+                ef.getUser().getFotoPerfil(), valorPlantilla
             ));
         }
 
@@ -349,9 +352,11 @@ public class EquipoFantasyService {
     private EquipoFantasyResponse cambiarTipoRespuesta(EquipoFantasy equipo){
 
         List<String> jugadores = new ArrayList<>();
+        long valorPlantilla = 0;
 
         for(JugadorFantasy jf : equipo.getJugadores()){
             jugadores.add(jf.getJugadorReal().getFullName());
+            valorPlantilla += jf.getJugadorReal().getValorMercado();
         }
 
         return new EquipoFantasyResponse(
@@ -364,7 +369,8 @@ public class EquipoFantasyService {
                 equipo.getPuntos(),
                 jugadores,
                 equipo.getFormacion(),
-                equipo.getUser().getFotoPerfil()
+                equipo.getUser().getFotoPerfil(),
+                valorPlantilla
         );
     }
 }

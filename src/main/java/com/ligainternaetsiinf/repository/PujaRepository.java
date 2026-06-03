@@ -71,12 +71,7 @@ public interface PujaRepository extends JpaRepository<Puja, Integer> {
     long contarPujasActivas(@Param("jugadorId") Integer jugadorId,
                             @Param("desde") LocalDateTime desde);
 
-    // Puestas en venta: oferta del sistema pendiente (sin comprador, sin resolver)
-    @Query("SELECT COUNT(p) FROM Puja p WHERE p.jugadorFantasy.jugadorReal.id = :jugadorId " +
-        "AND p.equipoComprador IS NULL AND p.resuelta = false " +
-        "AND p.fecha >= :desde")
-    long contarPuestasEnVenta(@Param("jugadorId") Integer jugadorId,
-                            @Param("desde") LocalDateTime desde);
+    
 
     // Clausulazos ejecutados
     @Query("SELECT p FROM Puja p WHERE p.jugadorFantasy.jugadorReal.id = :jugadorId " +

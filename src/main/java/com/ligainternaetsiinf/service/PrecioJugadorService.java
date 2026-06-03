@@ -63,13 +63,13 @@ public class PrecioJugadorService {
     }
 
     // ─── Cálculo del índice de demanda ────────────────────────────────────────
-    private double calcularIndice(Jugador jugador, LocalDateTime desde) {
+    /*private double calcularIndice(Jugador jugador, LocalDateTime desde) {
         Integer id = jugador.getId();
 
         long comprasAlSistema  = pujaRepository.contarComprasAlSistema(id, desde);
         long ventasAlSistema   = pujaRepository.contarVentasAlSistema(id, desde);
         long pujasActivas      = pujaRepository.contarPujasActivas(id, desde);
-        long puestasEnVenta    = pujaRepository.contarPuestasEnVenta(id, desde);
+        long puestasEnVenta = jugadorFantasyRepository.contarPuestasEnVenta(id);
         List<Puja> clausulazos = pujaRepository.findClausulazos(id, desde);
 
         // Peso de clausulazos: 3 base × ratio sobreprecio (cap en 2x)
@@ -99,7 +99,50 @@ public class PrecioJugadorService {
         if (actividadTotal == 0) return 0.0;
 
         return (presionCompra - presionVenta) / actividadTotal;
-    }
+    }*/
+
+        private double calcularIndice(Jugador jugador, LocalDateTime desde) {
+            Integer id = jugador.getId();
+
+            long comprasAlSistema  = pujaRepository.contarComprasAlSistema(id, desde);
+            long ventasAlSistema   = pujaRepository.contarVentasAlSistema(id, desde);
+            long pujasActivas      = pujaRepository.contarPujasActivas(id, desde);
+            long puestasEnVenta = jugadorFantasyRepository.contarPuestasEnVenta(id);
+            List<Puja> clausulazos = pujaRepository.findClausulazos(id, desde);
+
+            double pesoClausulazos = 0;
+            long valorMercado = jugador.getValorMercado();
+            for (Puja c : clausulazos) {
+                if (c.getValorClausulaMomento() != null && valorMercado > 0) {
+                    double ratio = (double) c.getValorClausulaMomento() / valorMercado;
+                    pesoClausulazos += 3.0 * Math.min(ratio, 2.0);
+                } else {
+                    pesoClausulazos += 3.0;
+                }
+            }
+
+            double presionCompra = (comprasAlSistema * 3.0) + (pujasActivas * 2.0) + pesoClausulazos;
+            double presionVenta  = (ventasAlSistema * 3.0) + (puestasEnVenta * 1.0);
+            double actividadMercado = presionCompra + presionVenta;
+
+            double indiceBase;
+            if (actividadMercado == 0) {
+                indiceBase = 0.0;
+            } else {
+                indiceBase = (presionCompra - presionVenta) / actividadMercado;
+            }
+
+            // El rendimiento modifica el índice pero no puede invertirlo
+            double presionRendimiento = calcularPresionRendimiento(jugador);
+            double indice = indiceBase + (presionRendimiento * 0.3);
+
+            // Sin actividad de mercado, solo sube ligeramente por rendimiento
+            if (actividadMercado == 0 && presionRendimiento > 0) {
+                indice = presionRendimiento * 0.3;
+            }
+
+            return Math.max(-1.0, Math.min(1.0, indice));
+        }
 
     // ─── Rendimiento: media de puntos normalizada ─────────────────────────────
     private double calcularPresionRendimiento(Jugador jugador) {

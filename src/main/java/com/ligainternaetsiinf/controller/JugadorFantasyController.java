@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.ligainternaetsiinf.dto.JugadorFantasyDetalleResponse;
 import com.ligainternaetsiinf.dto.JugadorFantasyResponse;
-import com.ligainternaetsiinf.model.JugadorFantasy;
+
 import com.ligainternaetsiinf.service.JugadorFantasyService;
 
 @RestController

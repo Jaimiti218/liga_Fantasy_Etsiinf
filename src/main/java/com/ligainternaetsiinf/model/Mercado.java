@@ -1,7 +1,7 @@
 package com.ligainternaetsiinf.model;
 
 import java.time.LocalDateTime;
-import java.util.List;
+
 
 import jakarta.persistence.*;
 

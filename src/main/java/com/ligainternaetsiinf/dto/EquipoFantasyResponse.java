@@ -22,10 +22,12 @@ public class EquipoFantasyResponse {
 
     private String fotoPerfil;
 
+    private long valorPlantilla;
+
     public EquipoFantasyResponse(){}
 
     public EquipoFantasyResponse(Integer id, Integer ligaId, String ligaNombre, Integer userId, String userNombre, long dinero, int puntos, 
-        List<String> jugadores, String formacion, String fotoPerfil){
+        List<String> jugadores, String formacion, String fotoPerfil, long valorPlantilla){
 
         this.id = id;
         this.ligaId = ligaId;
@@ -37,6 +39,7 @@ public class EquipoFantasyResponse {
         this.jugadores = jugadores;
         this.formacion = formacion;
         this.fotoPerfil = fotoPerfil;
+        this.valorPlantilla = valorPlantilla;
     }
 
     public Integer getId(){ return id; }
@@ -57,4 +60,5 @@ public class EquipoFantasyResponse {
     public String getFormacion(){ return formacion; }
 
     public String getFotoPerfil(){ return fotoPerfil; }
+    public long getValorPlantilla(){ return valorPlantilla; }
 }

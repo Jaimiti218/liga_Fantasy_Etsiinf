@@ -364,7 +364,7 @@ function confirmarResultado() {
         <br><strong>Jugadores con stats:</strong> ${jugadoresConStats.length}
         <br>${jugadoresConStats.map(j => {
             const nombre = document.querySelector(`#fila-jugador-${j.jugadorId} label`)?.textContent ?? j.jugadorId;
-            return `${nombre}: ${j.goles}⚽ ${j.asistencias}👟 ${j.tarjetasAmarillas}🟨 ${j.tarjetasRojas}🟥`;
+            return `${nombre}: ${j.goles}⚽ ${j.asistencias}👟 ${j.tarjetasAmarillas}🟨 ${j.tarjetasRojas}🟥${j.paradas > 0 ? ` ${j.paradas}🧤` : ''}`;
         }).join('<br>')}
     `;
     document.getElementById('modal-confirmar').classList.remove('hidden');

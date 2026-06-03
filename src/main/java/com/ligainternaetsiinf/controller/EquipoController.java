@@ -17,8 +17,7 @@ import com.ligainternaetsiinf.dto.EquipoClasificacionResponse;
 import com.ligainternaetsiinf.dto.EquipoResponse;
 import com.ligainternaetsiinf.dto.EquipoUpdateDTO;
 import com.ligainternaetsiinf.model.Equipo;
-import com.ligainternaetsiinf.model.Jugador;
-import com.ligainternaetsiinf.repository.EquipoRepository;
+
 import com.ligainternaetsiinf.service.EquipoService;
 
 @RestController

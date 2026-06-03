@@ -2,9 +2,9 @@ package com.ligainternaetsiinf.service;
 
 import java.time.Instant;
 import java.time.ZoneId;
-import java.util.Date;
+
 import java.util.List;
-import java.util.Optional;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
@@ -25,7 +25,7 @@ import com.ligainternaetsiinf.repository.AlineacionEquipoJornadaRepository;
 import com.ligainternaetsiinf.repository.EquipoFantasyRepository;
 import com.ligainternaetsiinf.repository.EquipoRepository;
 import com.ligainternaetsiinf.repository.EstadisticasJugadorPartidoRepository;
-import com.ligainternaetsiinf.repository.JugadorFantasyRepository;
+
 import com.ligainternaetsiinf.repository.JugadorRepository;
 import com.ligainternaetsiinf.repository.PartidoRepository;
 
@@ -34,7 +34,7 @@ public class PartidoService {
 
     @Autowired private PartidoRepository partidoRepository;
     @Autowired private JugadorRepository jugadorRepository;
-    @Autowired private JugadorFantasyRepository jugadorFantasyRepository;
+
     @Autowired private EquipoFantasyRepository equipoFantasyRepository;
     @Autowired private EstadisticasJugadorPartidoRepository estadisticasRepository;
     @Autowired private EquipoRepository equipoRepository;

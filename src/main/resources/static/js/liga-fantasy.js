@@ -100,6 +100,7 @@ function renderizarClasificacion(lista) {
                     ${avatarHtml}${equipo.username}
                 </span>
                 <span class="fila-puntos">${equipo.puntos} pts</span>
+                <span class="fila-valor" style="font-size:0.8rem;color:#888">${formatearDinero(equipo.valorPlantilla ?? 0)}</span>
             </div>
         `;
     }).join('');

@@ -223,7 +223,9 @@ async function renderizarMercado(jugadores) {
 
         const jornadasHtml = ultimas5.map(jorn => {
             if (!jorn) return `<div class="jornada-mini jornada-vacia">—</div>`;
-            const color = jorn.puntos >= 8 ? 'alta' : jorn.puntos >= 4 ? 'media' : 'baja';
+            const color = !jorn.jugo ? 'vacia'
+                : jorn.puntos < 0 ? 'baja'
+                : 'alta';
             return `<div class="jornada-mini jornada-${color}">
                 J${jorn.jornada}<br><strong>${jorn.jugo ? jorn.puntos : '—'}</strong>
             </div>`;

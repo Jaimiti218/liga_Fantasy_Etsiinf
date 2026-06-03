@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.ligainternaetsiinf.model.JugadorFantasy;
-import com.ligainternaetsiinf.model.LigaFantasy;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -35,4 +35,8 @@ public interface JugadorFantasyRepository extends JpaRepository<JugadorFantasy, 
         "WHERE im.mercado.ligaFantasy.id = :ligaId AND im.resuelta = false)")
     List<JugadorFantasy> findDisponiblesParaAsignacion(@Param("ligaId") Integer ligaId);
 
+
+    // Elimina contarPuestasEnVenta del PujaRepository y añade esto en JugadorFantasyRepository:
+    @Query("SELECT COUNT(jf) FROM JugadorFantasy jf WHERE jf.jugadorReal.id = :jugadorId AND jf.enVenta = true")
+    long contarPuestasEnVenta(@Param("jugadorId") Integer jugadorId);
 }

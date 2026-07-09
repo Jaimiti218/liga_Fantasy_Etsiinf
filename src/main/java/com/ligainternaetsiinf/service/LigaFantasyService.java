@@ -250,7 +250,7 @@ public class LigaFantasyService {
     private JugadorFantasy elegirJugadorEquilibrado(List<JugadorFantasy> lista, Random random) {
         if (lista.isEmpty()) throw new RuntimeException("No hay jugadores disponibles para esta posición");
         List<JugadorFantasy> normales = lista.stream()
-            .filter(j -> j.getJugadorReal().getValorMercado() >= 2000000
+            .filter(j -> j.getJugadorReal().getValorMercado() >= 5000000
                     && j.getJugadorReal().getValorMercado() <= 15000000)
             .collect(java.util.stream.Collectors.toList());
         List<JugadorFantasy> fuente = normales.isEmpty() ? lista : normales;

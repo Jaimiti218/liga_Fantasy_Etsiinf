@@ -31,7 +31,7 @@ public class PrecioJugadorService {
     @Autowired private HistorialPrecioRepository historialRepository;
 
     // ─── Actualización diaria a las 23:30 ────────────────────────────────────
-    @Scheduled(cron = "0 19 22 * * *")
+    @Scheduled(cron = "0 59 23 * * *")
     @Transactional
     public void actualizarPreciosDiarios() {
         LocalDateTime hace24h = LocalDateTime.now().minusHours(24);
@@ -166,7 +166,7 @@ public class PrecioJugadorService {
 
     // ─── Obtener variaciones para la pantalla ─────────────────────────────────
     public List<VariacionPrecioResponse> obtenerVariaciones(String periodo, boolean subidas) {
-        LocalDate fechaReferencia = switch (periodo) {
+        LocalDate fechaInicioPeriodo = switch (periodo) {
             case "dia" -> LocalDate.now().minusDays(1);
             case "mes" -> LocalDate.now().minusDays(30);
             default    -> LocalDate.now().minusDays(7);
@@ -176,9 +176,10 @@ public class PrecioJugadorService {
         List<VariacionPrecioResponse> resultado = new ArrayList<>();
 
         for (Jugador j : jugadores) {
+            // Buscar el precio MÁS ANTIGUO dentro del periodo (el primero después de fechaInicio)
             Optional<HistorialPrecioJugador> historial =
-                historialRepository.findFirstByJugadorAndFechaLessThanEqualOrderByFechaDesc(
-                    j, fechaReferencia);
+                historialRepository.findFirstByJugadorAndFechaGreaterThanEqualOrderByFechaAsc(
+                    j, fechaInicioPeriodo);
 
             if (historial.isEmpty()) continue;
 

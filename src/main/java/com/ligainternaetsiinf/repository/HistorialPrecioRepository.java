@@ -15,6 +15,9 @@ public interface HistorialPrecioRepository extends
     Optional<HistorialPrecioJugador> findFirstByJugadorAndFechaLessThanEqualOrderByFechaDesc(
         Jugador jugador, LocalDate fecha);
 
+        Optional<HistorialPrecioJugador> findFirstByJugadorAndFechaGreaterThanEqualOrderByFechaAsc(
+    Jugador jugador, LocalDate fecha);
+
     // Para la pantalla de subidas/bajadas: todos los registros de una fecha concreta
     List<HistorialPrecioJugador> findByFecha(LocalDate fecha);
 }

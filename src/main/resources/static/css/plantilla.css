@@ -478,6 +478,50 @@
     .carta-jugador { width: 60px; }
     .carta-foto { width: 34px; height: 34px; }
     .carta-nombre { font-size: 0.58rem; }
+
+    .detalle-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .detalle-header-info {
+        width: 100%;
+    }
+
+    .detalle-top {
+        flex-wrap: wrap;
+        gap: 0.3rem;
+    }
+
+    .jugador-card {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .jugador-card-derecha {
+        width: 100%;
+    }
+
+    .jugador-card-stats {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .jornadas-recientes {
+        gap: 0.2rem;
+    }
+
+    .jornada-mini {
+        width: 32px;
+        font-size: 0.62rem;
+    }
+
+    .carta-jugador {
+        width: 52px;
+    }
+
+    .carta-nombre { font-size: 0.52rem; }
 }
 
 /* Campo vertical */

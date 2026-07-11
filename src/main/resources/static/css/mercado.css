@@ -290,3 +290,34 @@
     font-weight: 800;
     color: #0f3460;
 }
+
+
+
+@media (max-width: 600px) {
+    .tab-btn {
+        font-size: 0.75rem;
+        padding: 0.6rem 0.4rem;
+    }
+
+    .jugador-card-mercado {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .buscar-filtros {
+        flex-direction: column;
+    }
+
+    .buscar-filtros select {
+        width: 100%;
+    }
+
+    .jugador-busqueda-card {
+        gap: 0.5rem;
+        padding: 0.7rem;
+    }
+
+    .jugador-busqueda-derecha .puntos-busqueda {
+        font-size: 0.9rem;
+    }
+}

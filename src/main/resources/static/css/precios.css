@@ -121,3 +121,16 @@
     font-size: 0.9rem;
     line-height: 2;
 }
+
+
+@media (max-width: 600px) {
+    .precio-filtros {
+        flex-wrap: wrap;
+        gap: 0.4rem;
+    }
+
+    .precio-card {
+        flex-wrap: wrap;
+        gap: 0.4rem;
+    }
+}

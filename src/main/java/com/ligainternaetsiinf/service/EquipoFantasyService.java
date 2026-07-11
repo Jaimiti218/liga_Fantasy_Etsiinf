@@ -16,6 +16,7 @@ import com.ligainternaetsiinf.dto.ClasificacionResponse;
 import com.ligainternaetsiinf.dto.EquipoFantasyResponse;
 import com.ligainternaetsiinf.dto.JugadorFantasyDetalleResponse;
 import com.ligainternaetsiinf.dto.JugadorFantasyResponse;
+import com.ligainternaetsiinf.dto.MiEquipoResumenResponse;
 import com.ligainternaetsiinf.dto.PuntosJornadaJugadorResponse;
 import com.ligainternaetsiinf.dto.PuntosJornadaResponse;
 import com.ligainternaetsiinf.model.AlineacionEquipoJornada;
@@ -371,6 +372,30 @@ public class EquipoFantasyService {
                 equipo.getFormacion(),
                 equipo.getUser().getFotoPerfil(),
                 valorPlantilla
+        );
+    }
+
+
+
+    public MiEquipoResumenResponse obtenerResumenMiEquipo(Integer ligaId, Integer userId) {
+        EquipoFantasy equipo = equipoFantasyRepository
+            .findByLigaFantasyIdAndUserId(ligaId, userId)
+            .orElseThrow(() -> new RuntimeException("Equipo no encontrado"));
+
+        // Posición: solo necesitas cuántos equipos tienen más puntos
+        long posicion = equipoFantasyRepository
+            .countByLigaFantasyIdAndPuntosGreaterThan(ligaId, equipo.getPuntos()) + 1;
+
+        // Aviso: saldo negativo o menos de 7 alineados
+        boolean tieneAviso = equipo.getDinero() < 0 ||
+            equipo.getJugadores().stream().filter(JugadorFantasy::isAlineado).count() < 7;
+
+        return new MiEquipoResumenResponse(
+            equipo.getId(),
+            equipo.getPuntos(),
+            equipo.getDinero(),
+            (int) posicion,
+            tieneAviso
         );
     }
 }

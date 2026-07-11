@@ -5,11 +5,14 @@ import com.ligainternaetsiinf.model.InstanciaMercado;
 import com.ligainternaetsiinf.model.JugadorFantasy;
 import com.ligainternaetsiinf.model.Puja;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+
 import java.util.List;
 import java.util.Optional;
 import java.time.LocalDateTime;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface PujaRepository extends JpaRepository<Puja, Integer> {
 
@@ -79,4 +82,11 @@ public interface PujaRepository extends JpaRepository<Puja, Integer> {
         "AND p.fecha >= :desde")
     List<Puja> findClausulazos(@Param("jugadorId") Integer jugadorId,
                                 @Param("desde") LocalDateTime desde);
+
+
+
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM Puja p WHERE p.jugadorFantasy.id = :jugadorFantasyId")
+    void deleteByJugadorFantasyId(@Param("jugadorFantasyId") Integer jugadorFantasyId);
 }

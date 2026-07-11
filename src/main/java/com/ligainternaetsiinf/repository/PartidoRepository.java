@@ -9,4 +9,5 @@ public interface PartidoRepository extends JpaRepository<Partido, Integer> {
     List<Partido> findByJornada(Integer jornada);
     List<Partido> findByJugadoFalseOrderByFechaAsc();
     List<Partido> findByEquipoLocalOrEquipoVisitanteOrderByJornadaAsc(Equipo equipoLocal, Equipo equipoVisitante);
+    List<Partido> findByEquipoLocalIdOrEquipoVisitanteId(Integer localId, Integer visitanteId);
 }

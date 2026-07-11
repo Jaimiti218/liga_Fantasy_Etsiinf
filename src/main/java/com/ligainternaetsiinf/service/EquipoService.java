@@ -13,9 +13,13 @@ import com.ligainternaetsiinf.dto.EquipoResponse;
 import com.ligainternaetsiinf.dto.JugadorResponse;
 import com.ligainternaetsiinf.model.Equipo;
 import com.ligainternaetsiinf.model.Jugador;
+import com.ligainternaetsiinf.model.Partido;
 import com.ligainternaetsiinf.repository.EquipoRepository;
+import com.ligainternaetsiinf.repository.EstadisticasJugadorPartidoRepository;
 import com.ligainternaetsiinf.repository.JugadorRepository;
 import com.ligainternaetsiinf.repository.PartidoRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class EquipoService {
@@ -27,6 +31,9 @@ public class EquipoService {
 
     @Autowired
     private PartidoRepository partidoRepository;
+
+    @Autowired
+    private EstadisticasJugadorPartidoRepository estadisticasRepository;
 
 
     public Equipo crearEquipo(Equipo equipo){ /*El motivo por el que no podemos usar este equipo en el equipoRepository.save es porque
@@ -139,11 +146,29 @@ public class EquipoService {
         return equipoRepository.save(equipoAModificar);
     }
 
-
+    @Transactional
     public void eliminarEquipo(Integer id){
+
+        List<Jugador> jugadores;
 
         if(!equipoRepository.existsById(id)){
             throw new RuntimeException("Equipo no encontrado");
+        }
+
+        // 1. Borrar estadísticas de jugadores en partidos de este equipo
+        List<Partido> partidos = partidoRepository.findByEquipoLocalIdOrEquipoVisitanteId(id, id);
+        for (Partido p : partidos) {
+            estadisticasRepository.deleteByPartidoId(p.getId());
+        }
+
+        // 2. Borrar los partidos del equipo
+        partidoRepository.deleteAll(partidos);
+
+        jugadores = jugadorRepository.findByEquipoId(id);
+
+        for(Jugador j : jugadores){
+            j.setEquipo(null);
+            jugadorRepository.save(j);
         }
 
         equipoRepository.deleteById(id);

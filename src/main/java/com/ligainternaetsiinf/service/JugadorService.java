@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ligainternaetsiinf.dto.JugadorEstadisticasResponse;
 import com.ligainternaetsiinf.dto.JugadorFantasyResponse;
@@ -15,7 +16,11 @@ import com.ligainternaetsiinf.model.Equipo;
 import com.ligainternaetsiinf.model.Jugador;
 import com.ligainternaetsiinf.model.JugadorFantasy;
 import com.ligainternaetsiinf.repository.EquipoRepository;
+import com.ligainternaetsiinf.repository.EstadisticasJugadorPartidoRepository;
+import com.ligainternaetsiinf.repository.HistorialPrecioRepository;
+import com.ligainternaetsiinf.repository.JugadorFantasyRepository;
 import com.ligainternaetsiinf.repository.JugadorRepository;
+
 
 @Service
 public class JugadorService {
@@ -23,7 +28,19 @@ public class JugadorService {
     private JugadorRepository jugadorRepository;
 
     @Autowired
+    private JugadorFantasyRepository jugadorFantasyRepository;
+
+    @Autowired
     private EquipoRepository equipoRepository;
+
+    @Autowired
+    private HistorialPrecioRepository historialPrecioRepository;
+
+    @Autowired
+    private EstadisticasJugadorPartidoRepository estadisticasRepository;
+
+    @Autowired
+    private JugadorFantasyService jugadorFantasyService;
 
     public Jugador crearJugador(Jugador jugador){
         if(jugadorRepository.findByFullName(jugador.getFullName()).isPresent()){
@@ -89,12 +106,25 @@ public class JugadorService {
         return jugadorRepository.save(jugador);
     }
 
-    public void eliminarJugador(Integer id){
-
-        if(!jugadorRepository.existsById(id)){
+    @Transactional
+    public void eliminarJugador(Integer id) {
+        if (!jugadorRepository.existsById(id)) {
             throw new RuntimeException("Jugador no encontrado");
         }
 
+        // 1. Borrar estadísticas en partidos
+        estadisticasRepository.deleteByJugadorId(id);
+
+        // 2. Borrar historial de precios
+        historialPrecioRepository.deleteByJugadorId(id);
+
+        // 3. Borrar todos los jugadores fantasy de todas las ligas
+        List<JugadorFantasy> copias = jugadorFantasyRepository.findByJugadorRealId(id);
+        for (JugadorFantasy jf : copias) {
+            jugadorFantasyService.eliminarJugadorFantasy(jf.getId());
+        }
+
+        // 4. Borrar el jugador
         jugadorRepository.deleteById(id);
     }
 

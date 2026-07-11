@@ -42,52 +42,36 @@ async function renderizarLigas(ligas) {
     const contenedor = document.getElementById('lista-ligas');
     contenedor.innerHTML = '';
 
-    for (const liga of ligas) {
-        let miEquipo = null;
+    const datosLigas = await Promise.all(ligas.map(async liga => {
         let posicion = '—';
+        let puntos = '—';
+        let dinero = '—';
         let tieneAviso = false;
+        let equipoId = null;
 
         try {
-            const resEquipo = await fetch(`/equipos-fantasy/liga/${liga.id}/mi-equipo`, {
+            const res = await fetch(`/equipos-fantasy/liga/${liga.id}/mi-resumen`, {
                 credentials: 'include'
             });
-            if (resEquipo.ok) {
-                miEquipo = await resEquipo.json();
-
-                // Comprobar saldo negativo
-                if (miEquipo.dinero < 0) tieneAviso = true;
-
-                // Comprobar alineación incompleta
-                if (!tieneAviso) {
-                    const resPlantilla = await fetch(
-                        `/equipos-fantasy/${miEquipo.id}/plantilla-publica`,
-                        { credentials: 'include' }
-                    );
-                    if (resPlantilla.ok) {
-                        const plantilla = await resPlantilla.json();
-                        const alineados = plantilla.filter(j => j.alineado).length;
-                        if (alineados < 7) tieneAviso = true;
-                    }
-                }
-            }
-
-            const resClasif = await fetch(`/equipos-fantasy/ligas/${liga.id}/clasificacion`, {
-                credentials: 'include'
-            });
-            if (resClasif.ok && miEquipo) {
-                const clasificacion = await resClasif.json();
-                const pos = clasificacion.findIndex(e => e.equipoId === miEquipo.id);
-                posicion = pos !== -1 ? (pos + 1) + 'º' : '—';
+            if (res.ok) {
+                const resumen = await res.json();
+                posicion = resumen.posicion + 'º';
+                puntos = resumen.puntos;
+                dinero = formatearDinero(resumen.dinero);
+                tieneAviso = resumen.tieneAviso;
+                equipoId = resumen.equipoId;
             }
         } catch (e) {}
 
+        return { liga, equipoId, posicion, puntos, dinero, tieneAviso };
+    }));
+
+    for (const { liga, equipoId, posicion, puntos, dinero, tieneAviso } of datosLigas) {
         const card = document.createElement('div');
         card.className = 'liga-card';
         card.innerHTML = `
             <div class="liga-card-info" onclick="entrarALiga(${liga.id})">
-                <div class="liga-card-nombre">
-                    ${liga.name}
-                </div>
+                <div class="liga-card-nombre">${liga.name}</div>
                 <div class="liga-card-stats">
                     <div class="liga-stat">
                         <span class="liga-stat-label">Posición</span>
@@ -95,11 +79,11 @@ async function renderizarLigas(ligas) {
                     </div>
                     <div class="liga-stat">
                         <span class="liga-stat-label">Puntos</span>
-                        <span class="liga-stat-valor">${miEquipo ? miEquipo.puntos : '—'}</span>
+                        <span class="liga-stat-valor">${puntos}</span>
                     </div>
                     <div class="liga-stat">
                         <span class="liga-stat-label">Dinero</span>
-                        <span class="liga-stat-valor">${miEquipo ? formatearDinero(miEquipo.dinero) : '—'}</span>
+                        <span class="liga-stat-valor">${dinero}</span>
                     </div>
                 </div>
             </div>

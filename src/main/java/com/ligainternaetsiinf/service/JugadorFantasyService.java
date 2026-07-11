@@ -7,15 +7,20 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ligainternaetsiinf.dto.JugadorFantasyDetalleResponse;
 import com.ligainternaetsiinf.dto.JugadorFantasyResponse;
+import com.ligainternaetsiinf.model.AlineacionEquipoJornada;
 import com.ligainternaetsiinf.model.EquipoFantasy;
+import com.ligainternaetsiinf.model.InstanciaMercado;
 import com.ligainternaetsiinf.model.Jugador;
 import com.ligainternaetsiinf.model.JugadorFantasy;
 import com.ligainternaetsiinf.model.LigaFantasy;
 import com.ligainternaetsiinf.model.Puja;
+import com.ligainternaetsiinf.repository.AlineacionEquipoJornadaRepository;
 import com.ligainternaetsiinf.repository.EquipoFantasyRepository;
+import com.ligainternaetsiinf.repository.InstanciaMercadoRepository;
 import com.ligainternaetsiinf.repository.JugadorFantasyRepository;
 import com.ligainternaetsiinf.repository.JugadorRepository;
 import com.ligainternaetsiinf.repository.LigaFantasyRepository;
@@ -38,6 +43,12 @@ public class JugadorFantasyService {
 
     @Autowired
     private PujaRepository pujaRepository;
+
+    @Autowired
+    private AlineacionEquipoJornadaRepository alineacionRepository;
+
+    @Autowired
+    private InstanciaMercadoRepository instanciaRepository;
 
     public void crearJugadorFantasy(Integer jugadorRealId){
         /*este metodo se va a usar cuando, a mitad de temporada, por ejemplo en la ventana de fichajes de invierno, cuando se pueden
@@ -202,5 +213,30 @@ public class JugadorFantasyService {
 
         return new JugadorFantasyResponse(jf.getId(), jf.getJugadorReal().getId(), jf.getJugadorReal().getFullName(), jf.getJugadorReal().getPosicion(),
         jf.getJugadorReal().getValorMercado(), jf.getLigaFantasy().getId(), jf.getLigaFantasy().getName(), equipoId, dueno, jf.getClausula());
+    }
+
+
+    @Transactional
+    public void eliminarJugadorFantasy(Integer jugadorFantasyId) {
+        JugadorFantasy jf = jugadorFantasyRepository.findById(jugadorFantasyId)
+            .orElseThrow(() -> new RuntimeException("Jugador fantasy no encontrado"));
+
+        // 1. Quitarlo de alineaciones donde aparezca
+        List<AlineacionEquipoJornada> alineaciones = 
+            alineacionRepository.findByJugadorAlineadoId(jugadorFantasyId);
+        alineaciones.forEach(a -> a.getJugadoresAlineados().removeIf(j -> j.getId().equals(jugadorFantasyId)));
+        alineacionRepository.saveAll(alineaciones);
+
+        // 2. Quitarlo de instancias de mercado donde esté disponible
+        List<InstanciaMercado> instancias = 
+            instanciaRepository.findByJugadorDisponibleId(jugadorFantasyId);
+        instancias.forEach(i -> i.getJugadoresDisponibles().removeIf(j -> j.getId().equals(jugadorFantasyId)));
+        instanciaRepository.saveAll(instancias);
+
+        // 3. Borrar pujas relacionadas
+        pujaRepository.deleteByJugadorFantasyId(jugadorFantasyId);
+
+        // 4. Borrar el jugador fantasy
+        jugadorFantasyRepository.delete(jf);
     }
 }

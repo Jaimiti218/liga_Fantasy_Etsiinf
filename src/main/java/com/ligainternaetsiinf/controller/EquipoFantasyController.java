@@ -13,6 +13,7 @@ import com.ligainternaetsiinf.security.CustomUserDetails;
 import com.ligainternaetsiinf.service.EquipoFantasyService;
 import com.ligainternaetsiinf.dto.AlineacionDTO;
 import com.ligainternaetsiinf.dto.JugadorFantasyDetalleResponse;
+import com.ligainternaetsiinf.dto.MiEquipoResumenResponse;
 import com.ligainternaetsiinf.dto.PuntosJornadaJugadorResponse;
 import com.ligainternaetsiinf.dto.PuntosJornadaResponse;
 
@@ -109,6 +110,14 @@ public class EquipoFantasyController {
             @PathVariable Integer equipoId,
             @PathVariable Integer jornada) {
         return equipoFantasyService.obtenerInfoJornada(equipoId, jornada);
+    }
+
+    @GetMapping("/liga/{ligaId}/mi-resumen")
+    public MiEquipoResumenResponse obtenerMiResumen(
+            @PathVariable Integer ligaId,
+            Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        return equipoFantasyService.obtenerResumenMiEquipo(ligaId, userDetails.getId());
     }
 
     

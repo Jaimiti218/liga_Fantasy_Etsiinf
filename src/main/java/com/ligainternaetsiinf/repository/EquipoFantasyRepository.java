@@ -29,4 +29,6 @@ public interface EquipoFantasyRepository extends JpaRepository<EquipoFantasy, In
     """)
     List<LigaFantasy> findLigasByUserId(Integer userId);
 
+    long countByLigaFantasyIdAndPuntosGreaterThan(Integer ligaId, int puntos);
+
 }

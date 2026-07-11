@@ -20,4 +20,6 @@ public interface HistorialPrecioRepository extends
 
     // Para la pantalla de subidas/bajadas: todos los registros de una fecha concreta
     List<HistorialPrecioJugador> findByFecha(LocalDate fecha);
+
+    void deleteByJugadorId(Integer jugadorId);
 }

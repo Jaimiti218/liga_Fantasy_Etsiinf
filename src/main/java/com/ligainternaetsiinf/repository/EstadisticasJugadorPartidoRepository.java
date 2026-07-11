@@ -14,4 +14,8 @@ public interface EstadisticasJugadorPartidoRepository extends JpaRepository<Esta
     Optional<EstadisticasJugadorPartido> findByJugadorIdAndPartidoId(Integer jugadorId, Integer partidoId);
 
     List<EstadisticasJugadorPartido> findByPartidoJornada(Integer jornada);
+
+    void deleteByPartidoId(Integer partidoId);
+
+    void deleteByJugadorId(Integer jugadorId);
 }

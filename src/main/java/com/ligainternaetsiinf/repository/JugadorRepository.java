@@ -1,5 +1,6 @@
 package com.ligainternaetsiinf.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,4 +13,6 @@ public interface JugadorRepository extends JpaRepository<Jugador, Integer> {
     
     @Query(value = "SELECT * FROM jugador WHERE full_name = :fullName LIMIT 1", nativeQuery = true)
     Optional<Jugador> findByFullName(@Param("fullName") String fullName);
+
+    List<Jugador> findByEquipoId(Integer equipoId);
 }

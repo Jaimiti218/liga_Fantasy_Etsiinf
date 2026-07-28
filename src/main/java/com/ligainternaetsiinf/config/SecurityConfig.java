@@ -62,6 +62,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/equipos/clasificacion", "/jugadores/estadisticas", "/jornadas/**","/jornadas", "/partidos", "/partidos/**", "/precios/**").permitAll()
                 .requestMatchers("/", "/fantasy/auth", "/fantasy/mis-ligas", "/fantasy/liga/**", "/fantasy/plantilla/**", "/fantasy/mercado/**").permitAll()
                 // Todo lo demás requiere autenticación
+                .requestMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session

@@ -1,5 +1,6 @@
 package com.ligainternaetsiinf.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -17,16 +18,19 @@ public class ViewController {
     }
 
     @GetMapping("/admin")
+    @PreAuthorize("hasRole('ADMIN')")
     public String adminPanel() {
         return "admin/panel";
     }
 
     @GetMapping("/admin/jugadores")
+    @PreAuthorize("hasRole('ADMIN')")
     public String adminJugadores() {
         return "admin/jugadores";
     }
 
     @GetMapping("/admin/equipos")
+    @PreAuthorize("hasRole('ADMIN')")
     public String adminEquipos() {
         return "admin/equipos";
     }
@@ -67,6 +71,7 @@ public class ViewController {
     }
 
     @GetMapping("/admin/partidos")
+    @PreAuthorize("hasRole('ADMIN')")
     public String adminPartidos() {
         return "admin/partidos";
     }

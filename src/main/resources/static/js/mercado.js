@@ -45,7 +45,9 @@ function editarPuja(jugadorId, nombre, valorMercado, pujaId) {
     document.getElementById('puja-jugador-nombre').textContent = nombre;
     document.getElementById('puja-saldo').textContent = formatearDineroCompleto(misDatos?.dinero ?? 0);
     document.getElementById('puja-valor-mercado').textContent = formatearDineroCompleto(valorMercado);
-    document.getElementById('input-puja').value = pujaActual ? pujaActual.cantidad.toLocaleString('es-ES') : '';
+    document.getElementById('input-puja').value = pujaActual 
+    ? pujaActual.cantidad.toLocaleString('es-ES') 
+    : valorMercado.toLocaleString('es-ES');
     document.getElementById('error-puja').classList.add('hidden');
     document.getElementById('modal-puja').classList.remove('hidden');
     document.querySelectorAll('.acciones-dropdown').forEach(d => d.classList.add('hidden'));
@@ -305,7 +307,7 @@ function abrirModalPuja(jugadorId, nombre, valorMercado) {
     document.getElementById('puja-jugador-nombre').textContent = nombre;
     document.getElementById('puja-saldo').textContent          = formatearDinero(misDatos?.dinero ?? 0);
     document.getElementById('puja-valor-mercado').textContent  = formatearDinero(valorMercado);
-    document.getElementById('input-puja').value                = '';
+   document.getElementById('input-puja').value = valorMercado.toLocaleString('es-ES');
     document.getElementById('error-puja').classList.add('hidden');
     document.getElementById('modal-puja').classList.remove('hidden');
 }

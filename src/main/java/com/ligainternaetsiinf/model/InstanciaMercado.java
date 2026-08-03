@@ -1,6 +1,7 @@
 package com.ligainternaetsiinf.model;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import jakarta.persistence.*;
 
@@ -26,7 +27,7 @@ public class InstanciaMercado {
     public InstanciaMercado(Mercado mercado, List<JugadorFantasy> jugadores){
         this.mercado = mercado;
         this.jugadoresDisponibles = jugadores;
-        this.inicio = LocalDateTime.now();
+        this.inicio = LocalDateTime.now(ZoneId.of("Europe/Madrid"));
         this.fin = this.inicio.plusHours(24);
         this.resuelta = false;
     }

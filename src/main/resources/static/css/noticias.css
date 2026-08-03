@@ -6,11 +6,11 @@
 }
 
 .noticia-card {
-    background: white;
+    background: #1a1f2e;
     border-radius: 12px;
     padding: 1rem 1.25rem;
     margin-bottom: 0.75rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     position: relative;
     border-left: 4px solid #0f3460;
 }
@@ -20,7 +20,7 @@
 .noticia-card.SIN-PUNTUACION { border-left-color: #e74c3c; }
 .noticia-card.RECHAZADA     { border-left-color: #c0392b; }
 .noticia-card.OFERTA-RECIBIDA { border-left-color: #8e44ad; }
-.noticia-card.privada       { background: #fdf6ff; }
+.noticia-card.privada       { background: #1f1a2e; }
 
 .noticia-header {
     display: flex;
@@ -53,13 +53,13 @@
 
 .noticia-texto {
     font-size: 0.9rem;
-    color: #333;
+    color: #c0c8d8;
     line-height: 1.5;
 }
 
 .noticia-fecha {
     font-size: 0.72rem;
-    color: #2d2c2c;
+    color: #8a9bb0; 
     text-align: right;
     margin-top: 0.4rem;
 }

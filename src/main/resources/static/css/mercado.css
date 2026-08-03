@@ -1,5 +1,5 @@
 .saldo-mercado {
-    background: #32c02b;
+    background: #03bc60;
     border-radius: 12px;
     padding: 1rem 1.25rem;
     margin-bottom: 1rem;
@@ -43,10 +43,10 @@
 
 /* TARJETA MERCADO */
 .jugador-card-mercado {
-    background: white;
+    background: #1a1f2e;
     border-radius: 14px;
     padding: 1rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     display: flex;
     align-items: flex-start;
     gap: 1rem;
@@ -54,8 +54,8 @@
 }
 
 .btn-fichar {
-    background: #27ae60;
-    color: white;
+    background: #00d46a;
+    color: #0d1117;
     border: none;
     padding: 0.5rem 1rem;
     border-radius: 8px;
@@ -65,7 +65,7 @@
     transition: background 0.2s;
     white-space: nowrap;
 }
-.btn-fichar:hover { background: #219a52; }
+.btn-fichar:hover { background: #00b558; }
 
 .temporizador-jugador {
     font-size: 0.7rem;
@@ -78,7 +78,8 @@
 /* MIS OPERACIONES */
 .operaciones-tabs {
     display: flex;
-    border-bottom: 2px solid #eee;
+    background: #1a1f2e;
+    border-bottom: 1px solid #252a3a;
     margin-bottom: 1rem;
 }
 
@@ -95,23 +96,24 @@
     transition: all 0.2s;
 }
 
-.op-tab.active { color: #0f3460; border-bottom-color: #0f3460; font-weight: 700; }
+.op-tab.active { color: #ff6b00; border-bottom-color: #ff6b00 }
 
 .puja-card, .venta-card {
-    background: white;
+    background: #1a1f2e;
+    color: #ffffff;
     border-radius: 12px;
     padding: 1rem;
     margin-bottom: 0.75rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     display: flex;
     align-items: center;
     gap: 1rem;
 }
 
 .puja-info { flex: 1; }
-.puja-nombre { font-size: 0.95rem; font-weight: 700; color: #1a1a2e; }
+.puja-nombre { font-size: 0.95rem; font-weight: 700; color: #ffffff }
 .puja-detalle { font-size: 0.8rem; color: #888; margin-top: 0.2rem; }
-.puja-cantidad { font-size: 1.1rem; font-weight: 800; color: #0f3460; }
+.puja-cantidad { font-size: 1.1rem; font-weight: 800; color: #ff6b00 }
 
 .btn-aceptar-oferta {
     background: #27ae60;
@@ -127,7 +129,7 @@
 .valor-mercado-ref {
     font-size: 1rem;
     font-weight: 700;
-    color: #0f3460;
+    color: #ffffff;
     display: block;
     margin-top: 0.2rem;
 }
@@ -142,9 +144,9 @@
 }
 
 .btn-acciones-puja {
-    background: #e8f0fe;
-    border: 1.5px solid #0f3460;
-    color: #0f3460;
+    background: #252a3a; 
+    border: 1.5px solid #ff6b00; 
+    color: #ff6b00;
     padding: 0.5rem 0.75rem;
     border-radius: 8px;
     font-size: 0.8rem;
@@ -163,8 +165,8 @@
 .contador-pujas {
     font-size: 0.85rem;
     font-weight: 700;
-    color: #1a1a2e;
-    background: #e8f0fe;
+    color: #ffffff; 
+    background: #ff6b00;
     padding: 0.2rem 0.6rem;
     border-radius: 12px;
     white-space: nowrap;
@@ -198,13 +200,15 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background: white;
-    border: 1.5px solid #ddd;
+    background: #252a3a;
+    border: 1.5px solid #353a4a;
     border-radius: 10px;
     padding: 0.5rem 1rem;
 }
 
 .buscar-input-wrap input {
+    background: transparent; 
+    color: #ffffff;
     border: none;
     outline: none;
     flex: 1;
@@ -229,14 +233,14 @@
 }
 
 .jugador-busqueda-card {
-    background: white;
+    background: #1a1f2e;
     border-radius: 12px;
     padding: 0.9rem 1rem;
     margin-bottom: 0.6rem;
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     cursor: pointer;
     transition: transform 0.15s, box-shadow 0.15s;
 }
@@ -266,7 +270,7 @@
 .jugador-busqueda-nombre {
     font-size: 0.95rem;
     font-weight: 700;
-    color: #1a1a2e;
+    color: #ffffff;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -281,14 +285,14 @@
 
 .jugador-busqueda-dueno {
     font-size: 0.75rem;
-    color: #555;
+    color: #8a9bb0;
     margin-top: 0.2rem;
 }
 
 .jugador-busqueda-derecha .puntos-busqueda {
     font-size: 1.1rem;
     font-weight: 800;
-    color: #0f3460;
+    color: #ff6b00;
 }
 
 
@@ -319,5 +323,36 @@
 
     .jugador-busqueda-derecha .puntos-busqueda {
         font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .puja-card, .venta-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .puja-card-info, .venta-card-info {
+        width: 100%;
+    }
+
+    .puja-card-acciones, .venta-card-acciones {
+        width: 100%;
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .puja-card-acciones button,
+    .venta-card-acciones button {
+        flex: 1;
+        min-width: 0;
+        font-size: 0.8rem;
+        padding: 0.5rem 0.4rem;
+    }
+
+    .puja-detalle {
+        font-size: 0.78rem;
     }
 }

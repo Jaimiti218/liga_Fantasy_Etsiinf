@@ -2,6 +2,7 @@ package com.ligainternaetsiinf.model;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -39,8 +40,8 @@ public class NoticiaFantasy {
         this.ligaFantasy = liga;
         this.titulo = titulo;
         this.noticia = noticia;
-        this.fecha = LocalDate.now();
-        this.hora  = LocalTime.now();
+        this.fecha = LocalDate.now(ZoneId.of("Europe/Madrid"));
+        this.hora  = LocalTime.now(ZoneId.of("Europe/Madrid"));
         this.userIdDestinatario = null;
     }
 
@@ -49,8 +50,8 @@ public class NoticiaFantasy {
         this.ligaFantasy = liga;
         this.titulo = titulo;
         this.noticia = noticia;
-        this.fecha = LocalDate.now();
-        this.hora  = LocalTime.now();
+        this.fecha = LocalDate.now(ZoneId.of("Europe/Madrid"));
+        this.hora  = LocalTime.now(ZoneId.of("Europe/Madrid"));
         this.userIdDestinatario = userId;
     }
 

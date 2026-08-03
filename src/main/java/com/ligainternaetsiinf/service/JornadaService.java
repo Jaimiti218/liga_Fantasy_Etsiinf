@@ -70,7 +70,7 @@ public class JornadaService {
 
     private void programarRegistroAlineaciones(Jornada jornada) {
         if (jornada.getFechaInicio() == null) return;
-        if (jornada.getFechaInicio().isBefore(java.time.LocalDateTime.now())) return;
+        if (jornada.getFechaInicio().isBefore(java.time.LocalDateTime.now(ZoneId.of("Europe/Madrid")))) return;
 
         // Cancelar tarea anterior si existe
         java.util.concurrent.ScheduledFuture<?> tareaAnterior = 
@@ -80,7 +80,7 @@ public class JornadaService {
         }
 
         Instant fechaEjecucion = jornada.getFechaInicio()
-            .atZone(ZoneId.systemDefault()).toInstant();
+            .atZone(ZoneId.of("Europe/Madrid")).toInstant();
         Integer numero = jornada.getNumero();
 
         java.util.concurrent.ScheduledFuture<?> tarea = taskScheduler.schedule(() -> {

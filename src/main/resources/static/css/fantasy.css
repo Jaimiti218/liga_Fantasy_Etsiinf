@@ -2,14 +2,14 @@
 
 body {
     font-family: 'Segoe UI', sans-serif;
-    background: #f0f2f5;
+    background: #0d1117;
     min-height: 100vh;
     padding-bottom: 70px; /* espacio para bottom-nav */
 }
 
 /* ── NAVBAR ── */
 .fantasy-navbar {
-    background: linear-gradient(135deg, #0f3460, #1a4a80);
+    background: linear-gradient(135deg, #1a1f2e, #0d1117);
     padding: 0.75rem 1.25rem;
     display: flex;
     justify-content: space-between;
@@ -58,7 +58,7 @@ body {
     left: 0;
     width: 280px;
     height: 100vh;
-    background: white;
+    background: #1a1f2e;
     z-index: 100;
     display: flex;
     flex-direction: column;
@@ -72,7 +72,7 @@ body {
 }
 
 .menu-header {
-    background: linear-gradient(135deg, #0f3460, #1a4a80);
+    background: linear-gradient(135deg, #0d1117, #1a1f2e);
     padding: 1.5rem 1.25rem 1rem;
     display: flex;
     justify-content: space-between;
@@ -99,7 +99,7 @@ body {
 .menu-item {
     padding: 0.9rem 1.5rem;
     font-size: 0.95rem;
-    color: #333;
+    color: #c0c8d8; 
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -107,12 +107,12 @@ body {
     transition: background 0.15s;
     text-decoration: none;
 }
-.menu-item:hover { background: #f0f4ff; }
+.menu-item:hover { background: #252a3a; }
 
 .proximamente-badge {
     font-size: 0.7rem;
-    background: #e8f0fe;
-    color: #0f3460;
+    background: #252a3a; 
+    color: #ff6b00;
     padding: 0.15rem 0.4rem;
     border-radius: 10px;
     margin-left: auto;
@@ -120,7 +120,7 @@ body {
 
 .menu-footer {
     padding: 1rem 1.25rem;
-    border-top: 1px solid #eee;
+    border-top: 1px solid #252a3a;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
@@ -128,15 +128,15 @@ body {
 
 .btn-volver-inicio {
     background: none;
-    border: 1.5px solid #ddd;
-    color: #666;
+    border: 1.5px solid #252a3a; 
+    color: #8a9bb0;
     padding: 0.6rem;
     border-radius: 8px;
     cursor: pointer;
     font-size: 0.85rem;
     transition: all 0.2s;
 }
-.btn-volver-inicio:hover { border-color: #0f3460; color: #0f3460; }
+.btn-volver-inicio:hover { border-color: #ff6b00; color: #ff6b00; }
 
 .btn-cerrar-sesion-menu {
     background: #fff0f0;
@@ -169,7 +169,7 @@ body {
 
 .mis-ligas-header h1 {
     font-size: 1.5rem;
-    color: #1a1a2e;
+    color: #ffffff;
 }
 
 .acciones-ligas {
@@ -187,10 +187,10 @@ body {
     transition: all 0.2s;
 }
 
-.btn-crear { background: #0f3460; color: white; }
-.btn-crear:hover { background: #1a4a80; }
-.btn-unirse { background: #e8f0fe; color: #0f3460; }
-.btn-unirse:hover { background: #d0e2ff; }
+.btn-crear { background: #ff6b00; color: white; }
+.btn-crear:hover { background: #e05a00; }
+.btn-unirse { background: #252a3a; color: #ff6b00; }
+.btn-unirse:hover { background: #2f3548; }
 
 .lista-ligas {
     display: flex;
@@ -201,17 +201,17 @@ body {
 
 .cargando-ligas {
     text-align: center;
-    color: #999;
+    color: #8a9bb0;
     padding: 3rem;
     font-size: 0.9rem;
 }
 
 /* TARJETA DE LIGA */
 .liga-card {
-    background: white;
+    background: #1a1f2e;
     border-radius: 14px;
     padding: 1.25rem;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -233,9 +233,9 @@ body {
     left: 100%;
     top: 0;
     z-index: 9999;
-    background: white;
+    background: #1a1f2e;
     border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
     min-width: 160px;
     overflow: visible;
     margin-left: 8px;
@@ -262,7 +262,7 @@ body {
 .liga-card-nombre {
     font-size: 1.05rem;
     font-weight: 700;
-    color: #1a1a2e;
+    color: #ffffff;
     margin-bottom: 0.5rem;
 }
 
@@ -280,7 +280,7 @@ body {
 
 .liga-stat-label {
     font-size: 0.7rem;
-    color: #999;
+    color: #8a9bb0; 
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -288,7 +288,7 @@ body {
 .liga-stat-valor {
     font-size: 0.95rem;
     font-weight: 700;
-    color: #0f3460;
+    color: #ff6b00;
 }
 
 
@@ -298,12 +298,12 @@ body {
     border: none;
     font-size: 1.2rem;
     cursor: pointer;
-    color: #999;
+    color: #8a9bb0;
     padding: 0.4rem;
     border-radius: 6px;
     transition: background 0.2s;
 }
-.btn-tres-puntos:hover { background: #f0f0f0; color: #333; }
+.btn-tres-puntos:hover { background: #252a3a; color: #ffffff; }
 
 
 
@@ -314,24 +314,24 @@ body {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    color: #333;
+    color: #c0c8d8;
     transition: background 0.15s;
 }
-.dropdown-item:hover { background: #f8f9ff; }
+.dropdown-item:hover { background: #252a3a;  }
 .dropdown-item.danger { color: #c0392b; }
-.dropdown-item.danger:hover { background: #fff0f0; }
+.dropdown-item.danger:hover { background: #3a1a1a; }
 
 .no-ligas {
     text-align: center;
     padding: 3rem 1rem;
-    color: #999;
+   color: #8a9bb0;
 }
-.no-ligas h3 { font-size: 1.1rem; margin-bottom: 0.5rem; color: #555; }
+.no-ligas h3 { font-size: 1.1rem; margin-bottom: 0.5rem; color: #c0c8d8; }
 .no-ligas p { font-size: 0.9rem; }
 
 /* ── CLASIFICACIÓN (liga.html) ── */
 .mi-equipo-banner {
-    background: linear-gradient(135deg, #0f3460, #1a4a80);
+    background: linear-gradient(135deg, #1a1f2e, #252a3a);
     border-radius: 14px;
     padding: 1.25rem;
     display: flex;
@@ -346,12 +346,12 @@ body {
 
 .clasificacion-container h2 {
     font-size: 1.2rem;
-    color: #1a1a2e;
+    color: #ffffff;
     margin-bottom: 1rem;
 }
 
 .tabla-clasificacion {
-    background: white;
+    background: #1a1f2e;
     border-radius: 14px;
     overflow: hidden;
     box-shadow: 0 2px 12px rgba(0,0,0,0.08);
@@ -361,18 +361,18 @@ body {
     display: flex;
     align-items: center;
     padding: 0.9rem 1.25rem;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid #252a3a;
     gap: 1rem;
     transition: background 0.15s;
 }
 .fila-clasificacion:last-child { border-bottom: none; }
-.fila-clasificacion:hover { background: #f8f9ff; }
-.fila-clasificacion.mi-equipo { background: #e8f0fe; }
+.fila-clasificacion:hover { background: #252a3a;  }
+.fila-clasificacion.mi-equipo { background: #2a1f3a !important; }
 
 .posicion-num {
     font-size: 1rem;
     font-weight: 800;
-    color: #0f3460;
+    color: #ff6b00;
     min-width: 28px;
     text-align: center;
 }
@@ -381,8 +381,8 @@ body {
 .posicion-num.top2 { color: #a0a0a0; }
 .posicion-num.top3 { color: #cd7f32; }
 
-.fila-username { flex: 1; font-size: 0.95rem; font-weight: 500; color: #333; }
-.fila-puntos { font-size: 0.95rem; font-weight: 700; color: #0f3460; }
+.fila-username { flex: 1; font-size: 0.95rem; font-weight: 500; color: #c0c8d8; }
+.fila-puntos { font-size: 0.95rem; font-weight: 700; color: #ffffff; }
 
 /* ── BOTTOM NAV ── */
 .bottom-nav {
@@ -390,8 +390,8 @@ body {
     bottom: 0;
     left: 0;
     right: 0;
-    background: white;
-    border-top: 1px solid #eee;
+    background: #1a1f2e;
+    border-top: 1px solid #252a3a;
     display: flex;
     box-shadow: 0 -2px 10px rgba(0,0,0,0.08);
     z-index: 50;
@@ -403,7 +403,7 @@ body {
     background: none;
     border: none;
     font-size: 0.75rem;
-    color: #999;
+    color: #8a9bb0; 
     cursor: pointer;
     display: flex;
     flex-direction: column;
@@ -411,7 +411,7 @@ body {
     gap: 0.2rem;
     transition: color 0.2s;
 }
-.bottom-nav-item.active { color: #0f3460; font-weight: 600; }
+.bottom-nav-item.active { color: #ff6b00; font-weight: 600; }
 .bottom-nav-item.proximamente-btn { opacity: 0.5; cursor: not-allowed; }
 
 /* ── MODALES ── */
@@ -427,7 +427,7 @@ body {
 }
 
 .modal {
-    background: white;
+    background: #1a1f2e;
     border-radius: 16px;
     padding: 2rem;
     width: 100%;
@@ -438,26 +438,26 @@ body {
     box-shadow: 0 20px 60px rgba(0,0,0,0.3);
 }
 
-.modal h3 { font-size: 1.3rem; color: #1a1a2e; }
-.subtexto { color: #666; font-size: 0.9rem; margin-top: -0.5rem; }
+.modal h3 { font-size: 1.3rem; color: #ffffff; }
+.subtexto { color: #8a9bb0; font-size: 0.9rem; margin-top: -0.5rem; }
 
 .campo { display: flex; flex-direction: column; gap: 0.4rem; }
-.campo label { font-size: 0.85rem; font-weight: 600; color: #444; }
+.campo label { font-size: 0.85rem; font-weight: 600; color: #c0c8d8; }
 .campo input {
     padding: 0.75rem 1rem;
-    border: 1.5px solid #e0e0e0;
+    background: #252a3a; border: 1.5px solid #353a4a; color: #ffffff;
     border-radius: 8px;
     font-size: 0.95rem;
     outline: none;
     transition: border-color 0.2s;
 }
-.campo input:focus { border-color: #0f3460; }
+.campo input:focus { border-color: #ff6b00; }
 
 .modal-botones { display: flex; gap: 0.75rem; }
 
 .btn-primary {
     flex: 1;
-    background: #0f3460;
+    background: #ff6b00;
     color: white;
     border: none;
     padding: 0.75rem;
@@ -467,22 +467,22 @@ body {
     cursor: pointer;
     transition: background 0.2s;
 }
-.btn-primary:hover { background: #1a4a80; }
+.btn-primary:hover { background: #e05a00;  }
 
 .btn-ghost {
     background: none;
-    border: 1.5px solid #e0e0e0;
-    color: #666;
+    border: 1.5px solid #353a4a;
+    color: #8a9bb0;
     padding: 0.75rem 1rem;
     border-radius: 8px;
     font-size: 0.95rem;
     cursor: pointer;
     transition: all 0.2s;
 }
-.btn-ghost:hover { border-color: #aaa; }
+.btn-ghost:hover { border-color: #8a9bb0; }
 
 .codigo-invitacion {
-    background: #f0f4ff;
+    background: #252a3a;
     border-radius: 10px;
     padding: 1rem;
     display: flex;
@@ -491,12 +491,12 @@ body {
     gap: 1rem;
     font-size: 1.2rem;
     font-weight: 800;
-    color: #0f3460;
+    color: #ff6b00;
     letter-spacing: 3px;
 }
 
 .btn-copiar {
-    background: #0f3460;
+    background: #ff6b00;
     color: white;
     border: none;
     padding: 0.5rem 0.75rem;
@@ -516,9 +516,9 @@ body {
 }
 
 .mensaje-exito {
-    background: #f0fff4;
-    color: #27ae60;
-    border: 1px solid #b7ebc8;
+    background: #0d2a1a; 
+    color: #00d46a; 
+    border-color: #1a4a30;
     border-radius: 8px;
     padding: 0.75rem 1rem;
     font-size: 0.875rem;

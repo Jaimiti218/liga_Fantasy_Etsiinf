@@ -114,6 +114,14 @@ public class LigaFantasyService {
         LigaFantasy liga = ligaFantasyRepository.findByCode(code)
             .orElseThrow(() -> new RuntimeException("Liga no encontrada"));
 
+
+        // Comprobar si el usuario ya está en esta liga
+        boolean yaEstaEnLiga = liga.getEquipos().stream()
+            .anyMatch(e -> e.getUser().getId().equals(userId));
+        if (yaEstaEnLiga) {
+            throw new RuntimeException("Ya estás en esta liga.");
+        }
+
         User usuario = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 

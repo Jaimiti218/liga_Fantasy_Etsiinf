@@ -47,6 +47,8 @@ async function hacerLogin() {
         return;
     }
 
+    mostrarCargando('Iniciando sesión...');
+
     try {
         const respuesta = await fetch('/users/login', {
             method: 'POST',
@@ -71,6 +73,9 @@ async function hacerLogin() {
     } catch (e) {
         mostrarError('error-login', 'Error de conexión con el servidor.');
     }
+    finally {
+        ocultarCargando();
+    }
 }
 
 async function hacerRegistro() {
@@ -94,6 +99,8 @@ async function hacerRegistro() {
         return;
     }
 
+    mostrarCargando('Creando cuenta...');
+
     try {
         const respuesta = await fetch('/users/register', {
             method: 'POST',
@@ -116,6 +123,9 @@ async function hacerRegistro() {
 
     } catch (e) {
         mostrarError('error-registro', 'Error de conexión con el servidor.');
+    }
+    finally {
+        ocultarCargando();
     }
 }
 

@@ -32,7 +32,8 @@
             <div class="campo">
                 <label for="email-login">Correo electrónico</label>
                 <input type="email" id="email-login" placeholder="tu@correo.com"
-                     autocomplete="username"/>
+                    autocomplete="username email"
+                    onkeydown="if(event.key==='Enter') hacerLogin()"/>
             </div>
 
             <div class="campo">

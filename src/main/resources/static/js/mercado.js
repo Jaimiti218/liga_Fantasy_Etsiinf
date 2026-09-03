@@ -534,6 +534,8 @@ async function rechazarOfertaPuja(pujaId) {
 
 async function aceptarOfertaPuja(pujaId, jugadorFantasyId) {
     if (!confirm('¿Seguro que quieres aceptar esta oferta?')) return;
+
+    mostrarCargando('Procesando venta...');
     try {
         const res = await fetch(`/mercado/pujas/${pujaId}/aceptar`, {
             method: 'POST', credentials: 'include'
@@ -546,6 +548,7 @@ async function aceptarOfertaPuja(pujaId, jugadorFantasyId) {
     } catch (e) {
         alert('Error de conexión.');
     }
+    finally { ocultarCargando(); }
 }
 
 

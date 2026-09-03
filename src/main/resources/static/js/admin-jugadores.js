@@ -127,11 +127,14 @@ async function guardarJugador() {
     const equipo   = document.getElementById('input-equipo').value.trim();
     const posicion = document.getElementById('input-posicion').value;
 
+
+    
     if (!nombre) {
         mostrarErrorModal('El nombre es obligatorio.');
         return;
     }
 
+    mostrarCargando('Guardando jugador...');
     try {
         let res;
 
@@ -180,6 +183,8 @@ async function guardarJugador() {
     } catch (e) {
         mostrarErrorModal('Error de conexión con el servidor.');
     }
+
+    finally { ocultarCargando(); }
 }
 
 async function eliminarJugador(id, nombre) {

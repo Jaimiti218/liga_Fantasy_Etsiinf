@@ -372,6 +372,8 @@ function confirmarResultado() {
 
 async function ejecutarGuardarResultado() {
     if (!resultadoPendiente) return;
+
+    mostrarCargando('Guardando resultado...');
     try {
         const res = await fetch(`/partidos/${resultadoPendiente.partidoId}/resultado`, {
             method: 'PUT', credentials: 'include',
@@ -390,6 +392,8 @@ async function ejecutarGuardarResultado() {
     } catch (e) {
         alert('Error de conexión.');
     }
+
+    finally { ocultarCargando(); }
 }
 
 function cerrarModalResultado() {

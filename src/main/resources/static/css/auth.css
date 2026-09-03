@@ -6,7 +6,7 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    background: linear-gradient(135deg, #1a3d1a 0%, #215821 50%, #338533 100%);
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -51,12 +51,12 @@ body {
 
 .auth-card h2 {
     font-size: 1.5rem;
-    color: #1a1a2e;
+    color: #1a3d1a;
     margin-bottom: 0.25rem;
 }
 
 .subtexto {
-    color: #666;
+    color: #5a7a5a;
     font-size: 0.9rem;
     margin-top: -0.5rem;
 }
@@ -70,12 +70,12 @@ body {
 .campo label {
     font-size: 0.85rem;
     font-weight: 600;
-    color: #444;
+    color: #5a7a5a;
 }
 
 .campo input {
     padding: 0.75rem 1rem;
-    border: 1.5px solid #e0e0e0;
+    border: 1.5px solid #c0d8c0;
     border-radius: 8px;
     font-size: 0.95rem;
     transition: border-color 0.2s;
@@ -84,7 +84,7 @@ body {
 }
 
 .campo input:focus {
-    border-color: #0f3460;
+    border-color: #1a3d1a;
 }
 
 .input-password {
@@ -125,33 +125,33 @@ body {
 }
 
 .btn-primary {
-    background: #0f3460;
+    background: #1a3d1a;
     color: white;
 }
 
 .btn-primary:hover {
-    background: #1a4a80;
+    background: #2d6a2d;
     transform: translateY(-1px);
 }
 
 .btn-secondary {
-    background: #e8f0fe;
-    color: #0f3460;
+    background: #e8f5e8;
+    color: #1a3d1a;
 }
 
 .btn-secondary:hover {
-    background: #d0e2ff;
+    background: #d4e8d4;
 }
 
 .btn-ghost {
     background: none;
-    color: #888;
+    color: #7a9a7a;
     font-size: 0.85rem;
     font-weight: 500;
 }
 
 .btn-ghost:hover {
-    color: #0f3460;
+    color: #1a3d1a;
     text-decoration: underline;
 }
 
@@ -176,7 +176,7 @@ body {
 
 .bienvenida {
     font-size: 1.1rem;
-    color: #333;
+    color: #2d3a2d;
     text-align: center;
     padding: 0.5rem 0;
 }

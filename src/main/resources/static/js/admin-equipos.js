@@ -168,6 +168,8 @@ async function guardarEquipo() {
         renderizarTags();
     }
 
+    mostrarCargando('Guardando equipo...');
+
     try {
         let res;
 
@@ -208,6 +210,9 @@ async function guardarEquipo() {
     } catch (e) {
         mostrarErrorModal('Error de conexión con el servidor.');
     }
+
+   
+    finally { ocultarCargando(); }
 }
 
 // ─── Eliminar ─────────────────────────────────────────────────────────────────

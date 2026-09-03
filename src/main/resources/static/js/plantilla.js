@@ -243,12 +243,16 @@ function obtenerAlineadosDePosicion(posicion) {
 async function guardarAlineacion() {
     const ids = alineacionActual.filter(id => id !== null);
 
+    
+    
     if (ids.length < 7) {
         const confirmar = confirm(
             `Solo tienes ${ids.length} jugadores alineados de 7. No puntuarás en la siguiente jornada con los huecos vacíos. ¿Guardar de todos modos?`
         );
         if (!confirmar) return;
     }
+
+    mostrarCargando('Guardando alineación...');
 
     try {
         const res = await fetch(`/equipos-fantasy/${equipoId}/alineacion`, {
@@ -270,6 +274,8 @@ async function guardarAlineacion() {
     } catch (e) {
         alert('Error de conexión.');
     }
+
+    finally { ocultarCargando(); }
 }
 
 // ─── Resumen ──────────────────────────────────────────────────────────────────

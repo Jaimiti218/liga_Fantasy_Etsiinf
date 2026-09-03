@@ -9,7 +9,7 @@ body {
 
 /* ── NAVBAR ── */
 .fantasy-navbar {
-    background: linear-gradient(135deg, #1a1f2e, #0d1117);
+    background: linear-gradient(135deg, #cc4400, #ff6b00);
     padding: 0.75rem 1.25rem;
     display: flex;
     justify-content: space-between;
@@ -367,7 +367,8 @@ body {
 }
 .fila-clasificacion:last-child { border-bottom: none; }
 .fila-clasificacion:hover { background: #252a3a;  }
-.fila-clasificacion.mi-equipo { background: #2a1f3a !important; }
+.fila-clasificacion.mi-equipo { background: rgba(255, 107, 0, 0.15);
+border-left: 3px solid #ff6b00; }
 
 .posicion-num {
     font-size: 1rem;
@@ -537,14 +538,15 @@ body {
 .hidden { display: none !important; }
 
 .mi-equipo-fila {
-    background: #1a3a6b !important;
+    background: rgba(254, 106, 1, 0.479) !important;
+border-left: 3px solid #ff6b00;
 }
 .mi-equipo-fila .fila-username {
     color: white;
     font-weight: 700;
 }
 .mi-equipo-fila .fila-puntos {
-    color: #90caf9;
+    color: #ff9d00;
 }
 
 .fila-clickable {
@@ -603,4 +605,6 @@ body {
         font-size: 0.65rem;
         padding: 0.6rem 0.25rem;
     }
+
+    
 }

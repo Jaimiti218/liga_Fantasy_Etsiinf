@@ -152,38 +152,44 @@ function abrirModalCrear() {
 
 async function crearLiga() {
     const nombre = document.getElementById('input-nombre-liga').value.trim();
-    if (!nombre) {
-        mostrarErrorModal('error-crear', 'El nombre es obligatorio.');
-        return;
-    }
-
-    const btn = document.querySelector('#modal-crear .btn-primary');
-    if (btn.disabled) return;
-    btn.disabled = true;
-    btn.textContent = 'Creando...';
-
-    try {
-        const res = await fetch(`/ligas-fantasy/crear?nombre=${encodeURIComponent(nombre)}`, {
-            method: 'POST',
-            credentials: 'include'
-        });
-
-        if (!res.ok) {
-            const texto = await res.text();
-            mostrarErrorModal('error-crear', texto || 'Error al crear la liga.');
+    
+    
+        if (!nombre) {
+            mostrarErrorModal('error-crear', 'El nombre es obligatorio.');
             return;
         }
 
-        cerrarModales();
-        mostrarMensajeGlobal('¡Liga creada!', 'exito');
-        await cargarMisLigas();
+        const btn = document.querySelector('#modal-crear .btn-primary');
+        if (btn.disabled) return;
+        btn.disabled = true;
+        btn.textContent = 'Creando...';
 
-    } catch (e) {
-        mostrarErrorModal('error-crear', 'Error de conexión.');
-    } finally {
-        btn.disabled = false;
-        btn.textContent = 'Crear liga';
-    }
+        mostrarCargando('Creando liga...');
+
+        try {
+            const res = await fetch(`/ligas-fantasy/crear?nombre=${encodeURIComponent(nombre)}`, {
+                method: 'POST',
+                credentials: 'include'
+            });
+
+            if (!res.ok) {
+                const texto = await res.text();
+                mostrarErrorModal('error-crear', texto || 'Error al crear la liga.');
+                return;
+            }
+
+            cerrarModales();
+            mostrarMensajeGlobal('¡Liga creada!', 'exito');
+            await cargarMisLigas();
+
+        } catch (e) {
+            mostrarErrorModal('error-crear', 'Error de conexión.');
+        } 
+        finally {
+                btn.disabled = false;
+                btn.textContent = 'Crear liga';
+                ocultarCargando();
+            }
 }
 
 // ─── Modal unirse a liga ──────────────────────────────────────────────────────
@@ -195,6 +201,8 @@ function abrirModalUnirse() {
 
 async function unirseALiga() {
     const codigo = document.getElementById('input-codigo-liga').value.trim();
+    
+    
     if (!codigo) {
         mostrarErrorModal('error-unirse', 'Introduce el código de la liga.');
         return;
@@ -204,6 +212,8 @@ async function unirseALiga() {
     if (btn.disabled) return;
     btn.disabled = true;
     btn.textContent = 'Uniéndose...';
+
+    mostrarCargando('Uniéndose a la liga...');
 
     try {
         const res = await fetch(`/ligas-fantasy/unirse?code=${encodeURIComponent(codigo)}`, {
@@ -226,6 +236,7 @@ async function unirseALiga() {
     } finally {
         btn.disabled = false;
         btn.textContent = 'Unirse';
+        ocultarCargando();
     }
 }
 

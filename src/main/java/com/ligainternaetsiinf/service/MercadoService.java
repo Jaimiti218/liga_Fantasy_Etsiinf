@@ -52,32 +52,53 @@ public class MercadoService {
     private MercadoService self;
 
     // ─── Al arrancar: resolver vencidas y reprogramar futuras ─────────────────
-   /*  @EventListener(ApplicationReadyEvent.class)
-    public void resolverInstanciasPendientesAlArrancar() {
+    // Las tareas del TaskScheduler viven en memoria y se pierden si el servidor se
+    // reinicia. Las instancias de mercado sí están en BD, así que al arrancar se
+    // cierran las que vencieron con el servidor parado y se reprograman las demás.
+    @EventListener(ApplicationReadyEvent.class)
+    public void reprogramarInstanciasAlArrancar() {
         List<InstanciaMercado> pendientes = instanciaRepository.findByResueltaFalse();
-        LocalDateTime ahora = LocalDateTime.now();
+        LocalDateTime ahora = LocalDateTime.now(ZoneId.of("Europe/Madrid"));
         for (InstanciaMercado instancia : pendientes) {
-            if (instancia.getFin().isBefore(ahora)) {
-                resolverInstancia(instancia);
-                crearNuevaInstancia(instancia);
-            } else {
-                programarResolucion(instancia);
+            try {
+                if (instancia.getFin() == null || !instancia.getFin().isAfter(ahora)) {
+                    ejecutarCierreInstancia(instancia.getId());
+                } else {
+                    programarResolucion(instancia);
+                }
+            } catch (Exception e) {
+                System.err.println("Error reprogramando instancia de mercado "
+                    + instancia.getId() + ": " + e.getMessage());
             }
         }
-    } 
+    }
 
-    // ─── Scheduler horario como red de seguridad ──────────────────────────────
-    @Scheduled(fixedDelay = 3600000)
-    public void resolverInstanciasVencidas() {
-        List<InstanciaMercado> pendientes = instanciaRepository.findByResueltaFalse();
-        LocalDateTime ahora = LocalDateTime.now();
-        for (InstanciaMercado instancia : pendientes) {
-            if (instancia.getFin().isBefore(ahora)) {
-                resolverInstancia(instancia);
-                crearNuevaInstancia(instancia);
+    // ─── Red de seguridad: cada 5 minutos cierra instancias ya vencidas ───────
+    @Scheduled(fixedDelay = 300000, initialDelay = 300000)
+    public void cerrarInstanciasVencidas() {
+        LocalDateTime ahora = LocalDateTime.now(ZoneId.of("Europe/Madrid"));
+        for (InstanciaMercado instancia : instanciaRepository.findByResueltaFalse()) {
+            if (instancia.getFin() != null && instancia.getFin().plusMinutes(1).isBefore(ahora)) {
+                try {
+                    ejecutarCierreInstancia(instancia.getId());
+                } catch (Exception e) {
+                    System.err.println("Error cerrando instancia de mercado "
+                        + instancia.getId() + ": " + e.getMessage());
+                }
             }
         }
-    } */
+    }
+
+    // Cierra una instancia (resuelve pujas y crea la siguiente) solo si sigue
+    // pendiente, para que nunca se resuelva dos veces la misma instancia.
+    private synchronized void ejecutarCierreInstancia(Integer instanciaId) {
+        boolean pendiente = instanciaRepository.findById(instanciaId)
+            .map(i -> !i.isResuelta())
+            .orElse(false);
+        if (!pendiente) return;
+        self.resolverInstancia(instanciaId);
+        self.crearNuevaInstancia(instanciaId);
+    }
 
     // ─── Crear primera instancia ──────────────────────────────────────────────
     public void crearPrimeraInstancia(Mercado mercado) {
@@ -549,11 +570,15 @@ public class MercadoService {
     // ─── Programar resolución automática ─────────────────────────────────────
     private void programarResolucion(InstanciaMercado instancia) {
         Instant fechaCierre = instancia.getFin()
-            .atZone(ZoneId.systemDefault()).toInstant();
+            .atZone(ZoneId.of("Europe/Madrid")).toInstant();
         Integer instanciaId = instancia.getId();
         taskScheduler.schedule(() -> {
-            self.resolverInstancia(instanciaId);
-            self.crearNuevaInstancia(instanciaId);
+            try {
+                ejecutarCierreInstancia(instanciaId);
+            } catch (Exception e) {
+                System.err.println("Error cerrando instancia de mercado "
+                    + instanciaId + ": " + e.getMessage());
+            }
         }, fechaCierre);
     }
 

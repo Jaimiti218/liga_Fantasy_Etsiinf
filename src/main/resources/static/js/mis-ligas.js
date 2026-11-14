@@ -15,7 +15,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ─── Cargar ligas del usuario ─────────────────────────────────────────────────
 async function cargarMisLigas() {
     try {
-        const res = await fetch('/ligas-fantasy/usuario/mis-ligas', {
+        // Una sola petición ligera con todas las ligas y su resumen (posición, puntos, dinero, aviso)
+        const res = await fetch('/equipos-fantasy/usuario/mis-ligas-resumen', {
             credentials: 'include'
         });
 
@@ -42,34 +43,21 @@ async function renderizarLigas(ligas) {
     const contenedor = document.getElementById('lista-ligas');
     contenedor.innerHTML = '';
 
-    const datosLigas = await Promise.all(ligas.map(async liga => {
-        let posicion = '—';
-        let puntos = '—';
-        let dinero = '—';
-        let tieneAviso = false;
-        let equipoId = null;
-
-        try {
-            const res = await fetch(`/equipos-fantasy/liga/${liga.id}/mi-resumen`, {
-                credentials: 'include'
-            });
-            if (res.ok) {
-                const resumen = await res.json();
-                posicion = resumen.posicion + 'º';
-                puntos = resumen.puntos;
-                dinero = formatearDinero(resumen.dinero);
-                tieneAviso = resumen.tieneAviso;
-                equipoId = resumen.equipoId;
-            }
-        } catch (e) {}
-
-        return { liga, equipoId, posicion, puntos, dinero, tieneAviso };
+    // El resumen ya viene incluido en cada liga (endpoint /equipos-fantasy/usuario/mis-ligas-resumen)
+    const datosLigas = ligas.map(liga => ({
+        liga,
+        equipoId: liga.equipoId,
+        posicion: liga.posicion != null ? liga.posicion + 'º' : '—',
+        puntos:   liga.puntos != null ? liga.puntos : '—',
+        dinero:   liga.dinero != null ? formatearDinero(liga.dinero) : '—',
+        tieneAviso: !!liga.tieneAviso
     }));
 
     for (const { liga, equipoId, posicion, puntos, dinero, tieneAviso } of datosLigas) {
         const card = document.createElement('div');
         card.className = 'liga-card';
         card.innerHTML = `
+            <img class="liga-card-escudo" src="/images/escudoETSIINF.png" alt="ETSIINF" onclick="entrarALiga(${liga.id})">
             <div class="liga-card-info" onclick="entrarALiga(${liga.id})">
                 <div class="liga-card-nombre">${liga.name}</div>
                 <div class="liga-card-stats">
@@ -88,7 +76,13 @@ async function renderizarLigas(ligas) {
                 </div>
             </div>
             <div class="liga-card-menu">
-                ${tieneAviso ? `<span class="aviso-alineacion" title="Alineación incompleta o saldo negativo">⚠️</span>` : ''}
+                ${tieneAviso ? `<span class="aviso-alineacion" title="Alineación incompleta o saldo negativo">
+                    <svg viewBox="0 0 24 24" width="22" height="22" aria-label="Aviso">
+                        <path d="M12 2.5 L23 21.5 H1 Z" fill="#e53935" stroke="#e53935" stroke-width="1.5" stroke-linejoin="round"/>
+                        <rect x="11" y="9" width="2" height="6.5" rx="1" fill="#fff"/>
+                        <circle cx="12" cy="18.2" r="1.2" fill="#fff"/>
+                    </svg>
+                </span>` : ''}
                 <button class="btn-tres-puntos" onclick="toggleDropdown(event, ${liga.id}, '${escapar(liga.code)}')">⋯</button>
                 <div id="dropdown-${liga.id}" class="dropdown-menu hidden">
                     <div class="dropdown-item" onclick="mostrarModalInvitar('${escapar(liga.code)}')">

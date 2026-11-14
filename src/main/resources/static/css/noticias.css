@@ -6,21 +6,21 @@
 }
 
 .noticia-card {
-    background: #1a1f2e;
+    background: #ffffff;
     border-radius: 12px;
     padding: 1rem 1.25rem;
     margin-bottom: 0.75rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     position: relative;
-    border-left: 4px solid #0f3460;
+    border-left: 4px solid #6b8f71;
 }
 
 .noticia-card.COMPRA        { border-left-color: #27ae60; }
-.noticia-card.VENTA         { border-left-color: #f39c12; }
+.noticia-card.VENTA         { border-left-color: #d4a017; }
 .noticia-card.SIN-PUNTUACION { border-left-color: #e74c3c; }
 .noticia-card.RECHAZADA     { border-left-color: #c0392b; }
 .noticia-card.OFERTA-RECIBIDA { border-left-color: #8e44ad; }
-.noticia-card.privada       { background: #1f1a2e; }
+.noticia-card.privada       { background: #faf5fd; }
 
 .noticia-header {
     display: flex;
@@ -40,26 +40,26 @@
 }
 
 .titulo-COMPRA         { background: #27ae60; }
-.titulo-VENTA          { background: #f39c12; }
+.titulo-VENTA          { background: #d4a017; }
 .titulo-SIN-PUNTUACION { background: #e74c3c; }
 .titulo-RECHAZADA      { background: #c0392b; }
 .titulo-OFERTA-RECIBIDA { background: #8e44ad; }
-.titulo-default        { background: #0f3460; }
+.titulo-default        { background: #3d5c43; }
 
 .noticia-hora {
     font-size: 0.75rem;
-    color: #aaa;
+    color: #7a9a7a;
 }
 
 .noticia-texto {
     font-size: 0.9rem;
-    color: #c0c8d8;
+    color: #2d3a2d;
     line-height: 1.5;
 }
 
 .noticia-fecha {
     font-size: 0.72rem;
-    color: #8a9bb0; 
+    color: #7a9a7a; 
     text-align: right;
     margin-top: 0.4rem;
 }

@@ -19,7 +19,8 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public UserResponse registerUser(String email, String username, String password){
+    // synchronized: evita que dos peticiones simultáneas (doble click) creen dos cuentas con el mismo correo
+    public synchronized UserResponse registerUser(String email, String username, String password){
         // comprobar si el email ya existe
         if(userRepository.findByEmail(email).isPresent()){
             throw new RuntimeException("Ya existe una cuenta con este correo!");

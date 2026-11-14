@@ -14,6 +14,7 @@ import com.ligainternaetsiinf.service.EquipoFantasyService;
 import com.ligainternaetsiinf.dto.AlineacionDTO;
 import com.ligainternaetsiinf.dto.JugadorFantasyDetalleResponse;
 import com.ligainternaetsiinf.dto.MiEquipoResumenResponse;
+import com.ligainternaetsiinf.dto.MiLigaResumenResponse;
 import com.ligainternaetsiinf.dto.PuntosJornadaJugadorResponse;
 import com.ligainternaetsiinf.dto.PuntosJornadaResponse;
 
@@ -28,6 +29,13 @@ public class EquipoFantasyController {
     @GetMapping("/{equipoId}")
     public EquipoFantasyResponse obtenerEquipo(@PathVariable Integer equipoId){
         return equipoFantasyService.obtenerEquipo(equipoId);
+    }
+
+    // Resumen de todas las ligas del usuario (pantalla "Mis ligas") en una sola petición
+    @GetMapping("/usuario/mis-ligas-resumen")
+    public List<MiLigaResumenResponse> obtenerResumenMisLigas(Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        return equipoFantasyService.obtenerResumenMisLigas(userDetails.getId());
     }
 
     /*creamos lo de clasificacion response para que en el frontend no se vean datos innecesarios */

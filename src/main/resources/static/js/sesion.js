@@ -15,6 +15,8 @@ async function obtenerUsuarioActual() {
 }
 
 function mostrarCargando(texto = 'Cargando...') {
+    // Quitar el foco del botón pulsado para que Enter/Espacio no repitan la operación
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
     let overlay = document.getElementById('loading-overlay');
     if (!overlay) {
         overlay = document.createElement('div');
@@ -50,14 +52,14 @@ function mostrarCargando(texto = 'Cargando...') {
             <div style="
                 width: 22px;
                 height: 22px;
-                border: 3px solid rgba(255,107,0,0.2);
-                border-top-color: #ff6b00;
+                border: 3px solid rgba(45,106,45,0.2);
+                border-top-color: #2d6a2d;
                 border-radius: 50%;
                 animation: spin 0.75s linear infinite;
                 flex-shrink: 0;
             "></div>
             <span style="
-                color: #1a1a2e;
+                color: #1a3d1a;
                 font-size: 0.9rem;
                 font-weight: 600;
                 white-space: nowrap;

@@ -1,5 +1,5 @@
 .saldo-mercado {
-    background: #03bc60;
+    background: linear-gradient(135deg, #215821, #338533);
     border-radius: 12px;
     padding: 1rem 1.25rem;
     margin-bottom: 1rem;
@@ -28,7 +28,7 @@
 .saldo-valor-small  { font-size: 1rem; font-weight: 700; }
 
 .contador-mercado {
-    background: #1a1a2e;
+    background: #1a3d1a;
     border-radius: 10px;
     padding: 0.75rem 1rem;
     display: flex;
@@ -43,10 +43,11 @@
 
 /* TARJETA MERCADO */
 .jugador-card-mercado {
-    background: #1a1f2e;
+    background: #ffffff;
+    border: 1px solid #d4e8d4;
     border-radius: 14px;
     padding: 1rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     display: flex;
     align-items: flex-start;
     gap: 1rem;
@@ -54,8 +55,8 @@
 }
 
 .btn-fichar {
-    background: #00d46a;
-    color: #0d1117;
+    background: #2d6a2d;
+    color: #ffffff;
     border: none;
     padding: 0.5rem 1rem;
     border-radius: 8px;
@@ -65,7 +66,7 @@
     transition: background 0.2s;
     white-space: nowrap;
 }
-.btn-fichar:hover { background: #00b558; }
+.btn-fichar:hover { background: #215821; }
 
 .temporizador-jugador {
     font-size: 0.7rem;
@@ -78,8 +79,8 @@
 /* MIS OPERACIONES */
 .operaciones-tabs {
     display: flex;
-    background: #1a1f2e;
-    border-bottom: 1px solid #252a3a;
+    background: #ffffff;
+    border-bottom: 1px solid #d4e8d4;
     margin-bottom: 1rem;
 }
 
@@ -90,30 +91,31 @@
     border: none;
     font-size: 0.9rem;
     font-weight: 500;
-    color: #888;
+    color: #5a7a5a;
     cursor: pointer;
     border-bottom: 3px solid transparent;
     transition: all 0.2s;
 }
 
-.op-tab.active { color: #ff6b00; border-bottom-color: #ff6b00 }
+.op-tab.active { color: #2d6a2d; border-bottom-color: #2d6a2d; font-weight: 700; }
 
 .puja-card, .venta-card {
-    background: #1a1f2e;
-    color: #ffffff;
+    background: #ffffff;
+    border: 1px solid #d4e8d4;
+    color: #2d3a2d;
     border-radius: 12px;
     padding: 1rem;
     margin-bottom: 0.75rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     display: flex;
     align-items: center;
     gap: 1rem;
 }
 
 .puja-info { flex: 1; }
-.puja-nombre { font-size: 0.95rem; font-weight: 700; color: #ffffff }
-.puja-detalle { font-size: 0.8rem; color: #888; margin-top: 0.2rem; }
-.puja-cantidad { font-size: 1.1rem; font-weight: 800; color: #ff6b00 }
+.puja-nombre { font-size: 0.95rem; font-weight: 700; color: #1a3d1a; }
+.puja-detalle { font-size: 0.8rem; color: #5a7a5a; margin-top: 0.2rem; }
+.puja-cantidad { font-size: 1.1rem; font-weight: 800; color: #2d6a2d; }
 
 .btn-aceptar-oferta {
     background: #27ae60;
@@ -129,13 +131,13 @@
 .valor-mercado-ref {
     font-size: 1rem;
     font-weight: 700;
-    color: #ffffff;
+    color: #1a3d1a;
     display: block;
     margin-top: 0.2rem;
 }
 
 .badge-en-venta {
-    background: #f39c12;
+    background: #d4a017;
     color: white;
     font-size: 0.7rem;
     font-weight: 600;
@@ -144,9 +146,9 @@
 }
 
 .btn-acciones-puja {
-    background: #252a3a; 
-    border: 1.5px solid #ff6b00; 
-    color: #ff6b00;
+    background: #ffffff; 
+    border: 1.5px solid #2d6a2d; 
+    color: #2d6a2d;
     padding: 0.5rem 0.75rem;
     border-radius: 8px;
     font-size: 0.8rem;
@@ -166,7 +168,7 @@
     font-size: 0.85rem;
     font-weight: 700;
     color: #ffffff; 
-    background: #ff6b00;
+    background: #2d6a2d;
     padding: 0.2rem 0.6rem;
     border-radius: 12px;
     white-space: nowrap;
@@ -200,15 +202,15 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background: #252a3a;
-    border: 1.5px solid #353a4a;
+    background: #ffffff;
+    border: 1.5px solid #c0d8c0;
     border-radius: 10px;
     padding: 0.5rem 1rem;
 }
 
 .buscar-input-wrap input {
     background: transparent; 
-    color: #ffffff;
+    color: #2d3a2d;
     border: none;
     outline: none;
     flex: 1;
@@ -225,7 +227,8 @@
     flex: 1;
     min-width: 120px;
     padding: 0.5rem 0.75rem;
-    border: 1.5px solid #ddd;
+    border: 1.5px solid #c0d8c0;
+    color: #2d3a2d;
     border-radius: 8px;
     font-size: 0.85rem;
     background: white;
@@ -233,14 +236,15 @@
 }
 
 .jugador-busqueda-card {
-    background: #1a1f2e;
+    background: #ffffff;
+    border: 1px solid #d4e8d4;
     border-radius: 12px;
     padding: 0.9rem 1rem;
     margin-bottom: 0.6rem;
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     cursor: pointer;
     transition: transform 0.15s, box-shadow 0.15s;
 }
@@ -254,7 +258,7 @@
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    background: #eee;
+    background: #e8f5e8;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -270,7 +274,7 @@
 .jugador-busqueda-nombre {
     font-size: 0.95rem;
     font-weight: 700;
-    color: #ffffff;
+    color: #1a3d1a;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -285,14 +289,14 @@
 
 .jugador-busqueda-dueno {
     font-size: 0.75rem;
-    color: #8a9bb0;
+    color: #5a7a5a;
     margin-top: 0.2rem;
 }
 
 .jugador-busqueda-derecha .puntos-busqueda {
     font-size: 1.1rem;
     font-weight: 800;
-    color: #ff6b00;
+    color: #2d6a2d;
 }
 
 

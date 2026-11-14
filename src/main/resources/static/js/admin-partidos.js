@@ -298,7 +298,7 @@ function renderizarJugadoresResultado(equipoNombre, jugadores) {
         <div class="jugador-resultado-fila" id="fila-jugador-${j.id}">
             <input type="checkbox" id="jugo-${j.id}" onchange="toggleJugador(${j.id})"/>
             <label for="jugo-${j.id}" style="font-weight:600;cursor:pointer" title="Pos. defecto: ${j.posicion}">${j.fullName}</label>
-            <select id="pos-${j.id}" disabled title="Deja vacío para usar posición por defecto (${j.posicion})">
+            <select id="pos-${j.id}" disabled data-pos-defecto="${j.posicion}" onchange="actualizarVisibilidadParadas(${j.id})" title="Deja vacío para usar posición por defecto (${j.posicion})">
                 <option value="">Por defecto</option>
                 <option value="PORTERO" ${j.posicion === 'PORTERO' ? 'selected' : ''}>Portero</option>
                 <option value="DEFENSA" ${j.posicion === 'DEFENSA' ? 'selected' : ''}>Defensa</option>
@@ -326,6 +326,22 @@ function toggleJugador(jugadorId) {
     });
 }
 
+// Posición con la que jugó el partido: la elegida en el selector o, si está vacío, la de por defecto
+function posicionEfectiva(jugadorId) {
+    const select = document.getElementById(`pos-${jugadorId}`);
+    if (!select) return null;
+    return select.value || select.dataset.posDefecto || null;
+}
+
+// El campo de paradas solo tiene sentido si el jugador jugó de portero en este partido
+function actualizarVisibilidadParadas(jugadorId) {
+    const input = document.getElementById(`parad-${jugadorId}`);
+    if (!input) return;
+    const esPortero = posicionEfectiva(jugadorId) === 'PORTERO';
+    input.style.visibility = esPortero ? 'visible' : 'hidden';
+    if (!esPortero) input.value = 0;
+}
+
 function confirmarResultado() {
     const golesLocal = parseInt(document.getElementById('goles-local').value);
     const golesVis   = parseInt(document.getElementById('goles-visitante').value);
@@ -335,14 +351,16 @@ function confirmarResultado() {
         const jId = parseInt(fila.id.replace('fila-jugador-', ''));
         const jugo = document.getElementById(`jugo-${jId}`)?.checked;
         if (!jugo) return;
+        const esPortero = posicionEfectiva(jId) === 'PORTERO';
         jugadoresConStats.push({
+            esPortero,
             jugadorId: jId,
             jugo: true,
             goles:             parseInt(document.getElementById(`goles-${jId}`)?.value ?? 0),
             asistencias:       parseInt(document.getElementById(`asist-${jId}`)?.value ?? 0),
             tarjetasAmarillas: parseInt(document.getElementById(`amari-${jId}`)?.value ?? 0),
             tarjetasRojas:     parseInt(document.getElementById(`rojas-${jId}`)?.value ?? 0),
-            paradas:           parseInt(document.getElementById(`parad-${jId}`)?.value ?? 0),
+            paradas:           esPortero ? (parseInt(document.getElementById(`parad-${jId}`)?.value) || 0) : 0,
             posicionPartido:   document.getElementById(`pos-${jId}`)?.value || null
         });
     });
@@ -364,14 +382,18 @@ function confirmarResultado() {
         <br><strong>Jugadores con stats:</strong> ${jugadoresConStats.length}
         <br>${jugadoresConStats.map(j => {
             const nombre = document.querySelector(`#fila-jugador-${j.jugadorId} label`)?.textContent ?? j.jugadorId;
-            return `${nombre}: ${j.goles}⚽ ${j.asistencias}👟 ${j.tarjetasAmarillas}🟨 ${j.tarjetasRojas}🟥${j.paradas > 0 ? ` ${j.paradas}🧤` : ''}`;
+            return `${nombre}: ${j.goles}⚽ ${j.asistencias}👟 ${j.tarjetasAmarillas}🟨 ${j.tarjetasRojas}🟥${j.esPortero ? ` ${j.paradas}🧤` : ''}`;
         }).join('<br>')}
     `;
     document.getElementById('modal-confirmar').classList.remove('hidden');
 }
 
+let guardandoResultado = false;
+
 async function ejecutarGuardarResultado() {
-    if (!resultadoPendiente) return;
+    // Evita enviar el resultado dos veces (se otorgarían los puntos por duplicado)
+    if (!resultadoPendiente || guardandoResultado) return;
+    guardandoResultado = true;
 
     mostrarCargando('Guardando resultado...');
     try {
@@ -393,7 +415,7 @@ async function ejecutarGuardarResultado() {
         alert('Error de conexión.');
     }
 
-    finally { ocultarCargando(); }
+    finally { guardandoResultado = false; ocultarCargando(); }
 }
 
 function cerrarModalResultado() {

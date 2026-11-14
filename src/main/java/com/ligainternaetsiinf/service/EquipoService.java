@@ -58,8 +58,15 @@ public class EquipoService {
             i++;
         }
 
-        return equipoRepository.save(new Equipo(equipo.getName(), jugadores)); /*al crear un equipo de 0, no tiene sentido rellenar los demas
+        Equipo nuevo = equipoRepository.save(new Equipo(equipo.getName(), jugadores)); /*al crear un equipo de 0, no tiene sentido rellenar los demas
         campos aparte del nombre y los jugadores, ya que todo va a ser 0, asi que no hace falta usar DTO ni cambiarlos aqui*/
+
+        // La relación la controla Jugador (mappedBy = "equipo"): hay que asignar el equipo a cada jugador
+        for (Jugador j : jugadores) {
+            j.setEquipo(nuevo);
+            jugadorRepository.save(j);
+        }
+        return nuevo;
 
     }
 

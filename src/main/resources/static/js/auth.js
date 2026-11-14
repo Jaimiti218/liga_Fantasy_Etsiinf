@@ -38,7 +38,15 @@ function entrarAlFantasy() {
     window.location.href = '/fantasy/mis-ligas';
 }
 
+// Evita lanzar la misma operación varias veces si el usuario pulsa repetidamente
+let operacionAuthEnCurso = false;
+
+function bloquearBotonesAuth(bloquear) {
+    document.querySelectorAll('.auth-card button, button.btn').forEach(b => { b.disabled = bloquear; });
+}
+
 async function hacerLogin() {
+    if (operacionAuthEnCurso) return;
     const email    = document.getElementById('email-login').value.trim();
     const password = document.getElementById('password-login').value;
 
@@ -47,7 +55,10 @@ async function hacerLogin() {
         return;
     }
 
+    operacionAuthEnCurso = true;
+    bloquearBotonesAuth(true);
     mostrarCargando('Iniciando sesión...');
+    let exito = false;
 
     try {
         const respuesta = await fetch('/users/login', {
@@ -68,17 +79,24 @@ async function hacerLogin() {
         const datos = await respuesta.json();
         localStorage.setItem('username', datos.username);
 
+        exito = true;
         entrarTrasLogin();
 
     } catch (e) {
         mostrarError('error-login', 'Error de conexión con el servidor.');
     }
     finally {
-        ocultarCargando();
+        // Si ha ido bien, se mantiene el spinner hasta que cambie la página
+        if (!exito) {
+            operacionAuthEnCurso = false;
+            bloquearBotonesAuth(false);
+            ocultarCargando();
+        }
     }
 }
 
 async function hacerRegistro() {
+    if (operacionAuthEnCurso) return;
     const username  = document.getElementById('username-registro').value.trim();
     const email     = document.getElementById('email-registro').value.trim();
     const password  = document.getElementById('password-registro').value;
@@ -99,7 +117,10 @@ async function hacerRegistro() {
         return;
     }
 
+    operacionAuthEnCurso = true;
+    bloquearBotonesAuth(true);
     mostrarCargando('Creando cuenta...');
+    let exito = false;
 
     try {
         const respuesta = await fetch('/users/register', {
@@ -115,7 +136,9 @@ async function hacerRegistro() {
             return;
         }
 
+        exito = true;
         mostrarExito('exito-registro', '¡Cuenta creada! Iniciando sesión...');
+        mostrarCargando('¡Cuenta creada! Iniciando sesión...');
 
         setTimeout(() => {
             entrarTrasLogin();
@@ -125,7 +148,12 @@ async function hacerRegistro() {
         mostrarError('error-registro', 'Error de conexión con el servidor.');
     }
     finally {
-        ocultarCargando();
+        // Si ha ido bien, botones bloqueados y spinner visible hasta la redirección
+        if (!exito) {
+            operacionAuthEnCurso = false;
+            bloquearBotonesAuth(false);
+            ocultarCargando();
+        }
     }
 }
 

@@ -670,7 +670,7 @@ async function renderizarPuntos() {
         // Mostrar aviso si no puntúa
         if (datos.puntua === false) {
             const aviso = document.createElement('div');
-            aviso.style.cssText = 'text-align:center;color:#f39c12;font-size:0.85rem;font-weight:600;margin-bottom:0.5rem;padding:0.5rem;background:rgba(243,156,18,0.15);border-radius:8px';
+            aviso.style.cssText = 'text-align:center;color:#b07d00;font-size:0.85rem;font-weight:600;margin-bottom:0.5rem;padding:0.5rem;background:#fff8e1;border-radius:8px';
             aviso.textContent = '⚠️ Esta jornada no puntúas (alineación incompleta o saldo negativo)';
             campo.appendChild(aviso);
         }
@@ -753,7 +753,7 @@ function mostrarToast(texto) {
     if (!toast) {
         toast = document.createElement('div');
         toast.id = 'toast';
-        toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#0f3460;color:white;padding:0.6rem 1.2rem;border-radius:20px;font-size:0.85rem;font-weight:600;z-index:200;transition:opacity 0.3s';
+        toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#2d6a2d;color:white;padding:0.6rem 1.2rem;border-radius:20px;font-size:0.85rem;font-weight:600;z-index:200;transition:opacity 0.3s';
         document.body.appendChild(toast);
     }
     toast.textContent   = texto;

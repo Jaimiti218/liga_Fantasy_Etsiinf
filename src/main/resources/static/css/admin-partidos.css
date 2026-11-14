@@ -19,7 +19,7 @@
 }
 
 .jornada-header {
-    background: #0f3460;
+    background: #2d6a2d;
     color: white;
     padding: 0.875rem 1.25rem;
     display: flex;
@@ -75,7 +75,7 @@
 }
 
 .partido-resultado-badge {
-    background: #0f3460;
+    background: #2d6a2d;
     color: white;
     padding: 0.2rem 0.6rem;
     border-radius: 20px;
@@ -111,9 +111,9 @@
 }
 
 .btn-editar-partido {
-    border-color: #0f3460;
-    color: #0f3460;
-    background: #f0f4ff;
+    border-color: #6c757d;
+    color: #495057;
+    background: #f4f5f6;
 }
 
 .btn-eliminar-partido {
@@ -136,9 +136,9 @@
 }
 
 .btn-add-partido:hover {
-    border-color: #0f3460;
-    color: #0f3460;
-    background: #f8f9ff;
+    border-color: #2d6a2d;
+    color: #2d6a2d;
+    background: #f3f9f3;
 }
 
 /* Modal resultado */
@@ -154,7 +154,7 @@
     justify-content: center;
     gap: 1.5rem;
     padding: 1.25rem;
-    background: #f8f9ff;
+    background: #f3f9f3;
     border-radius: 12px;
     margin-bottom: 1.25rem;
 }
@@ -164,7 +164,7 @@
 .resultado-equipo-nombre {
     font-size: 1rem;
     font-weight: 700;
-    color: #0f3460;
+    color: #2d6a2d;
     margin-bottom: 0.5rem;
 }
 
@@ -181,7 +181,7 @@
 .resultado-vs {
     font-size: 1.5rem;
     font-weight: 800;
-    color: #0f3460;
+    color: #2d6a2d;
 }
 
 .jugador-resultado-fila {
@@ -213,9 +213,9 @@
 .jugador-resultado-equipo-titulo {
     font-weight: 700;
     font-size: 0.85rem;
-    color: #0f3460;
+    color: #2d6a2d;
     padding: 0.5rem 0 0.25rem;
-    border-bottom: 2px solid #0f3460;
+    border-bottom: 2px solid #2d6a2d;
     margin-bottom: 0.25rem;
     display: grid;
     grid-template-columns: 24px 1fr 80px 50px 50px 50px 50px 50px;

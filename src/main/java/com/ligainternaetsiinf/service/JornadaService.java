@@ -1,12 +1,15 @@
 package com.ligainternaetsiinf.service;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +21,8 @@ import com.ligainternaetsiinf.repository.JornadaRepository;
 
 @Service
 public class JornadaService {
+
+    private static final ZoneId ZONA = ZoneId.of("Europe/Madrid");
 
     @Autowired private JornadaRepository jornadaRepository;
     @Autowired private EquipoFantasyService equipoFantasyService;
@@ -68,30 +73,71 @@ public class JornadaService {
         jornadaRepository.deleteById(id);
     }
 
+    // ─── Al arrancar el servidor ─────────────────────────────────────────────
+    // Las tareas del TaskScheduler viven en memoria y se pierden al reiniciar.
+    // Las jornadas sí están en BD, así que al arrancar:
+    //  1) Se vuelven a programar todas las jornadas cuya fecha de inicio es futura.
+    //  2) Si la última jornada ya comenzada no tiene NINGUNA alineación registrada
+    //     (el servidor estaba parado en su hora de inicio), se registran ahora.
+    @EventListener(ApplicationReadyEvent.class)
+    public void reprogramarAlArrancar() {
+        LocalDateTime ahora = LocalDateTime.now(ZONA);
+        Jornada ultimaComenzada = null;
+
+        for (Jornada jornada : jornadaRepository.findAllByOrderByNumeroAsc()) {
+            if (jornada.getFechaInicio() == null) continue;
+            if (jornada.getFechaInicio().isAfter(ahora)) {
+                programarRegistroAlineaciones(jornada);
+            } else if (ultimaComenzada == null
+                    || jornada.getFechaInicio().isAfter(ultimaComenzada.getFechaInicio())) {
+                ultimaComenzada = jornada;
+            }
+        }
+
+        if (ultimaComenzada != null) {
+            Integer numero = ultimaComenzada.getNumero();
+            try {
+                if (alineacionRepository.findByJornada(numero).isEmpty()) {
+                    System.out.println("Registrando alineaciones pendientes de la jornada " + numero);
+                    equipoFantasyService.registrarAlineacionesJornada(numero);
+                }
+            } catch (Exception e) {
+                System.err.println("Error registrando alineaciones de la jornada " + numero
+                    + ": " + e.getMessage());
+            }
+        }
+    }
+
     private void programarRegistroAlineaciones(Jornada jornada) {
         if (jornada.getFechaInicio() == null) return;
-        if (jornada.getFechaInicio().isBefore(java.time.LocalDateTime.now(ZoneId.of("Europe/Madrid")))) return;
 
-        // Cancelar tarea anterior si existe
+        // Cancelar tarea anterior si existe (p. ej. al editar la fecha)
         java.util.concurrent.ScheduledFuture<?> tareaAnterior = 
-            tareasProgramadas.get(jornada.getNumero());
+            tareasProgramadas.remove(jornada.getNumero());
         if (tareaAnterior != null) {
             tareaAnterior.cancel(false);
         }
 
-        Instant fechaEjecucion = jornada.getFechaInicio()
-            .atZone(ZoneId.of("Europe/Madrid")).toInstant();
+        if (jornada.getFechaInicio().isBefore(LocalDateTime.now(ZONA))) return;
+
+        Instant fechaEjecucion = jornada.getFechaInicio().atZone(ZONA).toInstant();
         Integer numero = jornada.getNumero();
 
         java.util.concurrent.ScheduledFuture<?> tarea = taskScheduler.schedule(() -> {
-            boolean yaRegistrado = !alineacionRepository.findByJornada(numero).isEmpty();
-            if (!yaRegistrado) {
-                equipoFantasyService.registrarAlineacionesJornada(numero);
+            try {
+                boolean yaRegistrado = !alineacionRepository.findByJornada(numero).isEmpty();
+                if (!yaRegistrado) {
+                    equipoFantasyService.registrarAlineacionesJornada(numero);
+                }
+            } catch (Exception e) {
+                System.err.println("Error registrando alineaciones de la jornada " + numero
+                    + ": " + e.getMessage());
+            } finally {
+                tareasProgramadas.remove(numero);
             }
-            tareasProgramadas.remove(numero);
         }, fechaEjecucion);
 
-        tareasProgramadas.put(jornada.getNumero(), tarea);
+        tareasProgramadas.put(numero, tarea);
     }
 
     

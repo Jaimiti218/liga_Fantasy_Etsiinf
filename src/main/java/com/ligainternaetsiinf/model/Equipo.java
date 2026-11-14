@@ -12,6 +12,9 @@ public class Equipo {
 
     private String name;
 
+    // WRITE_ONLY: se lee al crear un equipo (nombres de jugadores) pero no se escribe en las
+    // respuestas JSON, para evitar la recursión infinita Equipo -> Jugador -> Equipo
+    @com.fasterxml.jackson.annotation.JsonProperty(access = com.fasterxml.jackson.annotation.JsonProperty.Access.WRITE_ONLY)
     @OneToMany(mappedBy = "equipo")
     private List<Jugador> jugadores;
 

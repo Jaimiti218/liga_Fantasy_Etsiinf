@@ -31,4 +31,14 @@ public interface EquipoFantasyRepository extends JpaRepository<EquipoFantasy, In
 
     long countByLigaFantasyIdAndPuntosGreaterThan(Integer ligaId, int puntos);
 
+    // Consulta escalar (no carga entidades ni relaciones EAGER): id equipo, id liga,
+    // nombre liga, código liga, puntos y dinero de cada equipo del usuario.
+    @Query("""
+    SELECT ef.id, l.id, l.name, l.code, ef.puntos, ef.dinero
+    FROM EquipoFantasy ef JOIN ef.ligaFantasy l
+    WHERE ef.user.id = :userId
+    ORDER BY ef.id
+    """)
+    List<Object[]> findResumenLigasByUserId(@org.springframework.data.repository.query.Param("userId") Integer userId);
+
 }

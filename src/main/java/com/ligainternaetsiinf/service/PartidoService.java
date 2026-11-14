@@ -308,7 +308,7 @@ public class PartidoService {
         if (partido.getFecha().isBefore(java.time.LocalDateTime.now())) return;
 
         Instant fechaEjecucion = partido.getFecha()
-            .atZone(ZoneId.systemDefault())
+            .atZone(ZoneId.of("Europe/Madrid"))
             .toInstant();
 
         Integer jornada = partido.getJornada();

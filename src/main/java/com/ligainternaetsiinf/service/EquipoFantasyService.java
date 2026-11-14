@@ -17,6 +17,7 @@ import com.ligainternaetsiinf.dto.EquipoFantasyResponse;
 import com.ligainternaetsiinf.dto.JugadorFantasyDetalleResponse;
 import com.ligainternaetsiinf.dto.JugadorFantasyResponse;
 import com.ligainternaetsiinf.dto.MiEquipoResumenResponse;
+import com.ligainternaetsiinf.dto.MiLigaResumenResponse;
 import com.ligainternaetsiinf.dto.PuntosJornadaJugadorResponse;
 import com.ligainternaetsiinf.dto.PuntosJornadaResponse;
 import com.ligainternaetsiinf.model.AlineacionEquipoJornada;
@@ -388,7 +389,7 @@ public class EquipoFantasyService {
 
         // Aviso: saldo negativo o menos de 7 alineados
         boolean tieneAviso = equipo.getDinero() < 0 ||
-            equipo.getJugadores().stream().filter(JugadorFantasy::isAlineado).count() < 7;
+            jugadorFantasyRepository.countByEquipoFantasyIdAndAlineadoTrue(equipo.getId()) < 7;
 
         return new MiEquipoResumenResponse(
             equipo.getId(),
@@ -397,5 +398,29 @@ public class EquipoFantasyService {
             (int) posicion,
             tieneAviso
         );
+    }
+
+    // ─── Resumen de TODAS las ligas del usuario en una sola petición ─────────
+    // Solo usa consultas escalares (sin cargar plantillas, usuarios ni mercados),
+    // por eso es mucho más rápido que pedir el resumen liga a liga.
+    public List<MiLigaResumenResponse> obtenerResumenMisLigas(Integer userId) {
+        List<MiLigaResumenResponse> resultado = new ArrayList<>();
+        for (Object[] fila : equipoFantasyRepository.findResumenLigasByUserId(userId)) {
+            Integer equipoId = (Integer) fila[0];
+            Integer ligaId   = (Integer) fila[1];
+            String nombre    = (String) fila[2];
+            String codigo    = (String) fila[3];
+            int puntos       = ((Number) fila[4]).intValue();
+            long dinero      = ((Number) fila[5]).longValue();
+
+            long posicion = equipoFantasyRepository
+                .countByLigaFantasyIdAndPuntosGreaterThan(ligaId, puntos) + 1;
+            boolean tieneAviso = dinero < 0 ||
+                jugadorFantasyRepository.countByEquipoFantasyIdAndAlineadoTrue(equipoId) < 7;
+
+            resultado.add(new MiLigaResumenResponse(ligaId, nombre, codigo, equipoId,
+                puntos, dinero, (int) posicion, tieneAviso));
+        }
+        return resultado;
     }
 }

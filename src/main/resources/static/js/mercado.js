@@ -384,8 +384,8 @@ async function cargarCompras() {
                         ${p.posicion.charAt(0) + p.posicion.slice(1).toLowerCase()}
                     </div>
                     <div class="puja-detalle">Valor: ${formatearDinero(p.valorMercado)}</div>
-                    ${p.duenoNombre ? `<div class="puja-detalle" style="color:#0f3460;font-weight:600">🏷 Propietario: ${p.duenoNombre}</div>` : ''}
-                    <div class="puja-detalle" style="color:#f39c12;font-weight:600">⏳ Pendiente de aceptación</div>
+                    ${p.duenoNombre ? `<div class="puja-detalle" style="color:#2d6a2d;font-weight:600">🏷 Propietario: ${p.duenoNombre}</div>` : ''}
+                    <div class="puja-detalle" style="color:#b07d00;font-weight:600">⏳ Pendiente de aceptación</div>
                 </div>
                 <div style="display:flex;flex-direction:column;gap:0.4rem;align-items:flex-end">
                     <div class="puja-cantidad">${formatearDinero(p.cantidad)}</div>
@@ -479,7 +479,7 @@ async function cargarVentas() {
                 <div class="puja-card">
                     ${infoJugadorHtml}
                     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.4rem">
-                        <div class="puja-detalle" style="color:#f39c12;font-weight:600">⏳ Sin ofertas</div>
+                        <div class="puja-detalle" style="color:#b07d00;font-weight:600">⏳ Sin ofertas</div>
                         ${v.enVenta
                             ? `<button class="btn-quitar-mercado-ventas"
                                        onclick="quitarDelMercadoDesdeVentas(${v.jugadorFantasyId})">
@@ -603,7 +603,7 @@ function mostrarToast(texto) {
     if (!toast) {
         toast = document.createElement('div');
         toast.id = 'toast';
-        toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#0f3460;color:white;padding:0.6rem 1.2rem;border-radius:20px;font-size:0.85rem;font-weight:600;z-index:200;transition:opacity 0.3s';
+        toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#2d6a2d;color:white;padding:0.6rem 1.2rem;border-radius:20px;font-size:0.85rem;font-weight:600;z-index:200;transition:opacity 0.3s';
         document.body.appendChild(toast);
     }
     toast.textContent   = texto;
@@ -817,7 +817,7 @@ function filtrarBusqueda() {
 function renderizarBusqueda(lista) {
     const contenedor = document.getElementById('lista-busqueda');
     if (lista.length === 0) {
-        contenedor.innerHTML = '<div style="text-align:center;color:#999;padding:2rem">No se encontraron jugadores</div>';
+        contenedor.innerHTML = '<div style="text-align:center;color:#7a9a7a;padding:2rem">No se encontraron jugadores</div>';
         return;
     }
     contenedor.innerHTML = lista.map(j => `
@@ -833,7 +833,7 @@ function renderizarBusqueda(lista) {
                 </div>
                 ${j.nombreEquipoFantasyDueno
                     ? `<div class="jugador-busqueda-dueno">👤 ${j.nombreEquipoFantasyDueno}</div>`
-                    : '<div class="jugador-busqueda-dueno" style="color:#aaa">Sin dueño</div>'}
+                    : '<div class="jugador-busqueda-dueno" style="color:#7a9a7a">Sin dueño</div>'}
             </div>
             <div class="jugador-busqueda-derecha">
                 <div class="jugador-valor-mercado">${formatearDineroCompleto(j.valorMercado)}</div>

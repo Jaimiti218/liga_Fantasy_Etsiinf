@@ -43,7 +43,7 @@ async function cargarDatos() {
                 <div class="sin-datos-precio">
                     <div style="font-size:2rem;margin-bottom:0.5rem">📊</div>
                     Sin datos para este periodo todavía.<br>
-                    <small>Los precios se actualizan cada día a las 23:30h.</small>
+                    <small>Los precios se actualizan cada día a las 23:59h.</small>
                 </div>`;
             return;
         }
